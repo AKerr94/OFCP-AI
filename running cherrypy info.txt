@@ -1,0 +1,7 @@
+in unix 
+
+screen
+python server.py     (start cherrypy server)
+ctrl+a then d to detach
+
+screen -r resumes session 

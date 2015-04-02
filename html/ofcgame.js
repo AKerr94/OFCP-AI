@@ -112,6 +112,8 @@ function play() {
         }
     }
 
+    
+    
     playButtonCounter++;
 
     // special case - first round
@@ -233,69 +235,79 @@ function resetGame() {
 
 function handleRoundEnd() {
 
-    // work out scores for each row
+    var temp1 = "", temp2 = "";
+    var tarray1 = [], tarray2 = [];
 
-    // calculate hand rank for player 1's bottom row 
-    var p1bottomrow = [];
-    for (i = 0; i < 5; i++) {
-        var tcard = document.getElementById(player_positions[i]).childNodes[0]; // extract card from each div
-        p1bottomrow.push(tcard);
+    for (i = 0; i < 13; i++) {
+        temp1 = document.getElementById(player_positions[i]).childNodes[0].name; // get player's card at pos i
+        temp2 = document.getElementById(AI_pos_c[i]).childNodes[0].name; // get AI's card at pos i
+        tarray1.push(temp1); // player's cards array
+        tarray2.push(temp2); // AI's cards array
     }
-    var p1bottomrank = getHandRank(p1bottomrow);
-
-    // calculate hand rank for player 1's middle row 
-    var p1middlerow = [];
-    for (i = 5; i < 10; i++) {
-        var tcard = document.getElementById(player_positions[i]).childNodes[0]; // extract card from each div
-        p1middlerow.push(tcard);
-    }
-    var p1middlerank = getHandRank(p1middlerow);
-
-    // calculate hand rank for player 1's top row 
-    var p1toprow = [];
-    for (i = 10; i < 13; i++) {
-        var tcard = document.getElementById(player_positions[i]).childNodes[0]; // extract card from each div
-        p1toprow.push(tcard);
-    }
-    var p1toprank = getHandRank(p1toprow);
-
-    /*
-       var scoringAlertString = "ranks: 0 high card, 1 pair, 2 two pair, 3 trips, 4 straight, 5 flush, 6 full house, 7 four of a kind, 8 straight flush, 9 royal flush";
-       scoringAlertString += "\n\n" + "Bottom Rank: " + p1bottomrank + ", Middle Rank: " + p1middlerank + ", Top Rank: " + p1toprank;
-       alert(scoringAlertString);
-       */
-
-    // AI scores
-
-    // calculate hand rank for player 2's bottom row 
-    var p2bottomrow = [];
-    for (i = 0; i < 5; i++) {
-        var tcard = document.getElementById(AI_pos_c[i]).childNodes[0]; // extract card from each div
-        p2bottomrow.push(tcard);
-    }
-    var p2bottomrank = getHandRank(p2bottomrow);
-
-    // calculate hand rank for player 2's middle row 
-    var p2middlerow = [];
-    for (i = 5; i < 10; i++) {
-        var tcard = document.getElementById(AI_pos_c[i]).childNodes[0]; // extract card from each div
-        p2middlerow.push(tcard);
-    }
-    var p2middlerank = getHandRank(p2middlerow);
-
-    // calculate hand rank for player 2's top row 
-    var p2toprow = [];
-    for (i = 10; i < 13; i++) {
-        var tcard = document.getElementById(AI_pos_c[i]).childNodes[0]; // extract card from each div
-        p2toprow.push(tcard);
-    }
-    var p2toprank = getHandRank(p2toprow);
-
-    /*
-	scoringAlertString = "[AI] Bottom Rank: " + p2bottomrank + ", Middle Rank: " + p2middlerank + ", Top Rank: " + p2toprank;	
-	alert(scoringAlertString);
-	*/
-
+    alert(tarray1);
+    alert(tarray2);
+    
+    reqwest({
+    //url: 'http://alastairkerr.co.uk/ofc/subpage/server-hands/'
+    url: 'http://alastairkerr.co.uk/ofc/subpage/eval-one-hand-test/'
+  , method: 'post'
+  , data: {'game-state':JSON.stringify(
+                                {
+                                    "name1": "Player1",
+                                    "properties1": {
+                                        "cards": {
+                                            "type": "array",
+                                            "items": {
+                                                "position1": 'AH',
+                                                "position2": "AD",
+                                                "position3": "AS",
+                                                "position4": 'AC',
+                                                "position5": "KH",
+                                                "position7": "KD",
+                                                "position8": "KS",
+                                                "position9": "KC",
+                                                "position10": "QH",
+                                                "position11": "QD",
+                                                "position12": "QS",
+                                                "position13": "QC",
+                                                "position14": "JH",
+                                                "position15": "JD"
+                                            }
+                                        }
+                                    },
+                                    "name2": "Player2",
+                                    "properties2": {
+                                        "cards": {
+                                            "type": "array",
+                                            "items": {
+                                                "position1": "TH",
+                                                "position2": "TD",
+                                                "position3": "TS",
+                                                "position4": "TC",
+                                                "position5": "9H",
+                                                "position7": "9D",
+                                                "position8": "9S",
+                                                "position9": "9C",
+                                                "position10": "8H",
+                                                "position11": "8D",
+                                                "position12": "8S",
+                                                "position13": "8C",
+                                                "position14": "7H",
+                                                "position15": "7D"
+                                            }
+                                        }
+                                    }
+                                }
+                )
+          }
+          , success: function (resp) {
+              console.log(resp)
+            }
+        })
+    
+	alert("alert after reqwest");
+	
+    /*    
     // temporary simplified points system 
     // bottom
     if (p1toprank > p2toprank) {
@@ -323,7 +335,7 @@ function handleRoundEnd() {
         rowScoresArr[2] = -p2bottomrank;
         rowScoresArr[5] = p2bottomrank;
     }
-
+        */
 
     p1score += rowScoresArr[0] + rowScoresArr[1] + rowScoresArr[2]; // player's top middle bottom
     p2score += rowScoresArr[3] + rowScoresArr[4] + rowScoresArr[5]; // AI's top middle bottom
@@ -462,6 +474,69 @@ function AI_main() {
         AI_cards.splice((3 + AI_placement_counter), 0, cardimg); // append card to appropriate position in array
     }
 }
+
+/*
+var teststring = "AH";
+var test2 = "AC";
+reqwest({
+    //url: 'http://alastairkerr.co.uk/ofc/subpage/server-hands/'
+    url: 'http://alastairkerr.co.uk/ofc/subpage/eval-one-hand-test/'
+  , method: 'post'
+  , data: {'game-state':JSON.stringify(
+                                {
+                                    "name1": "Player1",
+                                    "properties1": {
+                                        "cards": {
+                                            "type": "array",
+                                            "items": {
+                                                "position1": teststring,
+                                                "position2": "AD",
+                                                "position3": "AS",
+                                                "position4": test2,
+                                                "position5": "KH",
+                                                "position7": "KD",
+                                                "position8": "KS",
+                                                "position9": "KC",
+                                                "position10": "QH",
+                                                "position11": "QD",
+                                                "position12": "QS",
+                                                "position13": "QC",
+                                                "position14": "JH",
+                                                "position15": "JD"
+                                            }
+                                        }
+                                    },
+                                    "name2": "Player2",
+                                    "properties2": {
+                                        "cards": {
+                                            "type": "array",
+                                            "items": {
+                                                "position1": "TH",
+                                                "position2": "TD",
+                                                "position3": "TS",
+                                                "position4": "TC",
+                                                "position5": "9H",
+                                                "position7": "9D",
+                                                "position8": "9S",
+                                                "position9": "9C",
+                                                "position10": "8H",
+                                                "position11": "8D",
+                                                "position12": "8S",
+                                                "position13": "8C",
+                                                "position14": "7H",
+                                                "position15": "7D"
+                                            }
+                                        }
+                                    }
+                                }
+                )
+          }
+  , success: function (resp) {
+      console.log(resp)
+    }
+})
+*/
+
 
 // © 2015 Alastair Kerr. All rights reserved.
 // formatted with http://jsbeautifier.org/
