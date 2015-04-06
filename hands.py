@@ -1,4 +1,5 @@
-# Hand evaluator by kmanley. Source: https://github.com/kmanley/hands
+# -*- coding: utf-8 -*-
+# 5 card hand evaluator by kmanley. Original source: https://github.com/kmanley/hands
 
 RANKS = "23456789TJQKA"
 RANK_TO_VALUE = {rank : i+2 for i, rank in enumerate(RANKS)}

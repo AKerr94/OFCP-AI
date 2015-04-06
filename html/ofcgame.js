@@ -2,7 +2,8 @@
 var suits = ["h", "d", "s", "c"];
 var playButtonCounter = 0,
     cardsPlacedCount = 0,
-    deckIndex = 0;
+    deckIndex = 0,
+    round_number = 1;
 var playLock = false,
     playerFirst = false;
 var deck = [];
@@ -70,13 +71,14 @@ function drop(ev) {
                 AI_main();
             }
             gamestage = "end";
+            play(); // automatically move on when last card is dropped 
         }
     }
 }
 
 function setupGame() {
     createDeck(); // initialise deck
-    playerLabels(); // set player name fields
+    playerLabels(0); // set player name fields
 }
 
 // play function called from pressing button
@@ -88,6 +90,7 @@ function play() {
 
         //work out scores for each row and display these
         handleRoundEnd();
+        round_number += 1; 
 
         // modify play button into play again
         var button = document.getElementById("playButton");
@@ -146,15 +149,12 @@ function play() {
         if (playButtonCounter == 2) { // lock current cards in place
             for (i = 1; i < playButtonCounter + 4; i++) {
                 var temp = document.getElementById('place' + i + 'card');
-                temp.draggable = "false";
-                temp.ondragstart = "return false;";
-                temp.ondrop = "return false;";
+                temp.ondragstart = function() {return false;};
+                
             }
         } else { // lock card from last round
             var temp = document.getElementById('place' + (playButtonCounter + 3) + 'card');
-            temp.draggable = "false";
-            temp.ondragstart = "return false;";
-            temp.ondrop = "return false;";
+            temp.ondragstart = function() {return false;};
         }
 
         // generate next card
@@ -181,8 +181,13 @@ function resetGame() {
     }
 
     // reset global vars
-    playButtonCounter = 0, cardsPlacedCount = 0, deckIndex = 0, AI_placement_counter = 0;
-    AI_cards = [], player_cards = [], deck = [];
+    playButtonCounter = 0;
+    cardsPlacedCount = 0; 
+    deckIndex = 0; 
+    AI_placement_counter = 0;
+    AI_cards = []; 
+    player_cards = []; 
+    deck = [];
     gamestage = "init";
     rowScoresArr = [0, 0, 0, 0, 0, 0];
     setupGame();
@@ -228,8 +233,8 @@ function resetGame() {
     } else {
         playerFirst = true;
     }
-
-    play(); // automatically start next round
+    
+    play(); // automatically play next hand-test
     //window.location.reload();
 }
 
@@ -244,34 +249,31 @@ function handleRoundEnd() {
         tarray1.push(temp1); // player's cards array
         tarray2.push(temp2); // AI's cards array
     }
-    alert(tarray1);
-    alert(tarray2);
+    //alert(tarray1);
+    //alert(tarray2);
     
-    reqwest({
-    //url: 'http://alastairkerr.co.uk/ofc/subpage/server-hands/'
-    url: 'http://alastairkerr.co.uk/ofc/subpage/eval-one-hand-test/'
-  , method: 'post'
-  , data: {'game-state':JSON.stringify(
+    reqwest({'url': 'http://alastairkerr.co.uk/ofc/subpage/calculate-scores/'
+        , 'method': 'post'
+        , 'data': {'game-state':JSON.stringify(
                                 {
                                     "name1": "Player1",
                                     "properties1": {
                                         "cards": {
                                             "type": "array",
                                             "items": {
-                                                "position1": 'AH',
-                                                "position2": "AD",
-                                                "position3": "AS",
-                                                "position4": 'AC',
-                                                "position5": "KH",
-                                                "position7": "KD",
-                                                "position8": "KS",
-                                                "position9": "KC",
-                                                "position10": "QH",
-                                                "position11": "QD",
-                                                "position12": "QS",
-                                                "position13": "QC",
-                                                "position14": "JH",
-                                                "position15": "JD"
+                                                "position1": tarray1[0],
+                                                "position2": tarray1[1],
+                                                "position3": tarray1[2],
+                                                "position4": tarray1[3],
+                                                "position5": tarray1[4],
+                                                "position6": tarray1[5],
+                                                "position7": tarray1[6],
+                                                "position8": tarray1[7],
+                                                "position9": tarray1[8],
+                                                "position10": tarray1[9],
+                                                "position11": tarray1[10],
+                                                "position12": tarray1[11],
+                                                "position13": tarray1[12],
                                             }
                                         }
                                     },
@@ -280,72 +282,86 @@ function handleRoundEnd() {
                                         "cards": {
                                             "type": "array",
                                             "items": {
-                                                "position1": "TH",
-                                                "position2": "TD",
-                                                "position3": "TS",
-                                                "position4": "TC",
-                                                "position5": "9H",
-                                                "position7": "9D",
-                                                "position8": "9S",
-                                                "position9": "9C",
-                                                "position10": "8H",
-                                                "position11": "8D",
-                                                "position12": "8S",
-                                                "position13": "8C",
-                                                "position14": "7H",
-                                                "position15": "7D"
+                                                "position1": tarray2[0],
+                                                "position2": tarray2[1],
+                                                "position3": tarray2[2],
+                                                "position4": tarray2[3],
+                                                "position5": tarray2[4],
+                                                "position6": tarray2[5],
+                                                "position7": tarray2[6],
+                                                "position8": tarray2[7],
+                                                "position9": tarray2[8],
+                                                "position10": tarray2[9],
+                                                "position11": tarray2[10],
+                                                "position12": tarray2[11],
+                                                "position13": tarray2[12],
                                             }
                                         }
                                     }
                                 }
                 )
           }
-          , success: function (resp) {
-              console.log(resp)
-            }
-        })
+    })
+  .then(function (resp) {
+    scores_obj = JSON.parse(resp);
+    //  finalise scoring - update frontend to reflect scores 
     
-	alert("alert after reqwest");
-	
-    /*    
-    // temporary simplified points system 
-    // bottom
-    if (p1toprank > p2toprank) {
-        rowScoresArr[0] = p1toprank;
-        rowScoresArr[3] = -p1toprank;
-    } else {
-        rowScoresArr[0] = -p2toprank;
-        rowScoresArr[3] = p2toprank;
+    p1_wins = 0;     // keep track of how many rows are won by the player (if all 3, they scoop for +3 points)
+    
+    if (scores_obj[0][0] == 1) {                            // Player 1 wins bottom row
+        net = (scores_obj[0][1] - scores_obj[0][2]) + 1;    // Total = p1's royalty - p2's royalty, +1 for winning row
+        rowScoresArr[0] = net;                              // p1's bottom score
+        rowScoresArr[3] = -net;                             // p2's bottom score
+        p1_wins += 1;
+    } else if (scores_obj[0][0] == 2) {                     // Player 2 wins bottom row
+        net = (scores_obj[0][2] - scores_obj[0][1]) + 1;    // Total = p1's royalty - p2's royalty
+        rowScoresArr[0] = -net;                             // p1's bottom score
+        rowScoresArr[3] = net;                              // p2's bottom score
     }
 
-    // middle
-    if (p1middlerank > p2middlerank) {
-        rowScoresArr[1] = p1middlerank;
-        rowScoresArr[4] = -p1middlerank;
-    } else {
-        rowScoresArr[1] = -p2middlerank;
-        rowScoresArr[4] = p2middlerank;
+    if (scores_obj[1][0] == 1) {                            // Player 1 wins middle row
+        net = (scores_obj[1][1] - scores_obj[1][2]) + 1;    // Total = p1's royalty - p2's royalty
+        rowScoresArr[1] = net;                              // p1's middle score
+        rowScoresArr[4] = -net;                             // p2's middle score
+        p1_wins += 1;
+    } else if (scores_obj[1][0] == 2) {                     // Player 2 wins middle row
+        net = (scores_obj[1][2] - scores_obj[1][1]) + 1;    // Total = p1's royalty - p2's royalty
+        rowScoresArr[1] = -net;                             // p1's middle score
+        rowScoresArr[4] = net;                              // p2's middle score
     }
 
-    // top
-    if (p1bottomrank > p2bottomrank) {
-        rowScoresArr[2] = p1bottomrank;
-        rowScoresArr[5] = -p1bottomrank;
-    } else {
-        rowScoresArr[2] = -p2bottomrank;
-        rowScoresArr[5] = p2bottomrank;
+    if (scores_obj[2][0] == 1) {                            // Player 1 wins top row
+        net = (scores_obj[2][1] - scores_obj[2][2]) + 1;    // Total = p1's royalty - p2's royalty
+        rowScoresArr[2] = net;                              // p1's top score
+        rowScoresArr[5] = -net;                             // p2's top score
+        p1_wins += 1;
+    } else if (scores_obj[2][0] == 2) {                     // Player 2 wins top row
+        net = (scores_obj[2][2] - scores_obj[2][1])  + 1;   // Total = p1's royalty - p2's royalty
+        rowScoresArr[2] = -net;                             // p1's top score
+        rowScoresArr[5] = net;                              // p2's top score
     }
-        */
 
     p1score += rowScoresArr[0] + rowScoresArr[1] + rowScoresArr[2]; // player's top middle bottom
     p2score += rowScoresArr[3] + rowScoresArr[4] + rowScoresArr[5]; // AI's top middle bottom
 
+    scoop = 0;
+    if (p1_wins == 3) {         // player 1 scoops for + 3 extra points
+        p1score += 3;
+        p2score -= 3;
+        scoop = 1;
+    }
+    else if (p1_wins == 0) {    // player 2 scoops for + 3 extra points
+        p1score -= 3;
+        p2score += 3;
+        scoop = 2;
+    }
+    
     // modify score fields to reflect row scores
     var temp, colourString, textString, count = 0;
     // iterate through every row and update score containers
     // Display positive scores in green and negative in red
     for (pID = 1; pID <= 2; pID++) {
-        for (rowID = 1; rowID <= 3; rowID++) {
+        for (rowID = 3; rowID >= 1; rowID--) {              
             textString = "p" + pID + "_text" + rowID;
             colourString = chooseScoreColour(rowScoresArr[count]);
             temp = document.getElementById(textString);
@@ -356,12 +372,17 @@ function handleRoundEnd() {
     }
 
     // change player labels to reflect their total scores
-    playerLabels();
+    playerLabels(scoop);
+  })
+  .fail(function (err, msg) {
+    alert("Error! Reqwest unsuccessful?... check server connection and try again.");
+  });    
+    
 }
 
 function chooseScoreColour(num) {
     if (num >= 0) {
-        return "#00c303"; //green for positive
+        return "#00C303"; //green for positive
     } else {
         return "#FF0000"; //red for negative
     }
@@ -399,10 +420,24 @@ function createDeck() {
     deck = shuffle(deck);
 }
 
-function playerLabels() {
+function playerLabels(scoop_id) {
+    /* update player labels. Sccop id = 0 (no scoop)
+       scoop id = 1 (player 1 scoops)
+       scoop id = 2 (player 2 scoops) */
+    
+    p1_label_tail = ""
+    p2_label_tail = ""
+    
+    if (scoop_id == 1) {
+        p1_label_tail += " + Scoop (3)!"
+    }
+    else if (scoop_id == 2) {
+        p2_label_tail += " + Scoop (3)!"
+    }
+    
     var temp1, temp2;
-    temp1 = player1 + " (" + p1score + ")";
-    temp2 = player2 + " (" + p2score + ")";
+    temp1 = player1 + " (" + p1score + ")" + p1_label_tail;
+    temp2 = player2 + " (" + p2score + ")" + p2_label_tail;
 
     var temp3 = document.getElementById("p1label");
     temp3.innerHTML = temp1;
@@ -455,6 +490,7 @@ function AI_main() {
             cardimg.name = card.name;
             cardimg.width = 109;
             cardimg.height = 150;
+            cardimg.ondragstart = function() {return false;};
 
             document.getElementById(AI_positions[i]).appendChild(cardimg); // place img in div
             AI_cards.splice(i, 0, cardimg); // append card to appropriate position in array
@@ -467,75 +503,14 @@ function AI_main() {
         var cardimg = document.createElement("img");
         cardimg.src = card.src;
         cardimg.name = card.name;
-        cardimg.style.width = '109px';
-        cardimg.style.height = '150px';
+        cardimg.width = 109;
+        cardimg.height = 150;
+        cardimg.ondragstart = function() {return false;};
 
         document.getElementById(AI_positions[3 + AI_placement_counter]).appendChild(cardimg); // place img in div
         AI_cards.splice((3 + AI_placement_counter), 0, cardimg); // append card to appropriate position in array
     }
 }
-
-/*
-var teststring = "AH";
-var test2 = "AC";
-reqwest({
-    //url: 'http://alastairkerr.co.uk/ofc/subpage/server-hands/'
-    url: 'http://alastairkerr.co.uk/ofc/subpage/eval-one-hand-test/'
-  , method: 'post'
-  , data: {'game-state':JSON.stringify(
-                                {
-                                    "name1": "Player1",
-                                    "properties1": {
-                                        "cards": {
-                                            "type": "array",
-                                            "items": {
-                                                "position1": teststring,
-                                                "position2": "AD",
-                                                "position3": "AS",
-                                                "position4": test2,
-                                                "position5": "KH",
-                                                "position7": "KD",
-                                                "position8": "KS",
-                                                "position9": "KC",
-                                                "position10": "QH",
-                                                "position11": "QD",
-                                                "position12": "QS",
-                                                "position13": "QC",
-                                                "position14": "JH",
-                                                "position15": "JD"
-                                            }
-                                        }
-                                    },
-                                    "name2": "Player2",
-                                    "properties2": {
-                                        "cards": {
-                                            "type": "array",
-                                            "items": {
-                                                "position1": "TH",
-                                                "position2": "TD",
-                                                "position3": "TS",
-                                                "position4": "TC",
-                                                "position5": "9H",
-                                                "position7": "9D",
-                                                "position8": "9S",
-                                                "position9": "9C",
-                                                "position10": "8H",
-                                                "position11": "8D",
-                                                "position12": "8S",
-                                                "position13": "8C",
-                                                "position14": "7H",
-                                                "position15": "7D"
-                                            }
-                                        }
-                                    }
-                                }
-                )
-          }
-  , success: function (resp) {
-      console.log(resp)
-    }
-})
-*/
 
 
 // © 2015 Alastair Kerr. All rights reserved.

@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import json
 import hands 
+import helpers
 from datetime import datetime
 
 from config import application_config, cherrypy_config
@@ -16,16 +19,26 @@ class subpage(object):
                 game_state = json.loads(params['game-state']) # loads as dictionary 
         except: 
                 ef = open('error_log.txt','a')
-                ef.write(str(datetime.now()) + ': Invalid JSON error.')
+                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
                 return None
         f = open('test_output.txt', 'w')
        
         hand_string = ''
         for i in range (1,6):
                 hand_string += game_state['properties1']['cards']['items']['position'+str(i)] # take card info for p1 bottom row 
-        f.write('Hand String: ' + hand_string + '\n' +  hands.classify_5(hand_string))
+        f.write('Hand String: ' + hand_string + '\n = ' +  hands.classify_5(hand_string) +
+                '\n Score: ' + str(hands.score_5(hand_string)) )
         
         f.close()
+        
+        '''
+        test_items = ( 'c05c06c07c08c09','s05c05h09s08d13','h13c01s03d05c07','invalid',100,'fakestring',('i','am','invalid'),'123456789112345' )
+        for item in test_items:
+            format_resp = helpers.reformat_hand_xyy_yx(item,5)
+            if format_resp != None:
+                print 'Formatted ' + str(item) + ' -> ' + str(format_resp) + '\n'
+        '''
+        
         return '{}'.format(game_state)
         
     def server_hands(self, **params):
@@ -34,7 +47,7 @@ class subpage(object):
                 game_state = json.loads(params['game-state']) # loads as dictionary 
         except: 
                 ef = open('error_log.txt','a')
-                ef.write(str(datetime.now()) + ': Invalid JSON error.')
+                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
                 return None
         
         # handle game state stuff here - send to function for hand eval's, AI simulation etc.... 
@@ -42,6 +55,8 @@ class subpage(object):
         
         
         return '{}'.format(game_state)
+        
+        # dead code (for now)
         output = []
         for card in game_state['cards']:
                 output.append(card['value'])
@@ -50,12 +65,29 @@ class subpage(object):
                 
         return ''.join(output)
         
+    def calculate_scores(self, **params):
+        ''' takes game_state as input. Converts hands, classifies them and returns the scores for each row '''
+        try:
+                game_state = json.loads(params['game-state']) # loads as dictionary 
+        except: 
+                ef = open('error_log.txt','a')
+                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
+                return None
+                
+                
+        scores_array = helpers.scoring_helper(game_state)
+        # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty], 
+        #    [winnerid, winners_middle_royalty, losers_middle_royalty] , 
+        #    [winnerid, winners_top_royalty, losers_top_royalty] ]
         
+        print '\nBack to server.py!!!! \n--->\n', scores_array        
         
+        return json.dumps(scores_array)
         
     index.exposed = True
     server_hands.exposed = True
     eval_one_hand_test.exposed = True
+    calculate_scores.exposed = True
 
 class Root(object):
     #make a subpage
