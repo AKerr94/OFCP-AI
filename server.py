@@ -76,11 +76,12 @@ class subpage(object):
                 
                 
         scores_array = helpers.scoring_helper(game_state)
+        
         # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty], 
         #    [winnerid, winners_middle_royalty, losers_middle_royalty] , 
         #    [winnerid, winners_top_royalty, losers_top_royalty] ]
         
-        print '\nBack to server.py!!!! \n--->\n', scores_array        
+        print '\n   Back to server.py!\nScores -->', scores_array, '\n'     
         
         return json.dumps(scores_array)
         

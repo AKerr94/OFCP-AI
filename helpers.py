@@ -79,7 +79,7 @@ def reformat_hand_xyy_yx(hand, numCards):
     
         
 def scoring_helper(game_state):
-    ''' Reads game state and works out winner for each row, and also calculates appropriate royalties '''
+    ''' Reads game state and works out winner for each row, validates hands and calculates appropriate royalties '''
     
     def decode_state_hand(min,max,hands_list,numCards):
         ''' used to read cards for rows and call formatter. Returns updated hands_list '''
@@ -100,6 +100,10 @@ def scoring_helper(game_state):
             
             returns appropriate royalty based on row, hand rank and value 
         '''
+        
+        # check if the hand is fouled (indicated by a score of -1). If so return immediately 
+        if (hand_tuple == -1):
+            return 0
         
         # rankings: 1 High Card, 2 Pair, 3 Two Pair, 4 Three of a kind, 5 Straight, 6 Flush, 7 Full House, 8 4 of a Kind, 9 Straight Flush 
         
@@ -140,7 +144,13 @@ def scoring_helper(game_state):
         else:
             print "Invalid parameters. Row id req 'top' 'middle' or 'bottom"
             return None 
-            
+    
+    def validate_hands(players_row_scores):
+        ''' validate hands. If a player has fouled set scores to -1 '''
+        if not ( (players_row_scores[0] > players_row_scores[1]) and (players_row_scores[1] > players_row_scores[2]) ):
+            print "\nA player fouled! Hand:", players_row_scores
+            return 0
+        return players_row_scores
          
     # work out scores for 5 card hands (Bottom and middle rows)     
             
@@ -149,8 +159,8 @@ def scoring_helper(game_state):
     hands_list = decode_state_hand(6,11,hands_list,5)   # middle
     hands_list = decode_state_hand(11,14,hands_list,3)  # top
     
-    scores = []                     # format: p1 bot, p2 bot, p1 mid, p2 mid, p1 top, p2 top
-    classifications = []            # format: p1 bot, p2 bot, p1 mid, p2 mid, p1 top, p2 top
+    scores = []                     # format: p1 bot, p2 bot, p1 mid, p2 mid, p1 top, p2 top. Type: score tuples
+    classifications = []            # format: p1 bot, p2 bot, p1 mid, p2 mid, p1 top, p2 top. Type: Strings
     
     count = 0
     for poker_hand in hands_list:   # calculate scores and classifications for each hand
@@ -161,13 +171,24 @@ def scoring_helper(game_state):
         else:                       # evaluate 3 card hands
             result = simple_3card_evaluator(poker_hand[0])
             scores.append(result)
-            
-            temp = classify_3(result)
-            
-            classifications.append(temp)
+            classifications.append(classify_3(result))
                 
         count += 1  
+        
+    # validate each hand. If a player fouls set their scores to -1    
+    p1invalid = False
+    p2invalid = False
+    for i in range(0,2):        # validate player 1 then validate player 2
+        handisvalid = validate_hands([scores[0+i],scores[2+i],scores[4+i]])
+        if(handisvalid == 0):
+            if (i == 0):
+                scores = [(-1),scores[1],(-1),scores[3],(-1),scores[5]]
+                p1invalid = True
+            else:
+                scores = [scores[0],(-1),scores[2],(-1),scores[4],(-1)]
+                p2invalid = True
     
+    print "\nSCORES: ", scores
     
     scores_final = []               # keep track of who wins which row and what royalties to give them 
                                     # List Structure [ [winner id(1 or 2), royalty] ]
@@ -179,30 +200,38 @@ def scoring_helper(game_state):
     
     if scores[0] > scores[1]:       # player 1 wins bottom
         winnerid = 1
-    else:                           # player 2 wins bottom
+    elif scores[0] < scores[1]:     # player 2 wins bottom
         winnerid = 2
+    else:
+        winnerid = 0
     
     p1_royalty = calculate_royalties( scores[0], 'bottom' )
     p2_royalty = calculate_royalties( scores[1], 'bottom' )
-    scores_final.append([winnerid,p1_royalty, p2_royalty])
+    scores_final.append([winnerid, p1_royalty, p2_royalty])
     
     if scores[2] > scores[3]:       # player 1 wins middle
         winnerid = 1
-    else:                           # player 2 wins middle
+    elif scores[2] < scores[3]:     # player 2 wins middle
         winnerid = 2
+    else:
+        winnerid = 0
     
     p1_royalty = calculate_royalties( scores[2], 'middle' )
     p2_royalty = calculate_royalties( scores[3], 'middle' )
-    scores_final.append([winnerid,p1_royalty, p2_royalty])
+    scores_final.append([winnerid, p1_royalty, p2_royalty])
     
     if scores[4] > scores[5]:       # player 1 wins top
         winnerid = 1
-    else:                           # player 2 wins top
+    elif scores[4] < scores[5]:     # player 2 wins top
         winnerid = 2
+    else:
+        winnerid = 0
     
     p1_royalty = calculate_royalties( scores[4], 'top' )
     p2_royalty = calculate_royalties( scores[5], 'top' )
-    scores_final.append([winnerid,p1_royalty,p2_royalty])
+    scores_final.append([winnerid, p1_royalty, p2_royalty])
+    
+    scores_final.append([p1invalid,p2invalid]) 
         
     print scores_final, '\n', hands_list, '\n', classifications
     
