@@ -76,7 +76,7 @@
 \begin_layout Title
 \paragraph_spacing onehalf
 \begin_inset Graphics
-	filename ../../../LyX - latex word processor/notts logo.png
+	filename notts logo.png
 	lyxscale 25
 	scale 25
 
@@ -640,7 +640,11 @@ The game tree in MCTS grows asymmetrically, concentrating on searching more
 
 \begin_layout Standard
 \align center
-- http://www.cameronius.com/research/mcts/about/index.html 
+-
+\color blue
+ http://www.cameronius.com/research/mcts/about/index.html
+\color inherit
+ 
 \begin_inset Quotes erd
 \end_inset
 
