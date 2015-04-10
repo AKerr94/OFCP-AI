@@ -4,6 +4,7 @@ import cherrypy
 import json
 import hands 
 import helpers
+import OFCP_AI
 from datetime import datetime
 
 from config import application_config, cherrypy_config
@@ -50,9 +51,7 @@ class subpage(object):
                 ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
                 return None
         
-        # handle game state stuff here - send to function for hand eval's, AI simulation etc.... 
-        
-        
+        # handle game state stuff here - send to function for hand eval's, AI simulation etc....
         
         return '{}'.format(game_state)
         
@@ -84,11 +83,27 @@ class subpage(object):
         print '\n   Back to server.py!\nScores -->', scores_array, '\n'     
         
         return json.dumps(scores_array)
+    
+    def AI_calculate_first5(self, **params):
+        ''' calculate where AI will place first 5 cards '''
+        try:
+                game_state = json.loads(params['game-state']) # loads as dictionary 
+        except: 
+                ef = open('error_log.txt','a')
+                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
+                return None
         
+        cards = ['AH','AD','AS','TS','TC']
+        iterations = 1000
+        AI_placements = OFCP_AI.chooseMove(game_state,cards,iterations)
+        
+        return json.dumps(AI_placements)
+    
     index.exposed = True
     server_hands.exposed = True
     eval_one_hand_test.exposed = True
     calculate_scores.exposed = True
+    AI_calculate_first5.exposed = True
 
 class Root(object):
     #make a subpage

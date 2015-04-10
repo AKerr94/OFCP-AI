@@ -4,6 +4,9 @@
 #       produce tree from simulations 
 
 from random import randint
+import helpers
+
+number_top = 0 # keep track of cards placed top. When this reaches 3 prevent any more 
 
 class Node:
     ''' A node in the game tree '''
@@ -12,34 +15,160 @@ class Node:
         pass
 
 def simulateGame(game_state, row, card):
+    ''' takes in game state and chosen row to place given card in. 
+    randomly simulates rest of game and returns score '''
     return randint(0,50) # return random score between 0-50 inclusive for test purposes
         
 def chooseMove(game_state, card, iterations):
     ''' takes game state and dealt card as input, produces tree from monte carlo
     simulations and returns optimal move - 1 for bottom, 2 for middle, 3 for top '''
-    predicted_scores = [ [1,0], [2,0], [3,0] ] # first index: row, second index: total score
-    for i in range (1,iterations):
-        row = randint(1,3) 
-        predicted_scores[row -1][1] = simulateGame(game_state, row, card)
-        
-    t1 = predicted_scores[0][1]
-    t2 = predicted_scores[1][1]
-    t3 = predicted_scores[2][1]
     
-    if t1 > t2 and t1 > t3:
-        return 1
-    elif t2 > t1 and t2 > t3:
-        return 2
-    elif t3 > t1 and t3 > t2:
-        return 3
+    if type(card) == type([]): # calculate first 5 cards to place
+        if (len(card) == 5):
+            moves = []
+            for c in card:
+                moves.append(chooseMove(game_state, c, iterations))
+            print moves
+            return moves
+        else:
+            print "Invalid amount of cards - need 5!"
+            return None
+    
+    elif type(card) == type('') and len(card) == 2: # calculate 1 card placement
+        predicted_scores = [ [1,0], [2,0], [3,0] ] # first index: row, second index: total score
+        for i in range (1,iterations):
+            row = randint(1,3) 
+            predicted_scores[row -1][1] = simulateGame(game_state, row, card)
+            
+        t1 = predicted_scores[0][1]
+        t2 = predicted_scores[1][1]
+        t3 = predicted_scores[2][1]
+
+        global number_top
+        
+        # use slight weighting so that preference for placements is bottom > middle > top
+        if t1 >= t2:
+            if t1 >= t3:
+                return 1             #bottom
+            elif number_top < 3:
+                number_top += 1
+                return 3             #top    
+            else:
+                return randint(1,2)
+            
+        elif t2 > t1:
+            if t2 >= t3:
+                return 2             #middle
+            elif number_top < 3:
+                number_top += 1
+                return 3             #top
+            else:
+                return randint(1,2)
+                
+        elif t3 > t1:
+            if t3 > t2 and number_top < 3:
+                number_top += 1
+                return 3             #top
+            else:
+                return 2             #middle
+                
+        else:                        #shouldn't reach here
+            return randint(1,3)
+    
     else:
-        return randint(1,3)
+        print "Invalid cards. Need type: String e.g. 'AS' (ace of spades)"
+        return None
+    
 
 if __name__ == "__main__":
-    row_counts = [0,0,0]
-    for i in range(1,100):
-        chosen_row = chooseMove(None,None,1000)
-        row_counts[chosen_row -1] += 1
-    print row_counts
-    #print "This is a helper script implementing MCTS for OFCP.\n\
-    #To use import module externally."
+
+    print "Test run: Modelling 100 simulations of placing cards!...\n"
+    user_choice = raw_input(" Type 0 to test a single card,\n Type 1 to test 5 card initial placement.\n\
+    Anything else: exit.\n")
+    
+    
+    #### 1 card test ####
+    if user_choice == "0":
+        row_counts = [0,0,0]
+        for i in range(1,100):
+            chosen_row = chooseMove(None,'AH',500)
+            row_counts[chosen_row -1] += 1
+        print row_counts
+        
+        chosenrow = 0
+        if row_counts[0] >= row_counts[1]:
+            if row_counts[0] >= row_counts[2]:
+                chosenrow = 'Bottom'
+            else:
+                chosenrow = 'Top'
+        
+        elif row_counts[1] >=  row_counts[0]:
+            if row_counts[1] >= row_counts[2]:
+                chosenrow = 'Middle'
+            else:
+                chosenrow = 'Top'
+        
+        else:
+            chosenrow = 'Top'
+    
+        print "Final recommendation: Place card in", chosenrow, "row!"
+    
+    
+    #### 5 card test ####
+    elif user_choice == "1":
+        
+        count_row_1 = 0
+        count_row_2 = 0
+        count_row_3 = 0 
+        
+        illegal_moves = 0
+        
+        #row_counts = [0,0,0]
+        for i in range(1,100):
+            card_placements = [0,0,0,0,0]
+            num_iterations = 100
+            number_top = 0 # reset num top
+            
+            chosen_rows = chooseMove(None,['AH','AS','AD','TS','8H'],num_iterations)
+            
+            j = 0
+            for row in chosen_rows:
+                card_placements[j] += row
+                j += 1
+                
+            cardid = 1
+            t_count_top = 0
+            for placement in card_placements:
+                print "Place card", cardid, "in row", placement 
+                if placement == 1:
+                    count_row_1 += 1
+                elif placement == 2:
+                    count_row_2 += 1
+                elif placement == 3:
+                    count_row_3 += 1
+                    t_count_top += 1
+                else:
+                    print "AN EROR OCCURRED\n"
+                cardid += 1
+            
+            if t_count_top > 3:
+                print "Illegal amount of placements in top row!"
+                illegal_moves += 1
+            
+            print "" #linebreak
+        
+        print "Row 1", count_row_1, ", Row 2", count_row_2, ", Row 3", count_row_3
+        
+        print "There were", illegal_moves, "illegal recommended moves in this simulation.\n"
+    
+    
+    #### exit progam ####
+    else:
+        print "Exiting now...."
+        quit()
+    
+    
+    print "\nThis is a helper script implementing MCTS for OFCP.\n\
+    To use import module externally.\n"
+    
+    raw_input("Press Enter to continue...")
