@@ -2,8 +2,8 @@
 
 import hands
 
-rank_dic1 = {'10':'T', '11':'J', '12':'Q', '13':'K', '14':'A'} 
-rank_dic2 = {'T':'10', 'J':'11', 'Q':'12', 'K':'13', 'A':'14'}
+rank_dic1 = {'10':'T', '11':'J', '12':'Q', '13':'K', '14':'A'} # numerical value -> char value
+rank_dic2 = {'T':'10', 'J':'11', 'Q':'12', 'K':'13', 'A':'14'} # char value -> numerical value
 
 def reformat_hand_xyy_yx(hand, numCards):
     ''' Hand passed in as string (suit)(rank as 2 chars) *5. 
@@ -155,9 +155,9 @@ def scoring_helper(game_state):
     # work out scores for 5 card hands (Bottom and middle rows)     
             
     hands_list = []
-    hands_list = decode_state_hand(1,6,hands_list,5)    # bottom
-    hands_list = decode_state_hand(6,11,hands_list,5)   # middle
-    hands_list = decode_state_hand(11,14,hands_list,3)  # top
+    hands_list = decode_state_hand(1,6,hands_list,5)    # append bottom
+    hands_list = decode_state_hand(6,11,hands_list,5)   # append middle
+    hands_list = decode_state_hand(11,14,hands_list,3)  # append top
     
     scores = []                     # format: p1 bot, p2 bot, p1 mid, p2 mid, p1 top, p2 top. Type: score tuples
     classifications = []            # format: p1 bot, p2 bot, p1 mid, p2 mid, p1 top, p2 top. Type: Strings

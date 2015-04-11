@@ -27,7 +27,7 @@ def chooseMove(game_state, card, iterations):
         if (len(card) == 5):
             moves = []
             for c in card:
-                moves.append(chooseMove(game_state, c, iterations))
+                moves.append(chooseMove(game_state, c, iterations)) # store recommend row id placement for each card c 
             print moves
             return moves
         else:
@@ -111,6 +111,8 @@ def place_one(game_state, card, iterations):
     return chosenrow
 
 def place_five_initial(game_state, cards, iterations):
+    ''' takes game_state, cards array and iterations as parameters
+    determines optimal placement for cards given game state '''
     count_row_1 = 0
     count_row_2 = 0
     count_row_3 = 0 
@@ -182,7 +184,7 @@ if __name__ == "__main__":
     #### 1 card test ####
     if user_choice == "0" and valid == True:
         game_state = None
-        card = 'AS'
+        card = 's01' # example test card (ace of spades)
         num_iterations = 500
         for i in range(0, times_to_run):
             chosenrow = place_one(game_state, card, num_iterations)
@@ -193,7 +195,7 @@ if __name__ == "__main__":
     elif user_choice == "1" and valid == True:
         
         game_state = None
-        cards = ['AS', 'AD', 'AH', 'TC', '5D']
+        cards = ['s01', 'd01', 'h01', 'c10', 'd05']  # example test cards 
         num_iterations = 500
         placements_array = []
         for i in range(0, times_to_run):
