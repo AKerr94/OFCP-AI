@@ -34,7 +34,7 @@ def chooseMove(game_state, card, iterations):
             print "Invalid amount of cards - need 5!"
             return None
     
-    elif type(card) == type('') and len(card) == 2: # calculate 1 card placement
+    elif type(card) == type('') and len(card) == 3: # calculate 1 card placement
         predicted_scores = [ [1,0], [2,0], [3,0] ] # first index: row, second index: total score
         for i in range (1,iterations):
             row = randint(1,3)  # select a random row 
