@@ -1,6 +1,6 @@
 # basis for MCTS
 # very simple random monte carlo simulations
-# TODO: integrate with scoring system to produce valid, useable results
+# TODO: integrate with scoring system to produce valid, usable results
 #       produce tree from simulations 
 
 from random import randint
@@ -37,8 +37,8 @@ def chooseMove(game_state, card, iterations):
     elif type(card) == type('') and len(card) == 2: # calculate 1 card placement
         predicted_scores = [ [1,0], [2,0], [3,0] ] # first index: row, second index: total score
         for i in range (1,iterations):
-            row = randint(1,3) 
-            predicted_scores[row -1][1] = simulateGame(game_state, row, card)
+            row = randint(1,3)  # select a random row 
+            predicted_scores[row -1][1] = simulateGame(game_state, row, card) #then get estimated score for simulated game with card placed in that row
             
         t1 = predicted_scores[0][1]
         t2 = predicted_scores[1][1]
@@ -78,97 +78,124 @@ def chooseMove(game_state, card, iterations):
     else:
         print "Invalid cards. Need type: String e.g. 'AS' (ace of spades)"
         return None
-    
 
+def place_one(game_state, card, iterations):
+    ''' takes game_state, card and iterations as parameters
+    determines optimal placement for card given game state '''
+    
+    row_counts = [0,0,0]
+    x = 1
+    global number_top
+    for i in range(0,x):  # run x simulations of iterations each 
+        number_top = 0 # reset
+        chosen_row = chooseMove(game_state, card, iterations)
+        row_counts[chosen_row -1] += 1
+    print row_counts
+    
+    chosenrow = 0
+    if row_counts[0] >= row_counts[1]:
+        if row_counts[0] >= row_counts[2]:
+            chosenrow = 'Bottom'
+        else:
+            chosenrow = 'Top'
+    
+    elif row_counts[1] >=  row_counts[0]:
+        if row_counts[1] >= row_counts[2]:
+            chosenrow = 'Middle'
+        else:
+            chosenrow = 'Top'
+    
+    else:
+        chosenrow = 'Top'
+   
+    return chosenrow
+
+def place_five_initial(game_state, cards, iterations):
+    count_row_1 = 0
+    count_row_2 = 0
+    count_row_3 = 0 
+    
+    illegal_moves = 0
+    global number_top
+    
+    #row_counts = [0,0,0]
+    x = 1
+    for i in range(0,x):  # # run x simulations of iterations each 
+        card_placements = [0,0,0,0,0]
+        number_top = 0 # reset num top
+        
+        chosen_rows = chooseMove(game_state, cards, iterations)
+        
+        j = 0
+        for row in chosen_rows:
+            card_placements[j] += row
+            j += 1
+            
+        cardid = 1
+        t_count_top = 0
+        for placement in card_placements:
+            print "Place card", cardid, "in row", placement 
+            if placement == 1:
+                count_row_1 += 1
+            elif placement == 2:
+                count_row_2 += 1
+            elif placement == 3:
+                count_row_3 += 1
+                t_count_top += 1
+            else:
+                print "AN EROR OCCURRED\n"
+            cardid += 1
+        
+        if t_count_top > 3:
+            print "Illegal amount of placements in top row!"
+            illegal_moves += 1
+        
+        print "" #linebreak
+    
+    print "Row 1:", count_row_1, ", Row 2:", count_row_2, ", Row 3:", count_row_3
+    
+    print "There were", illegal_moves, "illegal recommended moves in this simulation.\n"
+    
+    
 if __name__ == "__main__":
 
     print "Test run: Modelling 100 simulations of placing cards!...\n"
     user_choice = raw_input(" Type 0 to test a single card,\n Type 1 to test 5 card initial placement.\n\
     Anything else: exit.\n")
     
+    ### exit ###
+    if user_choice not in ['0','1']:
+        print "Exiting now..."
+        quit()
+    
+    times_to_run = raw_input("How many test would you like to run? \n")
+    
+    try:
+        times_to_run = int(times_to_run)
+    except:
+        print "Invalid input! Required type: integer.\n"
     
     #### 1 card test ####
     if user_choice == "0":
-        row_counts = [0,0,0]
-        for i in range(1,100):
-            chosen_row = chooseMove(None,'AH',500)
-            row_counts[chosen_row -1] += 1
-        print row_counts
-        
-        chosenrow = 0
-        if row_counts[0] >= row_counts[1]:
-            if row_counts[0] >= row_counts[2]:
-                chosenrow = 'Bottom'
-            else:
-                chosenrow = 'Top'
-        
-        elif row_counts[1] >=  row_counts[0]:
-            if row_counts[1] >= row_counts[2]:
-                chosenrow = 'Middle'
-            else:
-                chosenrow = 'Top'
-        
-        else:
-            chosenrow = 'Top'
-    
-        print "Final recommendation: Place card in", chosenrow, "row!"
+        game_state = None
+        card = 'AS'
+        num_iterations = 500
+        for i in range(0, times_to_run):
+            chosenrow = place_one(game_state, card, num_iterations)
+            print "Recommendation: Place card in", chosenrow, "row!"
     
     
     #### 5 card test ####
     elif user_choice == "1":
         
-        count_row_1 = 0
-        count_row_2 = 0
-        count_row_3 = 0 
-        
-        illegal_moves = 0
-        
-        #row_counts = [0,0,0]
-        for i in range(1,100):
-            card_placements = [0,0,0,0,0]
-            num_iterations = 100
-            number_top = 0 # reset num top
-            
-            chosen_rows = chooseMove(None,['AH','AS','AD','TS','8H'],num_iterations)
-            
-            j = 0
-            for row in chosen_rows:
-                card_placements[j] += row
-                j += 1
-                
-            cardid = 1
-            t_count_top = 0
-            for placement in card_placements:
-                print "Place card", cardid, "in row", placement 
-                if placement == 1:
-                    count_row_1 += 1
-                elif placement == 2:
-                    count_row_2 += 1
-                elif placement == 3:
-                    count_row_3 += 1
-                    t_count_top += 1
-                else:
-                    print "AN EROR OCCURRED\n"
-                cardid += 1
-            
-            if t_count_top > 3:
-                print "Illegal amount of placements in top row!"
-                illegal_moves += 1
-            
-            print "" #linebreak
-        
-        print "Row 1", count_row_1, ", Row 2", count_row_2, ", Row 3", count_row_3
-        
-        print "There were", illegal_moves, "illegal recommended moves in this simulation.\n"
-    
-    
-    #### exit progam ####
-    else:
-        print "Exiting now...."
-        quit()
+        game_state = None
+        cards = ['AS', 'AD', 'AH', 'TC', '5D']
+        num_iterations = 500
+        for i in range(0, times_to_run):
+            place_five_initial(game_state, cards, num_iterations)
     
     
     print "\nThis is a helper script implementing MCTS for OFCP.\n\
-    To use import module externally.\n"
+    Intended use: import module externally.\n"
     
     raw_input("Press Enter to continue...")
