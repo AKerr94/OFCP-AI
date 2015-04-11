@@ -156,6 +156,8 @@ def place_five_initial(game_state, cards, iterations):
     
     print "There were", illegal_moves, "illegal recommended moves in this simulation.\n"
     
+    return card_placements
+    
     
 if __name__ == "__main__":
 
@@ -170,13 +172,15 @@ if __name__ == "__main__":
     
     times_to_run = raw_input("How many test would you like to run? \n")
     
+    valid = False
     try:
         times_to_run = int(times_to_run)
+        valid = True 
     except:
         print "Invalid input! Required type: integer.\n"
     
     #### 1 card test ####
-    if user_choice == "0":
+    if user_choice == "0" and valid == True:
         game_state = None
         card = 'AS'
         num_iterations = 500
@@ -186,13 +190,15 @@ if __name__ == "__main__":
     
     
     #### 5 card test ####
-    elif user_choice == "1":
+    elif user_choice == "1" and valid == True:
         
         game_state = None
         cards = ['AS', 'AD', 'AH', 'TC', '5D']
         num_iterations = 500
+        placements_array = []
         for i in range(0, times_to_run):
-            place_five_initial(game_state, cards, num_iterations)
+            placements_array.append( place_five_initial(game_state, cards, num_iterations) )
+        print "Simulations results: ", placements_array
     
     
     print "\nThis is a helper script implementing MCTS for OFCP.\n\
