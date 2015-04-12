@@ -75,6 +75,7 @@ class subpage(object):
                 
                 
         scores_array = helpers.scoring_helper(game_state)
+        OFCP_AI.reset() # reset AI variables/ states 
         
         # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty], 
         #    [winnerid, winners_middle_royalty, losers_middle_royalty] , 
@@ -84,7 +85,7 @@ class subpage(object):
         
         return json.dumps(scores_array)
     
-    def AI_calculate_first5(self, **params):
+    def AI_calculate_first_5(self, **params):
         ''' calculate where AI will place first 5 cards '''
         try:
                 game_state = json.loads(params['game-state']) # loads as dictionary 
@@ -93,17 +94,36 @@ class subpage(object):
                 ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
                 return None
         
-        cards = ['AH','AD','AS','TS','TC']
-        iterations = 1000
+        # read in cards to be placed 
+        cards = []
+        for i in range(0,5):
+            cards.append(str(game_state['properties2']['cards']['items']['card'+str(i+1)]))
+        iterations = 1000   # as iterations increases diverges to optimal solution 
         AI_placements = OFCP_AI.chooseMove(game_state,cards,iterations)
         
         return json.dumps(AI_placements)
+    
+    def AI_calculate_one(self, **params):
+        ''' calculate where AI should placed a given card '''
+        try:
+                game_state = json.loads(params['game-state']) # loads as dictionary 
+        except: 
+                ef = open('error_log.txt','a')
+                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
+                return None
+        
+        card = str(game_state['properties2']['cards']['items']['card'])
+        iterations = 1000
+        AI_placement = OFCP_AI.chooseMove(game_state,card,iterations)
+        
+        return json.dumps(AI_placement)
     
     index.exposed = True
     server_hands.exposed = True
     eval_one_hand_test.exposed = True
     calculate_scores.exposed = True
-    AI_calculate_first5.exposed = True
+    AI_calculate_first_5.exposed = True
+    AI_calculate_one.exposed = True
 
 class Root(object):
     #make a subpage

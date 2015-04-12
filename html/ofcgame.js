@@ -1,4 +1,3 @@
-// global vars
 var suits = ["h", "d", "s", "c"];
 var playButtonCounter = 0,
     cardsPlacedCount = 0,
@@ -11,14 +10,14 @@ var AI_positions = ["p2_bottom1", "p2_bottom2", "p2_bottom3", "p2_bottom4", "p2_
     "p2_middle1", "p2_middle2", "p2_middle3", "p2_middle4", "p2_middle5",
     "p2_top1", "p2_top2", "p2_top3"
 ];
-var AI_pos_c = AI_positions.slice();
-var AI_cards = [];
+var AI_pos_bottom = AI_positions.slice(0,5);
+var AI_pos_middle = AI_positions.slice(5,10);
+var AI_pos_top = AI_positions.slice(10);
 var AI_placement_counter = 0;
 var player_positions = ["p1_bottom1", "p1_bottom2", "p1_bottom3", "p1_bottom4", "p1_bottom5",
     "p1_middle1", "p1_middle2", "p1_middle3", "p1_middle4", "p1_middle5",
     "p1_top1", "p1_top2", "p1_top3"
 ];
-var player_cards = [];
 var gamestage = "init";
 var rowScoresArr = [0, 0, 0, 0, 0, 0]; // player 1 top, p1 middle, p1 bottom, p2 top, p2 middle, p2 bottom
 var p1score = 0,
@@ -71,14 +70,16 @@ function drop(ev) {
                 AI_main();
             }
             gamestage = "end";
-            play(); // automatically move on when last card is dropped 
+            if (playerFirst == false) {
+                play(); // automatically move on when last card is dropped 
+            }
         }
     }
 }
 
 function setupGame() {
     createDeck(); // initialise deck
-    playerLabels(0); // set player name fields
+    playerLabels(0,false,false); // set player name fields
 }
 
 // play function called from pressing button
@@ -185,11 +186,15 @@ function resetGame() {
     cardsPlacedCount = 0; 
     deckIndex = 0; 
     AI_placement_counter = 0;
-    AI_cards = []; 
-    player_cards = []; 
     deck = [];
     gamestage = "init";
     rowScoresArr = [0, 0, 0, 0, 0, 0];
+    
+    // recreate AI row temp arrays 
+    AI_pos_bottom = AI_positions.slice(0,5);
+    AI_pos_middle = AI_positions.slice(5,10);
+    AI_pos_top = AI_positions.slice(10);
+    
     setupGame();
 
     // reset player cards
@@ -234,7 +239,7 @@ function resetGame() {
         playerFirst = true;
     }
     
-    play(); // automatically play next hand-test
+    play(); // automatically play next hand
     //window.location.reload();
 }
 
@@ -245,12 +250,10 @@ function handleRoundEnd() {
 
     for (i = 0; i < 13; i++) {
         temp1 = document.getElementById(player_positions[i]).childNodes[0].name; // get player's card at pos i
-        temp2 = document.getElementById(AI_pos_c[i]).childNodes[0].name; // get AI's card at pos i
+        temp2 = document.getElementById(AI_positions[i]).childNodes[0].name;         // get AI's card at pos i
         tarray1.push(temp1); // player's cards array
         tarray2.push(temp2); // AI's cards array
     }
-    //alert(tarray1);
-    //alert(tarray2);
     
     reqwest({'url': 'http://alastairkerr.co.uk/ofc/subpage/calculate-scores/'
         , 'method': 'post'
@@ -303,10 +306,13 @@ function handleRoundEnd() {
           }
     })
   .then(function (resp) {
-    scores_obj = JSON.parse(resp);
+    scores_obj = JSON.parse(resp); // parse response as list again 
     //  finalise scoring - update frontend to reflect scores 
     
-    p1_wins = 0;     // keep track of how many rows are won by the player (if all 3, they scoop for +3 points)
+    p1_wins = 0;     // keep track of how many rows are won by each player 
+    p2_wins = 0;     // (if a player wins all 3 rows, they scoop for +3 points)
+    p1foul = scores_obj[3][0];  // boolean - true if p1's hand fouled 
+    p2foul = scores_obj[3][1];  // boolean - true if p2's hand fouled
     
     if (scores_obj[0][0] == 1) {                            // Player 1 wins bottom row
         net = (scores_obj[0][1] - scores_obj[0][2]) + 1;    // Total = p1's royalty - p2's royalty, +1 for winning row
@@ -317,6 +323,7 @@ function handleRoundEnd() {
         net = (scores_obj[0][2] - scores_obj[0][1]) + 1;    // Total = p1's royalty - p2's royalty
         rowScoresArr[0] = -net;                             // p1's bottom score
         rowScoresArr[3] = net;                              // p2's bottom score
+        p2_wins += 1;
     }
 
     if (scores_obj[1][0] == 1) {                            // Player 1 wins middle row
@@ -328,6 +335,7 @@ function handleRoundEnd() {
         net = (scores_obj[1][2] - scores_obj[1][1]) + 1;    // Total = p1's royalty - p2's royalty
         rowScoresArr[1] = -net;                             // p1's middle score
         rowScoresArr[4] = net;                              // p2's middle score
+        p2_wins += 1;
     }
 
     if (scores_obj[2][0] == 1) {                            // Player 1 wins top row
@@ -339,6 +347,7 @@ function handleRoundEnd() {
         net = (scores_obj[2][2] - scores_obj[2][1])  + 1;   // Total = p1's royalty - p2's royalty
         rowScoresArr[2] = -net;                             // p1's top score
         rowScoresArr[5] = net;                              // p2's top score
+        p2_wins += 1;
     }
 
     p1score += rowScoresArr[0] + rowScoresArr[1] + rowScoresArr[2]; // player's top middle bottom
@@ -350,7 +359,7 @@ function handleRoundEnd() {
         p2score -= 3;
         scoop = 1;
     }
-    else if (p1_wins == 0) {    // player 2 scoops for + 3 extra points
+    else if (p2_wins == 3) {    // player 2 scoops for + 3 extra points
         p1score -= 3;
         p2score += 3;
         scoop = 2;
@@ -372,10 +381,10 @@ function handleRoundEnd() {
     }
 
     // change player labels to reflect their total scores
-    playerLabels(scoop);
+    playerLabels(scoop,p1foul,p2foul);
   })
   .fail(function (err, msg) {
-    alert("Error! Reqwest unsuccessful?... check server connection and try again.");
+    alert("Error! Scoring Reqwest unsuccessful... check server connection and try again.");
   });    
     
 }
@@ -420,24 +429,36 @@ function createDeck() {
     deck = shuffle(deck);
 }
 
-function playerLabels(scoop_id) {
+function playerLabels(scoop_id, p1_foul, p2_foul) {
     /* update player labels. Sccop id = 0 (no scoop)
        scoop id = 1 (player 1 scoops)
        scoop id = 2 (player 2 scoops) */
     
-    p1_label_tail = ""
-    p2_label_tail = ""
+    p1_label_tail = "";
+    p2_label_tail = "";
     
-    if (scoop_id == 1) {
+    p1_t_score = p1score;
+    p2_t_score = p2score;
+    
+    if (scoop_id == 1) {             // if player 1 scoops
         p1_label_tail += " + Scoop (3)!"
+        p1_t_score = p1_t_score - 3; // display modified score + bonus
     }
-    else if (scoop_id == 2) {
+    else if (scoop_id == 2) {        // if player 2 scoops
         p2_label_tail += " + Scoop (3)!"
+        p2_t_score = p2_t_score - 3; // display modified score + bonus
+    }
+    
+    if (p1_foul == true) {
+        p1_label_tail += " Fouled!"
+    }
+    if (p2_foul == true) {
+        p2_label_tail += " Fouled!"
     }
     
     var temp1, temp2;
-    temp1 = player1 + " (" + p1score + ")" + p1_label_tail;
-    temp2 = player2 + " (" + p2score + ")" + p2_label_tail;
+    temp1 = player1 + " (" + p1_t_score + ")" + p1_label_tail;
+    temp2 = player2 + " (" + p2_t_score + ")" + p2_label_tail;
 
     var temp3 = document.getElementById("p1label");
     temp3.innerHTML = temp1;
@@ -469,20 +490,47 @@ function dealCard() {
         deckIndex++;
         return deck[deckIndex - 1];
     } else {
-        return "null";
+        return null;
     }
+}
+
+function populate_game_state_arrays() {
+    // populate temp arrays for game state. If no card placed in a position set appropriate index to null
+    
+    var temp1 = "", temp2 = "";
+    var tarray1 = [], tarray2 = [];
+
+    // populate temp arrays for game state. If no card placed in a position set appropriate index to null
+    for (i = 0; i < 13; i++) {
+        try {
+            temp1 = document.getElementById(player_positions[i]).childNodes[0].name; // get player's card at pos i
+        }
+        catch(err) {
+            temp1 = null;
+        }
+        
+        try {
+            temp2 = document.getElementById(AI_positions[i]).childNodes[0].name;         // get AI's card at pos i
+        }
+        catch(err) {
+            temp2 = null;
+        }
+        tarray1.push(temp1); // player's cards array
+        tarray2.push(temp2); // AI's cards array
+    }   
+    return [tarray1,tarray2];
 }
 
 // main function for handling the AI - pass here once the player is done
 function AI_main() {
 
-    // temporary naive algorithm - random card placements
-
     AI_placement_counter++;
 
     // special case - first round
     if (playButtonCounter == 1 || (playButtonCounter == 2 && playerFirst == true)) {
-        AI_positions = shuffle(AI_positions); // shuffle positions for random card placements
+        
+        // deal first 5 cards out 
+        var first_5_cards = [];
         for (i = 0; i < 5; i++) {
             var card = dealCard();
             var cardimg = document.createElement("img");
@@ -491,10 +539,98 @@ function AI_main() {
             cardimg.width = 109;
             cardimg.height = 150;
             cardimg.ondragstart = function() {return false;};
-
-            document.getElementById(AI_positions[i]).appendChild(cardimg); // place img in div
-            AI_cards.splice(i, 0, cardimg); // append card to appropriate position in array
+            first_5_cards.push(cardimg);
         }
+
+        var t = populate_game_state_arrays();
+        tarray1 = t[0];
+        tarray2 = t[1];
+        
+        reqwest({'url': 'http://alastairkerr.co.uk/ofc/subpage/AI-calculate-first-5'
+            , 'method': 'post'
+            , 'data': {'game-state':JSON.stringify(
+                                    {
+                                        "name1": "Player1",
+                                        "properties1": {
+                                            "cards": {
+                                                "type": "array",
+                                                "items": {
+                                                    "position1": tarray1[0],
+                                                    "position2": tarray1[1],
+                                                    "position3": tarray1[2],
+                                                    "position4": tarray1[3],
+                                                    "position5": tarray1[4],
+                                                    "position6": tarray1[5],
+                                                    "position7": tarray1[6],
+                                                    "position8": tarray1[7],
+                                                    "position9": tarray1[8],
+                                                    "position10": tarray1[9],
+                                                    "position11": tarray1[10],
+                                                    "position12": tarray1[11],
+                                                    "position13": tarray1[12],
+                                                }
+                                            }
+                                        },
+                                        "name2": "Player2",
+                                        "properties2": {
+                                            "cards": {
+                                                "type": "array",
+                                                "items": {
+                                                    "position1": tarray2[0],
+                                                    "position2": tarray2[1],
+                                                    "position3": tarray2[2],
+                                                    "position4": tarray2[3],
+                                                    "position5": tarray2[4],
+                                                    "position6": tarray2[5],
+                                                    "position7": tarray2[6],
+                                                    "position8": tarray2[7],
+                                                    "position9": tarray2[8],
+                                                    "position10": tarray2[9],
+                                                    "position11": tarray2[10],
+                                                    "position12": tarray2[11],
+                                                    "position13": tarray2[12],
+                                                    "card1": first_5_cards[0].name,
+                                                    "card2": first_5_cards[1].name,
+                                                    "card3": first_5_cards[2].name,
+                                                    "card4": first_5_cards[3].name,
+                                                    "card5": first_5_cards[4].name,
+                                                }
+                                            }
+                                        }
+                                    }
+                    )
+              }
+        })
+        .then(function (resp) {
+            var recommended_moves = JSON.parse(resp); // parse response as list again 
+            //alert(recommended_moves);
+            for(k = 0; k < 5; k++) {
+                if (recommended_moves[k] == 1) {
+                    // place card in bottom row
+                    document.getElementById(AI_pos_bottom[0]).appendChild(first_5_cards[k]);
+                    AI_pos_bottom.shift(); // removes first element from array - keeps up to date with available positions
+                }
+                else if (recommended_moves[k] == 2) {
+                    // place card in middle row 
+                    document.getElementById(AI_pos_middle[0]).appendChild(first_5_cards[k]);
+                    AI_pos_middle.shift();
+                }
+                else if (recommended_moves[k] == 3) {
+                    // place card in top row
+                    document.getElementById(AI_pos_top[0]).appendChild(first_5_cards[k]);
+                    AI_pos_top.shift();
+                }
+                else {
+                    alert("Invalid recommended row! Expected 1, 2 or 3. Actual: " + recommended_moves[k]);
+                }
+                //var astring = "Placing card " + first_5_cards[k].name + " in pos " + recommended_moves[k];
+                //alert(astring);
+            }
+            //AI_cards.splice(i, 0, cardimg); // append card to appropriate position in array
+        })
+        .fail(function (err, msg) {
+            alert("Error! AI place 5 Reqwest unsuccessful... check server connection and try again.");
+        });   
     }
 
     // general case
@@ -506,9 +642,95 @@ function AI_main() {
         cardimg.width = 109;
         cardimg.height = 150;
         cardimg.ondragstart = function() {return false;};
-
-        document.getElementById(AI_positions[3 + AI_placement_counter]).appendChild(cardimg); // place img in div
-        AI_cards.splice((3 + AI_placement_counter), 0, cardimg); // append card to appropriate position in array
+        
+        var t = populate_game_state_arrays();
+        tarray1 = t[0];
+        tarray2 = t[1];
+        
+        reqwest({'url': 'http://alastairkerr.co.uk/ofc/subpage/AI-calculate-one'
+            , 'method': 'post'
+            , 'data': {'game-state':JSON.stringify(
+                                    {
+                                        "name1": "Player1",
+                                        "properties1": {
+                                            "cards": {
+                                                "type": "array",
+                                                "items": {
+                                                    "position1": tarray1[0],
+                                                    "position2": tarray1[1],
+                                                    "position3": tarray1[2],
+                                                    "position4": tarray1[3],
+                                                    "position5": tarray1[4],
+                                                    "position6": tarray1[5],
+                                                    "position7": tarray1[6],
+                                                    "position8": tarray1[7],
+                                                    "position9": tarray1[8],
+                                                    "position10": tarray1[9],
+                                                    "position11": tarray1[10],
+                                                    "position12": tarray1[11],
+                                                    "position13": tarray1[12],
+                                                }
+                                            }
+                                        },
+                                        "name2": "Player2",
+                                        "properties2": {
+                                            "cards": {
+                                                "type": "array",
+                                                "items": {
+                                                    "position1": tarray2[0],
+                                                    "position2": tarray2[1],
+                                                    "position3": tarray2[2],
+                                                    "position4": tarray2[3],
+                                                    "position5": tarray2[4],
+                                                    "position6": tarray2[5],
+                                                    "position7": tarray2[6],
+                                                    "position8": tarray2[7],
+                                                    "position9": tarray2[8],
+                                                    "position10": tarray2[9],
+                                                    "position11": tarray2[10],
+                                                    "position12": tarray2[11],
+                                                    "position13": tarray2[12],
+                                                    "card": cardimg.name,
+                                                }
+                                            }
+                                        }
+                                    }
+                    )
+              }
+        })
+        .then(function (resp) {
+            var recommended_move = JSON.parse(resp); // parse response 
+            //alert(recommended_move);
+            if (recommended_move == 1) {
+                // place card in bottom row
+                document.getElementById(AI_pos_bottom[0]).appendChild(cardimg);
+                AI_pos_bottom.shift(); // removes first element from array - keeps up to date with available positions
+            }
+            else if (recommended_move == 2) {
+                // place card in middle row 
+                document.getElementById(AI_pos_middle[0]).appendChild(cardimg);
+                AI_pos_middle.shift();
+            }
+            else if (recommended_move == 3) {
+                // place card in top row
+                document.getElementById(AI_pos_top[0]).appendChild(cardimg);
+                AI_pos_top.shift();
+            }
+            else {
+                alert("Invalid recommended row! Expected 1, 2 or 3. Actual: " + recommended_move);
+            }
+            //var astring = "Placing card " + cardimg.name + " in pos " + recommended_move;
+            //alert(astring);
+            
+            //alert("AI placement count: " + AI_placement_counter + ", Player first:" + playerFirst);
+            if (AI_placement_counter >= 9 && playerFirst == true) {
+                gamestage = "end";
+                play();
+            }
+        })
+        .fail(function (err, msg) {
+            alert("Error! AI place one Reqwest unsuccessful... check server connection and try again.");
+        });           
     }
 }
 

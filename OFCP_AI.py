@@ -6,7 +6,11 @@
 from random import randint
 import helpers
 
-number_top = 0 # keep track of cards placed top. When this reaches 3 prevent any more 
+num_top_first_count = 0 # ensure that initial 5 card placement doesn't put too many top (very unlikely but possible)
+
+number_top = 0      # keep track of cards placed top. When this reaches 3 prevent any more 
+number_middle = 0   # max 5
+number_bottom = 0   # max 5
 
 class Node:
     ''' A node in the game tree '''
@@ -14,6 +18,32 @@ class Node:
         #self.moves_to_try = ?.findMoves()
         pass
 
+def reset():
+    ''' reset variables for a new round '''
+    global num_top_first_count
+    num_top_first_count = 0
+        
+def find_valid_moves(game_state):
+    ''' reads game state and detects how many valid placements are available for each row '''
+    global number_bottom
+    global number_middle
+    global number_top
+    
+    number_bottom = 0
+    number_middle = 0
+    number_top = 0
+    
+    for i in range(1,14):
+        temp = game_state['properties2']['cards']['items']['position'+str(i)]
+        if temp != None:
+            if i <= 5:
+                number_bottom += 1
+            elif i <= 10:
+                number_middle += 1
+            elif i <= 13:
+                number_top += 1
+    print "Valid placements: Bottom", 5 - number_bottom, ", Middle", 5 - number_middle, ", Top", 3 - number_top, "\n"
+        
 def simulateGame(game_state, row, card):
     ''' takes in game state and chosen row to place given card in. 
     randomly simulates rest of game and returns score '''
@@ -35,6 +65,37 @@ def chooseMove(game_state, card, iterations):
             return None
     
     elif type(card) == type('') and len(card) == 3: # calculate 1 card placement
+    
+        find_valid_moves(game_state)  # finds free spaces in each row and records counts in global vars number_bottom, number_middle, number_top
+
+        global number_top
+        global numer_middle
+        global number_bottom
+        
+        global num_top_first_count
+        
+        print "Current cards placed top,", number_top, ", middle,",number_middle,",bottom,",number_bottom,"and 1st it top",num_top_first_count,"\n"
+        
+        # booleans - True if there are free slots in row 
+        valid_bottom = True
+        valid_middle = True
+        valid_top = True
+        
+        if number_bottom == 5:
+            valid_bottom = False
+        if number_middle == 5:
+            valid_middle = False
+        if number_top == 3 or num_top_first_count == 3:
+            valid_top = False
+        
+        # if there is only one row with free slots save some processing time and just return that move without calculating scores
+        if valid_bottom == False and valid_middle == False:
+            return 3 # top 
+        elif valid_top == False and valid_bottom == False:
+            return 2 # middle
+        elif valid_middle == False and valid_top == False:
+            return 1 # bottom
+        
         predicted_scores = [ [1,0], [2,0], [3,0] ] # first index: row, second index: total score
         for i in range (1,iterations):
             row = randint(1,3)  # select a random row 
@@ -43,45 +104,53 @@ def chooseMove(game_state, card, iterations):
         t1 = predicted_scores[0][1]
         t2 = predicted_scores[1][1]
         t3 = predicted_scores[2][1]
-
-        global number_top
+        
         
         # use slight weighting so that preference for placements is bottom > middle > top
         if t1 >= t2:
-            if t1 >= t3:
+            if valid_bottom == True and t1 >= t3 :
                 return 1             #bottom
-            elif number_top < 3:
-                number_top += 1
+            elif valid_top == True and t3 > t2:
+                num_top_first_count += 1
                 return 3             #top    
-            else:
-                return randint(1,2)
+            elif valid_middle == True:
+                return 2             #middle
             
-        elif t2 > t1:
-            if t2 >= t3:
+        if t2 >= t1:
+            if valid_middle == True and t2 >= t3:
                 return 2             #middle
-            elif number_top < 3:
-                number_top += 1
+            elif valid_top == True:
+                num_top_first_count += 1
                 return 3             #top
-            else:
-                return randint(1,2)
                 
-        elif t3 > t1:
-            if t3 > t2 and number_top < 3:
-                number_top += 1
+        if t3 >= t1:
+            if valid_top == True and t3 >= t2:
+                num_top_first_count += 1
                 return 3             #top
-            else:
+            elif valid_middle == True:
                 return 2             #middle
                 
-        else:                        #shouldn't reach here
-            return randint(1,3)
+        else:                       
+            if valid_bottom == True:
+                return 1 
+            elif valid_middle == True:
+                return 2 
+            elif valid_top == True:
+                num_top_first_count += 1
+                return 3
+            else:
+                print "No valid placements available!"
+                return None 
     
     else:
-        print "Invalid cards. Need type: String e.g. 'AS' (ace of spades)"
+        print "Invalid cards. Need type: String e.g. 's01' (ace of spades)"
         return None
 
 def place_one(game_state, card, iterations):
     ''' takes game_state, card and iterations as parameters
-    determines optimal placement for card given game state '''
+    determines optimal placement for card given game state 
+    
+    Test function - server calls chooseMove function directly'''
     
     row_counts = [0,0,0]
     x = 1
@@ -112,7 +181,10 @@ def place_one(game_state, card, iterations):
 
 def place_five_initial(game_state, cards, iterations):
     ''' takes game_state, cards array and iterations as parameters
-    determines optimal placement for cards given game state '''
+    determines optimal placement for cards given game state 
+    
+    Test function - server calls chooseMove function directly'''
+    
     count_row_1 = 0
     count_row_2 = 0
     count_row_3 = 0 
