@@ -6,6 +6,7 @@
 from random import randint
 import random
 import helpers
+import copy 
 
 num_top_first_count = 0 # ensure that initial 5 card placement doesn't put too many top (very unlikely but possible)
 
@@ -51,6 +52,7 @@ def find_valid_moves(game_state):
     #print "Valid placements: Bottom", 5 - number_bottom, ", Middle", 5 - number_middle, ", Top", 3 - number_top, "\n"
 
 def produce_deck_of_cards():
+    ''' generates a standard deck of 52 cards. Ranks ace -> king; Suits hearts, diamonds, spades and clubs'''
     global deck
     deck = []
     suits = ["h", "d", "s", "c"]
@@ -64,6 +66,7 @@ def produce_deck_of_cards():
     return deck
 
 def prune_deck_of_cards(game_state):
+    ''' prunes deck of cards - reads in game state and removes any cards that have already been played on the board '''
     global deck
     
     unavailable_cards = []
@@ -73,19 +76,15 @@ def prune_deck_of_cards(game_state):
             if temp != None:
                 unavailable_cards.append(temp)
     
-    for x in unavailable_cards: # remove any occurrences of cards that are visible from the deck
+    for x in unavailable_cards: # remove any occurrences of placed cards from the deck
         deck[:] = (value for value in deck if value != x)
     
 def simulateGame(game_state, row, card):
     ''' takes in game state and chosen row to place given card in. 
     randomly simulates rest of game and returns score '''
     
-    # Code works fine with random placements when this line below is commented out!
     #print "\n\nOld:", game_state['properties2']
     game_state = simulate_append_card(game_state, row, card)    # append card to appropriate position in game state
-    # when its uncommented card placements are broken 
-    #     - game_state is only changed within the scope of this function - shouldnt have a carry through effect?? 
-    #     - IT SEEMS that any None values in game_state are being replaced with random cards - this is in fitting with functions written, but shouldnt have a permanent effect
     
     #print "\nNew:", game_state['properties2']
     
@@ -94,25 +93,36 @@ def simulateGame(game_state, row, card):
     random.shuffle(tdeck)
     #print "\n" + str(deck)
     
+    gs_copy = copy.deepcopy(game_state) # deepcopy copies all elements including nested ones 
+    
     # populate empty slots in game board with random cards
     for i in range(1,14):
         for j in range(1,3):
-            if game_state['properties'+str(j)]['cards']['items']['position'+str(i)] == None:
-                game_state['properties'+str(j)]['cards']['items']['position'+str(i)] = tdeck.pop(0)
+            if gs_copy['properties'+str(j)]['cards']['items']['position'+str(i)] == None:
+                gs_copy['properties'+str(j)]['cards']['items']['position'+str(i)] = tdeck.pop(0)
     
-    scores = helpers.scoring_helper(game_state) # score game board 
-    p1score = 0 
-    p2score = 0
-    p1_multiplier = 1 
-    p2_multiplier = 1
-    if scores[3][0] == True: # p1 fouls, scores 0
-        p1_multiplier = 0 
-    if scores[3][1] == True: # p2 fouls, scores 0
-        p2_multiplier = 0 
-    p1score = (scores[0][1] + scores[1][1] + scores[2][1]) * p1_multiplier
-    p2score = (scores[0][2] + scores[1][2] + scores[2][2]) * p2_multiplier
-    return p2score - p1score
-    #return randint(0,50) # return random score between 0-50 inclusive for test purposes
+    #print "\nAI: ", gs_copy['properties2'], '\nPlayer:', gs_copy['properties1']
+    #raw_input("press any key to continue...")
+    try:
+        #print "\np1 cards: ", gs_copy['properties1'], '\n\nAi cards:', gs_copy['properties2']
+        scores = helpers.scoring_helper(gs_copy) # score game board # THIS LINE IS CAUSING ERRORS - NEED TO WORK OUT WHY THERES AN INDEX ERROR 
+        p1score = 0 
+        p2score = 0
+        p1_multiplier = 1 
+        p2_multiplier = 1
+        if scores_l[3][0] == True: # p1 fouls, scores 0
+                p1_multiplier = 0 
+        if scores_l[3][1] == True: # p2 fouls, scores 0
+                p2_multiplier = 0 
+        p1score = (scores_l[0][1] + scores_l[1][1] + scores_l[2][1]) * p1_multiplier
+        p2score = (scores_l[0][2] + scores_l[1][2] + scores_l[2][2]) * p2_multiplier
+        return p2score - p1score
+        
+    except:
+        #print "There was an error while working out the scores!\n"
+        return randint(0,5) # test 
+    
+    return randint(0,50) # return random score between 0-50 inclusive for test purposes
 
 def simulate_append_card(game_state, row, card):
     ''' pass in game_state + a card and destination row
@@ -201,9 +211,10 @@ def chooseMove(game_state, card, iterations):
             return 2 # middle
         elif valid_middle == False and valid_top == False and valid_bottom == True:
             return 1 # bottom
-        else:
+        elif valid_bottom == False and valid_middle == False and valid_top == False:
             print "\nThere are no valid places to move! Check game state for duplicates/ errors!\nGame State:", game_state['properties2']
-            raw_input('waiting...')
+            #raw_input('waiting...')
+            return None 
         
         deck = produce_deck_of_cards()
         prune_deck_of_cards(game_state)
