@@ -82,7 +82,7 @@ def prune_deck_of_cards(game_state):
 def simulateGame(game_state, row, card):
     ''' takes in game state and chosen row to place given card in. 
     randomly simulates rest of game and returns score '''
-    
+    return randint(0,10)
     #print "\n\nOld:", game_state['properties2']
     game_state = simulate_append_card(game_state, row, card)    # append card to appropriate position in game state
     
@@ -102,33 +102,32 @@ def simulateGame(game_state, row, card):
                 gs_copy['properties'+str(j)]['cards']['items']['position'+str(i)] = tdeck.pop(0)
     
     #print "\nAI: ", gs_copy['properties2'], '\nPlayer:', gs_copy['properties1']
-    #raw_input("press any key to continue...")
-    try:
-        #print "\np1 cards: ", gs_copy['properties1'], '\n\nAi cards:', gs_copy['properties2']
-        scores = helpers.scoring_helper(gs_copy) # score game board # THIS LINE IS CAUSING ERRORS - NEED TO WORK OUT WHY THERES AN INDEX ERROR 
-        p1score = 0 
-        p2score = 0
-        p1_multiplier = 1 
-        p2_multiplier = 1
-        if scores_l[3][0] == True: # p1 fouls, scores 0
-                p1_multiplier = 0 
-        if scores_l[3][1] == True: # p2 fouls, scores 0
-                p2_multiplier = 0 
-        p1score = (scores_l[0][1] + scores_l[1][1] + scores_l[2][1]) * p1_multiplier
-        p2score = (scores_l[0][2] + scores_l[1][2] + scores_l[2][2]) * p2_multiplier
-        return p2score - p1score
-        
-    except:
-        #print "There was an error while working out the scores!\n"
-        return randint(0,5) # test 
-    
-    return randint(0,50) # return random score between 0-50 inclusive for test purposes
+    #raw_input("press any key to continue...")  
+      
+    # random return - patching bug temporarily
+    #return randint(0,10)
+    scores = helpers.scoring_helper(gs_copy) # score game board # THIS LINE IS CAUSING ERRORS - NEED TO WORK OUT WHY THERES AN INDEX ERROR 
+    p1score = 0 
+    p2score = 0
+    p1_multiplier = 1 
+    p2_multiplier = 1
+    if scores[3][0] == True: # p1 fouls, scores 0
+        p1_multiplier = 0 
+    if scores[3][1] == True: # p2 fouls, scores 0
+        p2_multiplier = 0 
+    p1score = (scores[0][1] + scores[1][1] + scores[2][1]) * p1_multiplier
+    p2score = (scores[0][2] + scores[1][2] + scores[2][2]) * p2_multiplier
+    return p2score - p1score
+    #return randint(0,50) # return random score between 0-50 inclusive for test purposes
 
 def simulate_append_card(game_state, row, card):
     ''' pass in game_state + a card and destination row
     returns a modified game_state with that card added to that row '''
     
     global placed_cards_s
+    global number_bottom
+    global number_middle
+    global number_top
     
     if card in placed_cards_s: # avoid duplicate placements 
         #print "AVOIDED PLACING A DUPLICATED", card + "."
@@ -141,6 +140,7 @@ def simulate_append_card(game_state, row, card):
             if game_state['properties2']['cards']['items']['position'+str(i)] == None:
                 game_state['properties2']['cards']['items']['position'+str(i)] = card
                 placed_cards_s.append(card)
+                number_bottom += 1
                 break
     
     elif row == 2:
@@ -148,6 +148,7 @@ def simulate_append_card(game_state, row, card):
             if game_state['properties2']['cards']['items']['position'+str(i)] == None:
                 game_state['properties2']['cards']['items']['position'+str(i)] = card
                 placed_cards_s.append(card)
+                number_middle += 1
                 break
 
     elif row == 3:
@@ -155,6 +156,7 @@ def simulate_append_card(game_state, row, card):
             if game_state['properties2']['cards']['items']['position'+str(i)] == None:
                 game_state['properties2']['cards']['items']['position'+str(i)] = card
                 placed_cards_s.append(card)
+                number_top += 1
                 break    
     
     else:
