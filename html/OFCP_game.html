@@ -8,6 +8,7 @@
 	.cardr {width:109px;height:150px;padding:0px;border:1px solid #aaaaaa;float: right;}
 	.scorecontainerl {width:109px;height:150px;padding:0px;border:0px solid #aaaaaa;float: left;font-size:15pt;}
 	.scorecontainerr {width:109px;height:150px;padding:0px;border:0px solid #aaaaaa;float: right;font-size:15pt;}
+    disp { text-decoration:underline; color:blue; }
 </style>
   <title>Open Face Chinese Poker (vs AI)</title>
   <link href="site.css" rel="stylesheet">
@@ -91,6 +92,7 @@
 <!-- play button -->
 <div id="buttonDiv">
 	<button id="playButton" style="margin-top:10px;margin-bottom:10px;" onclick="play()">Play!</button><br />
+    <p id="buttonTextReplacer"> </p>
 </div>
 
 <!-- cards to be placed by player -->
@@ -127,7 +129,7 @@
 	</div>
 </div>
 
-<a style="margin-top:10000px;" href="" onclick="alert('Try zooming out with Ctrl -');">Display problems?</a>
+<p style="margin-top:180px;" onclick="alert('Try zooming out with Ctrl -');"><disp>Display problems?</disp></p>
 
 <footer style="margin-top:10px;" id="footer1"></footer>
 

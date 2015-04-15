@@ -168,7 +168,7 @@ function play() {
         playLock = true;
 
         if (playerFirst) {
-            AI_main(); // call AI to handle their turn
+            AI_main();
         }
     }
 }
@@ -524,6 +524,12 @@ function populate_game_state_arrays() {
 // main function for handling the AI - pass here once the player is done
 function AI_main() {
 
+    var button = document.getElementById("playButton");
+    button.style.display = "none"; // hide button while AI calculates moves 
+    
+    var b_text = document.getElementById("buttonTextReplacer");
+    b_text.innerHTML = "AI is calculating move..."
+
     AI_placement_counter++;
 
     // special case - first round
@@ -626,6 +632,8 @@ function AI_main() {
                 //var astring = "Placing card " + first_5_cards[k].name + " in pos " + recommended_moves[k];
                 //alert(astring);
             }
+            button.style.display = "inline";
+            b_text.innerHTML = ""
             //AI_cards.splice(i, 0, cardimg); // append card to appropriate position in array
         })
         .fail(function (err, msg) {
@@ -727,6 +735,8 @@ function AI_main() {
                 gamestage = "end";
                 play();
             }
+            button.style.display = "inline";
+            b_text.innerHTML = ""
         })
         .fail(function (err, msg) {
             alert("Error! AI place one Reqwest unsuccessful... check server connection and try again.");

@@ -244,8 +244,8 @@ def chooseMove(game_state, card, iterations):
                     force_place = True
                 game_state = simulate_append_card(game_state, move, c, force_place)  # updates game_state with placement choice 
                 print "Game state updated with this change!"
-            print moves
-            return moves
+            print "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            print "First 5 placements:", card[0], moves[0], ",", card[1], moves[1], ",", card[2], moves[2], ",", card[3], moves[3], ",", card[4], moves[4], "\n"
             return moves
         else:
             print "Invalid amount of cards - need 5!"
@@ -317,7 +317,7 @@ def chooseMove(game_state, card, iterations):
             count += 1
         
         print "There were", nullscoringhands, "null boards &", scoringhands, "positive scoring boards &", zeroscorehands, "zero-scoring boards &", losinghands, "losing boards. Total simulations:", counthands
-        print "Final scores predictions~~\nPlacing",str(card),"in bottom:", str(predicted_scores[0][1]),", middle:",str(predicted_scores[1][1]),", top:",str(predicted_scores[2][1])
+        print "Final scores predictions~~\nEV from placing",str(card),"in bottom:", str(predicted_scores[0][1]),", middle:",str(predicted_scores[1][1]),", top:",str(predicted_scores[2][1])
         
         #print str(game_state)
         
@@ -348,8 +348,9 @@ def chooseMove(game_state, card, iterations):
                 return 3             #top
             elif valid_middle == True:
                 return 2             #middle
-                
-        else:                       
+        
+        else:              
+            print "\n\n\n\n\n######################################################################################\n\n\n\n#####\n"        
             if valid_bottom == True:
                 return 1 
             elif valid_middle == True:
@@ -358,11 +359,11 @@ def chooseMove(game_state, card, iterations):
                 num_top_first_count += 1
                 return 3
             else:
-                print "No valid placements available!"
+                print "No valid placements available!\n", game_state
                 return None 
     
     else:
-        print "Invalid cards. Need type: String e.g. 's01' (ace of spades)"
+        print "Invalid cards.", cards, ". Need type: String e.g. 's01' (ace of spades)"
         return None
 
 def place_one(game_state, card, iterations):
