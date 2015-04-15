@@ -55,11 +55,15 @@ def score_5(hand):
     >>> score_5("3H4STSJDQH")
     (1, 12, 11, 10, 4, 3)
     '''
+    
+    #print "Scoring hand:", hand
+    
     ranks = hand[::2]
     suits = set(hand[1::2])
     counts = [None, [], [], [], []] 
     for rank in ranks:
         counts[ranks.count(rank)].append(RANK_TO_VALUE[rank])
+    
     straight = ranks in STRAIGHTS
     counts_4 = counts[4]
     counts_3 = counts[3]
@@ -72,7 +76,13 @@ def score_5(hand):
             return (9, counts_1[-1])
         else:
             # flush
-            return (6, counts_1[-1], counts_1[-2], counts_1[-3], counts_1[-4], counts_1[-5])
+            try:
+                return (6, counts_1[-1], counts_1[-2], counts_1[-3], counts_1[-4], counts_1[-5])
+            except IndexError as e:
+                print "counts_1 len", len(counts_1)
+                print "Counts_1:", counts_1
+                print "Hand:", hand
+                raise e
     elif counts_4:
         # 4 of a kind
         return (8, counts_4[0], counts_1[-1])
