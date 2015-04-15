@@ -4,7 +4,7 @@ document.getElementById("footer1").innerHTML =
 
 document.getElementById("navigator").innerHTML =
 "<ul id='menu'>" +
-"<li><a href='index.html'>Home</a></li>" +
-"<li><a href='about.html'>About</a></li>" +
-"<li><a href='OFCP_main.html'>Dissertation</a></li>" +
+"<li><a href='/index.html'>Home</a></li>" +
+"<li><a href='/about.html'>About</a></li>" +
+"<li><a href='/OFCP_main.html'>Dissertation</a></li>" +
 "</ul>";

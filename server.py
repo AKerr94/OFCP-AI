@@ -98,7 +98,7 @@ class subpage(object):
         cards = []
         for i in range(0,5):
             cards.append(str(game_state['properties2']['cards']['items']['card'+str(i+1)]))
-        iterations = 1000   # as iterations increases diverges to optimal solution 
+        iterations = 500   # as iterations increases diverges to optimal solution 
         AI_placements = OFCP_AI.chooseMove(game_state,cards,iterations)
         
         return json.dumps(AI_placements)
@@ -113,7 +113,7 @@ class subpage(object):
                 return None
         
         card = str(game_state['properties2']['cards']['items']['card'])
-        iterations = 1000
+        iterations = 500
         AI_placement = OFCP_AI.chooseMove(game_state,card,iterations)
         
         return json.dumps(AI_placement)
@@ -130,7 +130,8 @@ class Root(object):
     subpage = subpage()
 
     def index(self):
-        return 'Hello world'
+        return render_template("OFCP_game.html")
+        #return 'Hello world'
 
     def test(self, name='freddie'):
         return "Hello {name}".format(name=name)

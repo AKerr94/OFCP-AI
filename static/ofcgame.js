@@ -412,10 +412,10 @@ function createDeck() {
             // build img and name strings
             if (j < 10) {
                 // if single digit need padding for string (0 before num)
-                cstring = "cards/" + suits[i] + "0" + j + ".png";
+                cstring = "static/cards/" + suits[i] + "0" + j + ".png";
                 cname = suits[i] + "0" + j;
             } else {
-                cstring = "cards/" + suits[i] + j + ".png";
+                cstring = "static/cards/" + suits[i] + j + ".png";
                 cname = suits[i] + "" + j;
             }
 
