@@ -3,6 +3,7 @@ import random
 import helpers
 import copy 
 import time
+import itertools 
 from datetime import datetime
 
 num_top_first_count = 0 # ensure that initial 5 card placement doesn't put too many top (very unlikely but possible)
@@ -91,18 +92,21 @@ def prune_deck_of_cards(game_state):
     
     #print 'Pruned deck\n' + str(game_state)+'\n\n'
     
-def simulateGame(game_state, row, card):
-    ''' takes in game state and chosen row to place given card in. 
+def simulateGame(game_state, row, card, bAppend):
+    ''' takes in game state and chosen row to place given card in if bAppend == True
+    else if bAppend is false skip appending any specific card.
     randomly simulates rest of game and returns score '''
 	
     gs_copy = copy.deepcopy(game_state) # deepcopy copies all elements including nested ones 
-    gs_copy = simulate_append_card(gs_copy, row, card, False)    # append card to appropriate position in game state
+    if bAppend == True:
+        gs_copy = simulate_append_card(gs_copy, row, card, True)    # append card to appropriate position in game state     
     prune_deck_of_cards(gs_copy)        
+    
+    print gs_copy
     
     global deck     # get available cards for placement 
     tdeck = deck[:]
     random.shuffle(tdeck)
-    
     
     # populate empty slots in game board with random cards
     for i in range(1,14):
@@ -111,7 +115,6 @@ def simulateGame(game_state, row, card):
                     
         if gs_copy['properties1']['cards']['items']['position'+str(i)] == None:
             gs_copy['properties1']['cards']['items']['position'+str(i)] = tdeck.pop(0)
-   
     
 
     current_milli_time = lambda: int(round(time.time() * 1000))
@@ -238,7 +241,135 @@ def simulate_append_card(game_state, row, card, force_place):
     
     #print "New AI board state:", str(game_state['properties2']['cards']['items']), '\n'
     return game_state
+  
+
+def place_5(game_state, cards, sim_timer):
+    ''' takes game_state, first 5 cards and allocated simulated time in ms as inputs.
+    Aggregates scores for simulations of each permutation of the first possible placements 
+    and returns an optimal placement as a list with index i = card i+1's allocated row
+    e.g. return [1,1,2,2,3] = card 1 in row 1, card 2 in row 1, card 3 in row 2, card 4 in row 2, card 5 in row 3'''
+
+    print "\n####\nPlace_5:", cards, "\nSimulation Timer:", sim_timer, "ms.\n"
     
+    cdic = {cards[0]:1, cards[1]:2, cards[2]:3, cards[3]:4, cards[4]:5} # keep a permanent record of which card was which index 
+
+    # ctemp = 13 elements: 5 cards + 8 '' blanks (13 containers on a player's OFC board)
+    ctemp = cards[:]
+    for i in range(0,8):
+        ctemp.append(None)
+        
+    pbot = set(itertools.combinations(ctemp,5)) # produce set of combinations for a 5 card row
+    pbot = list(pbot)
+
+    pmid = pbot[:] # combinations middle same as bottom
+
+    ptop = set(itertools.combinations(ctemp,3)) # produce set of combinations for a 3 card row
+    ptop = list(ptop)
+
+    rowlists = [pbot, pmid, ptop]
+
+    x = set(itertools.product(*rowlists)) # product of all possible row combinations
+
+    final = []
+    # post-processing removes duplicates and validates state has all cards placed 
+    for rows in x:
+        duplicate = False
+        c_count = 0
+        for pos in rows[0]:
+            if pos is not None:
+                c_count += 1
+                if pos in rows[1] or pos in rows[2]:
+                    duplicate = True
+                    break
+
+        if not duplicate:
+            for pos in rows[1]:
+                if pos is not None:
+                    c_count += 1
+                    if pos in rows[2]:
+                        duplicate = True
+                        break
+            for pos in rows[2]:
+                if pos is not None:
+                    c_count += 1
+            if c_count == 5 and not duplicate:
+                final.append(rows)
+
+    s_count = 0
+    for state in final:
+        s_count += 1
+        #print str(s_count) + ":", state
+        
+    print "\nTotal states:", s_count
+    
+    current_milli_time = lambda: int(round(time.time() * 1000))
+    
+    # produce every possible initial game state dictionary for AI placements 
+    state_id = 1
+    states_scores = []
+    for state in final:
+        gs_copy = copy.deepcopy(game_state)
+        for item in state[0]: # bottom
+            if item is not None:
+                gs_copy = simulate_append_card(gs_copy, 1, item, False)
+        for item in state[1]: # middle
+            if item is not None:
+                gs_copy = simulate_append_card(gs_copy, 2, item, False)
+        for item in state[2]: # top
+            if item is not None:
+                gs_copy = simulate_append_card(gs_copy, 3, item, False)
+        
+        stime = current_milli_time()
+        
+        s_ev = 0
+        iterations = 0
+        while ( (current_milli_time() - stime) < (sim_timer / 20) ): # loop for 1/10 of sim timer in ms
+            s_ev += simulateGame(gs_copy, None, None, False) # simulates random placements of rest of cards on game board and returns EV
+            iterations += 1
+        
+        states_scores.append([state_id, s_ev, iterations])
+        
+        state_id += 1
+
+    print "\nSTATE SCORES:", states_scores      
+        
+    # find the state selection with the highest EV
+    best_state = None
+    highest_ev = 0
+    for result in states_scores:
+        if result[1] > highest_ev:
+            best_state_score = result
+            highest_ev = result[1]
+    
+    print "Best state score:", best_state_score
+    
+    best_state_id = best_state_score[0]
+    best_state = final[best_state_id -1]
+        
+    print "~best state got:", best_state    
+    
+    brow = best_state[0]
+    mrow = best_state[1]
+    trow = best_state[2]
+    
+    r_placements = [0,0,0,0,0]
+    
+    for item in brow:
+        if item is not None:
+            t = cdic[item]
+            r_placements[t -1] = 1 # bottom
+    for item in mrow:
+        if item is not None:
+            t = cdic[item]
+            r_placements[t -1] = 2 # middle
+    for item in trow:
+        if item is not None:
+            t = cdic[item]
+            r_placements[t -1] = 3 # top
+        
+    return r_placements 
+    
+  
 def chooseMove(game_state, card, iterations_timer):
     ''' takes game state and dealt card as input, produces tree from monte carlo
     simulations and returns optimal move - 1 for bottom, 2 for middle, 3 for top '''
@@ -246,19 +377,25 @@ def chooseMove(game_state, card, iterations_timer):
     #### calculate first 5 cards to place - recursively call this function with each individual card ####
     if type(card) == type([]): 
         if (len(card) == 5):
+            global num_top_first_count 
+            global deck
+            num_top_first_count = 0
+            deck = produce_deck_of_cards()
+            prune_deck_of_cards(game_state)
             moves = []
-            for c in card:
-                move = chooseMove(game_state, c, iterations_timer) # store recommend row id placement for each card c 
-                moves.append(move)
-                print "Recommended placement of", c, "in row", str(move)
-                force_place = False
-                global placed_cards_s
-                if c in placed_cards_s: 
-                    force_place = True
-                game_state = simulate_append_card(game_state, move, c, force_place)  # updates game_state with placement choice 
-                print "Game state updated with this change!"
-            print "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-            print "First 5 placements:", card[0], moves[0], ",", card[1], moves[1], ",", card[2], moves[2], ",", card[3], moves[3], ",", card[4], moves[4], "\n"
+            moves = place_5(game_state, card, iterations_timer)
+            #for c in card:
+            #    move = chooseMove(game_state, c, iterations_timer) # store recommend row id placement for each card c 
+            #    moves.append(move)
+            #    print "Recommended placement of", c, "in row", str(move)
+            #    force_place = False
+            #    global placed_cards_s
+            #    if c in placed_cards_s: 
+            #        force_place = True
+            #    game_state = simulate_append_card(game_state, move, c, force_place)  # updates game_state with placement choice 
+            #    print "Game state updated with this change!"
+            #print "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            #print "First 5 placements:", card[0], moves[0], ",", card[1], moves[1], ",", card[2], moves[2], ",", card[3], moves[3], ",", card[4], moves[4], "\n"
             return moves
         else:
             print "Invalid amount of cards - need 5!"
@@ -284,11 +421,11 @@ def chooseMove(game_state, card, iterations_timer):
         valid_middle = True
         valid_top = True
         
-        if number_bottom == 5:
+        if number_bottom == 5: # if top full set false
             valid_bottom = False
-        if number_middle == 5:
+        if number_middle == 5: # ' middle '
             valid_middle = False
-        if number_top == 3 or num_top_first_count == 3:
+        if number_top == 3 or num_top_first_count == 3: # ' top '
             valid_top = False
         
         # if there is only one row with free slots save some processing time and just return that move without calculating scores
@@ -329,7 +466,7 @@ def chooseMove(game_state, card, iterations_timer):
         
         while ( (current_milli_time() - stime) < iterations_timer ):
             row = randint(1,3)                
-            predicted_scores[row -1][1] += simulateGame(game_state, row, card) # get expected value for random simulated game with card placed in that row
+            predicted_scores[row -1][1] += simulateGame(game_state, row, card, True) # get expected value for random simulated game with card placed in that row
             count += 1
         
         print "\nSimulated", count, "games with asserted time limit of", iterations_timer, "ms. Actual time taken:", current_milli_time() - stime, "ms"
@@ -367,24 +504,24 @@ def chooseMove(game_state, card, iterations_timer):
             elif valid_middle == True:
                 return 2             #middle
         
-        else:              
-            print "\n\n\n\n\n######################################################################################\n\n\n\n#####\n"        
-            if valid_bottom == True:
-                return 1 
-            elif valid_middle == True:
-                return 2 
-            elif valid_top == True:
-                num_top_first_count += 1
-                return 3
-            else:
-                print "No valid placements available!\n", game_state
-                return None 
+        #else:              
+        #    print "\n\n####################################\nFAILED FIRST THREE CHECKS FOR PLACEMENT. DUMPING ANYWHERE\n#############################################\n"        
+        #    if valid_bottom == True:
+        #        return 1 
+        #    elif valid_middle == True:
+        #        return 2 
+        #    elif valid_top == True:
+        #        num_top_first_count += 1
+        #        return 3
+        #    else:
+        #        print "No valid placements available!\n", game_state
+        #        return None 
     
     else:
         print "Invalid cards.", cards, ". Need type: String e.g. 's01' (ace of spades)"
         return None
 
-def place_one(game_state, card, iterations):
+def place_one_test(game_state, card, iterations):
     ''' takes game_state, card and iterations as parameters
     determines optimal placement for card given game state 
     
@@ -417,7 +554,7 @@ def place_one(game_state, card, iterations):
    
     return chosenrow
 
-def place_five_initial(game_state, cards, iterations):
+def place_five_initial_test(game_state, cards, iterations):
     ''' takes game_state, cards array and iterations as parameters
     determines optimal placement for cards given game state 
     
@@ -497,7 +634,7 @@ if __name__ == "__main__":
         card = 's01' # example test card (ace of spades)
         num_iterations = 500
         for i in range(0, times_to_run):
-            chosenrow = place_one(game_state, card, num_iterations)
+            chosenrow = place_one_test(game_state, card, num_iterations)
             print "Recommendation: Place card in", chosenrow, "row!"
     
     
@@ -509,7 +646,7 @@ if __name__ == "__main__":
         num_iterations = 500
         placements_array = []
         for i in range(0, times_to_run):
-            placements_array.append( place_five_initial(game_state, cards, num_iterations) )
+            placements_array.append( place_five_initial_test(game_state, cards, num_iterations) )
         print "Simulations results: ", placements_array
     
     
