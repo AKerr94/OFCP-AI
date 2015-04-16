@@ -1,5 +1,0 @@
-from unix command line
-
-python setup.py build_ext --inplace
-
-	where setup.py = e.g. build_AI.py

@@ -1,7 +1,26 @@
 in unix 
 
 screen
-python server.py     (start cherrypy server)
+python server.py     (start cherrypy server normallu)
+
+     OR ~faster~ with pypy (start cherrypy server using just in time compiler)
+
+pypy server.py
+
 ctrl+a then d to detach
 
 screen -r resumes session 
+
+=============================================
+
+Choice 1. pypy runs .py files with just-in-time compiler for increased efficiency
+
+
+
+Alternatively build modules into C using cython with the given build_x.py setup scripts. Run the following:
+
+from unix command line
+
+python setup.py build_ext --inplace
+
+	where setup.py = e.g. build_AI.py
