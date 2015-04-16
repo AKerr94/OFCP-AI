@@ -26,7 +26,7 @@ def reformat_hand_xyy_yx(hand, numCards):
             return None
             
         if ( (len(hand) != 15 and numCards == 5) or (len(hand) != 9 and numCards == 3) ):
-            print "Invalid Hand. Required format e.g: c09c10c11c12c13 (clubs straight flush 9->King)\n"
+            print "Invalid Hand:", hand, ". Required format e.g: c09c10c11c12c13 (clubs straight flush 9->King)\n"
             return None
         
         try:
@@ -148,7 +148,7 @@ def scoring_helper(game_state):
     def validate_hands(players_row_scores):
         ''' validate hands. If a player has fouled set scores to -1 '''
         if not ( (players_row_scores[0] > players_row_scores[1]) and (players_row_scores[1] > players_row_scores[2]) ):
-            print "\nA player fouled! Hand:", players_row_scores
+            #print "\nA player fouled! Hand:", players_row_scores
             return 0
         return players_row_scores
          
@@ -166,12 +166,12 @@ def scoring_helper(game_state):
     for poker_hand in hands_list:   # calculate scores and classifications for each hand
         if count < 4:               # evaluate 5 card hands
             scores.append( hands.score_5(poker_hand[0]) )
-            classifications.append( hands.classify_5(poker_hand[0]) )
+            #classifications.append( hands.classify_5(poker_hand[0]) )
             
         else:                       # evaluate 3 card hands
             result = simple_3card_evaluator(poker_hand[0])
             scores.append(result)
-            classifications.append(classify_3(result))
+            #classifications.append(classify_3(result))
                 
         count += 1  
         
@@ -188,7 +188,7 @@ def scoring_helper(game_state):
                 scores = [scores[0],(-1),scores[2],(-1),scores[4],(-1)]
                 p2invalid = True
     
-    print "\nSCORES: ", scores
+    #print "\nSCORES: ", scores
     
     scores_final = []               # keep track of who wins which row and what royalties to give them 
                                     # List Structure [ [winner id(1 or 2), royalty] ]
@@ -233,7 +233,7 @@ def scoring_helper(game_state):
     
     scores_final.append([p1invalid,p2invalid]) 
         
-    print scores_final, '\n', hands_list, '\n', classifications
+    #print scores_final, '\n', hands_list, '\n', classifications
     
     return scores_final
 

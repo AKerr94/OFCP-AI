@@ -7,6 +7,7 @@ from random import randint
 import random
 import helpers
 import copy 
+import time
 
 num_top_first_count = 0 # ensure that initial 5 card placement doesn't put too many top (very unlikely but possible)
 
@@ -22,6 +23,8 @@ scoringhands = 0
 losinghands = 0
 counthands = 0
 zeroscorehands = 0
+
+loop_elapsed = 0
 
 class Node:
     ''' A node in the game tree '''
@@ -95,14 +98,22 @@ def prune_deck_of_cards(game_state):
 def simulateGame(game_state, row, card):
     ''' takes in game state and chosen row to place given card in. 
     randomly simulates rest of game and returns score '''
+    
+ 
+    
+    current_milli_time = lambda: int(round(time.time() * 1000))
+    stime = current_milli_time()
 	
     gs_copy = copy.deepcopy(game_state) # deepcopy copies all elements including nested ones 
     gs_copy = simulate_append_card(gs_copy, row, card, False)    # append card to appropriate position in game state
     prune_deck_of_cards(gs_copy)        
     
+    print "\ngs dic Time taken:", current_milli_time() - stime
+    
     global deck     # get available cards for placement 
     tdeck = deck[:]
     random.shuffle(tdeck)
+    
     
     # populate empty slots in game board with random cards
     for i in range(1,14):
@@ -111,8 +122,18 @@ def simulateGame(game_state, row, card):
                     
         if gs_copy['properties1']['cards']['items']['position'+str(i)] == None:
             gs_copy['properties1']['cards']['items']['position'+str(i)] = tdeck.pop(0)
+   
+    
 
+    current_milli_time = lambda: int(round(time.time() * 1000))
+    stime2 = current_milli_time()
+    
     scores = helpers.scoring_helper(gs_copy) # score game board 
+    
+    
+    global loop_elapsed
+    loop_elapsed += (current_milli_time() - stime2)
+    
     p1score = 0 
     p2score = 0
     p1_multiplier = 1 
@@ -148,17 +169,24 @@ def simulateGame(game_state, row, card):
     global counthands
     counthands += 1
     
+
+    
+    
+    
     if scores[3][1] == False and scores[3][0] == False: # only printing valid results (fouled simulated hands omitted) 
         '''
-        scores_string = "\nAi calculates potential score of " + str(p2score - p1score) + " for placing " + str(card) + " in " + str(row) + "\n    " + str(scores) + "\n"
+        scores_string = map(str, ["\nAi calculates potential score of ", p2score - p1score, " for placing " , card , " in " , row, "\n    ", scores, "\n"])
+        scores_string = ''.join(scores_string)
         AIstring = "AI board~~\n "
         for i in range(1,14):
-            AIstring += "Pos"+ str(i)+ ": "+ str(game_state['properties2']['cards']['items']['position'+str(i)])+ "->"+ str(gs_copy['properties2']['cards']['items']['position'+str(i)]) + ". "
+            t = map(str, ["Pos", i, ": ", game_state['properties2']['cards']['items']['position'+str(i)], "->", gs_copy['properties2']['cards']['items']['position'+str(i)], ". "])
+            AIstring += ''.join(t)
             if i == 5 or i == 10:
                     AIstring += "\n "
         p1string = "P1 board~~\n "
         for i in range(1,14):
-            p1string += "Pos"+ str(i)+ ": "+ str(game_state['properties1']['cards']['items']['position'+str(i)])+ "->"+ str(gs_copy['properties1']['cards']['items']['position'+str(i)]) + ". "
+            t = map(str, ["Pos", i, ": ", game_state['properties1']['cards']['items']['position'+str(i)], "->", gs_copy['properties1']['cards']['items']['position'+str(i)], ". "])
+            p1string += ''.join(t)
             if i == 5 or i == 10:
                     p1string += "\n "
                   
@@ -309,12 +337,18 @@ def chooseMove(game_state, card, iterations):
         # ~equal simulations for each row 
         count = 0
         row = 1
+        current_milli_time = lambda: int(round(time.time() * 1000))
+        stime = current_milli_time()
         for i in range (0,iterations):
             if count >= float(iterations)/float(3):
                 count = 0
                 row += 1
+                
             predicted_scores[row -1][1] += simulateGame(game_state, row, card) #then get estimated score for simulated game with card placed in that row
+            
             count += 1
+        
+        print "\nINNER Time taken:", current_milli_time() - stime
         
         print "There were", nullscoringhands, "null boards &", scoringhands, "positive scoring boards &", zeroscorehands, "zero-scoring boards &", losinghands, "losing boards. Total simulations:", counthands
         print "Final scores predictions~~\nEV from placing",str(card),"in bottom:", str(predicted_scores[0][1]),", middle:",str(predicted_scores[1][1]),", top:",str(predicted_scores[2][1])

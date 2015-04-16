@@ -6,6 +6,7 @@ import hands
 import helpers
 import OFCP_AI
 from datetime import datetime
+import time
 
 from config import application_config, cherrypy_config
 
@@ -20,8 +21,8 @@ class subpage(object):
                 game_state = json.loads(params['game-state']) # loads as dictionary 
         except: 
                 ef = open('error_log.txt','a')
-                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
-                return None
+                ef.write( '\n{} invalid json: {}'.format(datetime.now(), params) )
+                raise cherrypy.HTTPError(403, "There was an error with the given game state.")
         f = open('test_output.txt', 'w')
        
         hand_string = ''
@@ -48,8 +49,9 @@ class subpage(object):
                 game_state = json.loads(params['game-state']) # loads as dictionary 
         except: 
                 ef = open('error_log.txt','a')
-                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
-                return None
+                #ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
+                ef.write( '\n{} invalid json: {}'.format(datetime.now(), params) )
+                raise cherrypy.HTTPError(403, "There was an error with the given game state.")
         
         # handle game state stuff here - send to function for hand eval's, AI simulation etc....
         
@@ -70,8 +72,8 @@ class subpage(object):
                 game_state = json.loads(params['game-state']) # loads as dictionary 
         except: 
                 ef = open('error_log.txt','a')
-                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
-                return None
+                ef.write( '\n{} invalid json: {}'.format(datetime.now(), params) )
+                raise cherrypy.HTTPError(403, "There was an error with the given game state.")
                 
                 
         scores_array = helpers.scoring_helper(game_state)
@@ -91,8 +93,11 @@ class subpage(object):
                 game_state = json.loads(params['game-state']) # loads as dictionary 
         except: 
                 ef = open('error_log.txt','a')
-                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
-                return None
+                ef.write( '\n{} invalid json: {}'.format(datetime.now(), params) )
+                raise cherrypy.HTTPError(403, "There was an error with the given game state.")
+        
+        current_milli_time = lambda: int(round(time.time() * 1000))
+        stime = current_milli_time()
         
         # read in cards to be placed 
         cards = []
@@ -100,6 +105,10 @@ class subpage(object):
             cards.append(str(game_state['properties2']['cards']['items']['card'+str(i+1)]))
         iterations = 500   # as iterations increases diverges to optimal solution 
         AI_placements = OFCP_AI.chooseMove(game_state,cards,iterations)
+        
+        print "\nTime taken:", current_milli_time() - stime
+        
+        print OFCP_AI.loop_elapsed
         
         return json.dumps(AI_placements)
     
@@ -109,8 +118,8 @@ class subpage(object):
                 game_state = json.loads(params['game-state']) # loads as dictionary 
         except: 
                 ef = open('error_log.txt','a')
-                ef.write(str(datetime.now()) + ': Invalid JSON error. \n ' + str(params) + '\n\n')
-                return None
+                ef.write( '\n{} invalid json: {}'.format(datetime.now(), params) )
+                raise cherrypy.HTTPError(403, "There was an error with the given game state.")
         
         card = str(game_state['properties2']['cards']['items']['card'])
         iterations = 500
@@ -118,9 +127,9 @@ class subpage(object):
         
         return json.dumps(AI_placement)
     
-    index.exposed = True
-    server_hands.exposed = True
-    eval_one_hand_test.exposed = True
+    index.exposed = False
+    server_hands.exposed = False
+    eval_one_hand_test.exposed = False
     calculate_scores.exposed = True
     AI_calculate_first_5.exposed = True
     AI_calculate_one.exposed = True
