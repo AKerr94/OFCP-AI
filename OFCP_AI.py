@@ -3,6 +3,7 @@ import random
 import helpers
 import copy 
 import time
+from datetime import datetime
 
 num_top_first_count = 0 # ensure that initial 5 card placement doesn't put too many top (very unlikely but possible)
 
@@ -93,17 +94,10 @@ def prune_deck_of_cards(game_state):
 def simulateGame(game_state, row, card):
     ''' takes in game state and chosen row to place given card in. 
     randomly simulates rest of game and returns score '''
-    
- 
-    
-    current_milli_time = lambda: int(round(time.time() * 1000))
-    stime = current_milli_time()
 	
     gs_copy = copy.deepcopy(game_state) # deepcopy copies all elements including nested ones 
     gs_copy = simulate_append_card(gs_copy, row, card, False)    # append card to appropriate position in game state
     prune_deck_of_cards(gs_copy)        
-    
-    print "\ngs dic Time taken:", current_milli_time() - stime
     
     global deck     # get available cards for placement 
     tdeck = deck[:]
@@ -163,10 +157,6 @@ def simulateGame(game_state, row, card):
     
     global counthands
     counthands += 1
-    
-
-    
-    
     
     if scores[3][1] == False and scores[3][0] == False: # only printing valid results (fouled simulated hands omitted) 
         '''
@@ -249,7 +239,7 @@ def simulate_append_card(game_state, row, card, force_place):
     #print "New AI board state:", str(game_state['properties2']['cards']['items']), '\n'
     return game_state
     
-def chooseMove(game_state, card, iterations):
+def chooseMove(game_state, card, iterations_timer):
     ''' takes game state and dealt card as input, produces tree from monte carlo
     simulations and returns optimal move - 1 for bottom, 2 for middle, 3 for top '''
     
@@ -258,7 +248,7 @@ def chooseMove(game_state, card, iterations):
         if (len(card) == 5):
             moves = []
             for c in card:
-                move = chooseMove(game_state, c, iterations) # store recommend row id placement for each card c 
+                move = chooseMove(game_state, c, iterations_timer) # store recommend row id placement for each card c 
                 moves.append(move)
                 print "Recommended placement of", c, "in row", str(move)
                 force_place = False
@@ -310,6 +300,9 @@ def chooseMove(game_state, card, iterations):
             return 1 # bottom
         elif valid_bottom == False and valid_middle == False and valid_top == False:
             print "\nThere are no valid places to move! Check game state for duplicates/ errors!\nGame State:", game_state['properties2']
+            f = open('error_log_invalid_rows.txt','a')
+            f.write('{} No valid rows left!\n gamestate:{}\ncard: {}\nIterations Timer: {} \n'.format(datetime.now(), game_state, card, iterations_timer))
+            f.close()
             #raw_input('waiting...')
             return None 
         
@@ -329,24 +322,20 @@ def chooseMove(game_state, card, iterations):
         
         predicted_scores = [ [1,0], [2,0], [3,0] ] # first index: row choice, second index: total score
         
-        # ~equal simulations for each row 
         count = 0
-        row = 1
+        
         current_milli_time = lambda: int(round(time.time() * 1000))
         stime = current_milli_time()
-        for i in range (0,iterations):
-            if count >= float(iterations)/float(3):
-                count = 0
-                row += 1
-                
-            predicted_scores[row -1][1] += simulateGame(game_state, row, card) #then get estimated score for simulated game with card placed in that row
-            
+        
+        while ( (current_milli_time() - stime) < iterations_timer ):
+            row = randint(1,3)                
+            predicted_scores[row -1][1] += simulateGame(game_state, row, card) # get expected value for random simulated game with card placed in that row
             count += 1
         
-        print "\nINNER Time taken:", current_milli_time() - stime
+        print "\nSimulated", count, "games with asserted time limit of", iterations_timer, "ms. Actual time taken:", current_milli_time() - stime, "ms"
         
         print "There were", nullscoringhands, "null boards &", scoringhands, "positive scoring boards &", zeroscorehands, "zero-scoring boards &", losinghands, "losing boards. Total simulations:", counthands
-        print "Final scores predictions~~\nEV from placing",str(card),"in bottom:", str(predicted_scores[0][1]),", middle:",str(predicted_scores[1][1]),", top:",str(predicted_scores[2][1])
+        print "Final scores predictions~~\nAvg. EV from placing",str(card),"in bottom:", str(predicted_scores[0][1]),", middle:",str(predicted_scores[1][1]),", top:",str(predicted_scores[2][1])
         
         #print str(game_state)
         
