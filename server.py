@@ -105,7 +105,7 @@ class subpage(object):
         cards = []
         for i in range(0,5):
             cards.append(str(game_state['properties2']['cards']['items']['card'+str(i+1)]))
-        iterations_timer = 750   # Sets time in ms to spend simulating games. As iterations increases diverges to optimal solution 
+        iterations_timer = 3000   # Sets time in ms to spend simulating games. As iterations increases diverges to optimal solution 
         AI_placements = OFCP_AI.chooseMove(game_state,cards,iterations_timer)
         
         print "\nTime taken calculating 5 placements:", current_milli_time() - stime, "ms"
@@ -129,7 +129,7 @@ class subpage(object):
         stime = current_milli_time()
         
         card = str(game_state['properties2']['cards']['items']['card'])
-        iterations_timer = 1750
+        iterations_timer = 2500
         AI_placement = OFCP_AI.chooseMove(game_state,card,iterations_timer)
         
         print "\nTime taken calculating 1 placement:", current_milli_time() - stime, "ms"

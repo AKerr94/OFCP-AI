@@ -102,7 +102,7 @@ def simulateGame(game_state, row, card, bAppend):
         gs_copy = simulate_append_card(gs_copy, row, card, True)    # append card to appropriate position in game state     
     prune_deck_of_cards(gs_copy)        
     
-    print gs_copy
+    #print gs_copy
     
     global deck     # get available cards for placement 
     tdeck = deck[:]
@@ -300,7 +300,7 @@ def place_5(game_state, cards, sim_timer):
         s_count += 1
         #print str(s_count) + ":", state
         
-    print "\nTotal states:", s_count
+    print "Total states:", s_count
     
     current_milli_time = lambda: int(round(time.time() * 1000))
     
@@ -323,7 +323,7 @@ def place_5(game_state, cards, sim_timer):
         
         s_ev = 0
         iterations = 0
-        while ( (current_milli_time() - stime) < (sim_timer / 20) ): # loop for 1/10 of sim timer in ms
+        while ( (current_milli_time() - stime) < (sim_timer / 20) ): # loop for 1/20 of sim timer in ms
             s_ev += simulateGame(gs_copy, None, None, False) # simulates random placements of rest of cards on game board and returns EV
             iterations += 1
         
@@ -341,12 +341,20 @@ def place_5(game_state, cards, sim_timer):
             best_state_score = result
             highest_ev = result[1]
     
-    print "Best state score:", best_state_score
+    print "\nBest state score:", best_state_score
     
     best_state_id = best_state_score[0]
     best_state = final[best_state_id -1]
         
     print "~best state got:", best_state    
+    
+    ftw = open("states_ev.txt", "w")
+    s = ""
+    for line in states_scores:
+        s = "ID:", str(line[0]), ", EV:", str(line[1]), "from", str(line[2]), "iterations."
+        s += str(final[line[0]-1]) + "\n"
+        ftw.write()
+    ftw.close()
     
     brow = best_state[0]
     mrow = best_state[1]
@@ -366,7 +374,15 @@ def place_5(game_state, cards, sim_timer):
         if item is not None:
             t = cdic[item]
             r_placements[t -1] = 3 # top
-        
+    
+    a = "\nPlacements: "
+    for i in range(0,5):
+        a += cards[i] + " -> Row " + str(r_placements[i])
+        if i is not 4:
+            a += ", "
+        else:
+            a += "."
+    print a
     return r_placements 
     
   
@@ -465,7 +481,17 @@ def chooseMove(game_state, card, iterations_timer):
         stime = current_milli_time()
         
         while ( (current_milli_time() - stime) < iterations_timer ):
-            row = randint(1,3)                
+            while ( True ): # select a random valid row to place card in
+                row = randint(1,3)       
+                if row == 1:
+                    if valid_top == True:
+                        break
+                elif row == 2:
+                    if valid_middle == True:
+                        break
+                else:
+                    if valid_top == True:
+                        break
             predicted_scores[row -1][1] += simulateGame(game_state, row, card, True) # get expected value for random simulated game with card placed in that row
             count += 1
         
@@ -475,6 +501,14 @@ def chooseMove(game_state, card, iterations_timer):
         print "Final scores predictions~~\nAvg. EV from placing",str(card),"in bottom:", str(predicted_scores[0][1]),", middle:",str(predicted_scores[1][1]),", top:",str(predicted_scores[2][1])
         
         #print str(game_state)
+        
+        # do not recommend placement in an invalid row
+        if valid_top == False:
+            predicted_scores[0][1] = -99999
+        if valid_middle == False:
+            predicted_scores[1][1] = -99999
+        if valid_top == False:
+            predicted_scores[2][1] = -99999
         
         t1 = predicted_scores[0][1]
         t2 = predicted_scores[1][1]
