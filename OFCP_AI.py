@@ -365,10 +365,12 @@ def place_5(game_state, cards, sim_timer):
         for state in final:
             counts = [0,0,0]
             for i in range(0,3):
-                thatrank_char = backrankmappingdic[thatrank]
                 for x in state[i]:
                     if x is not None:
-                        if x[0] == thatrank_char:
+                        x = int(x[1] + x[2])
+                        if x == 1:
+                            x = 14
+                        if x == thatrank:
                             counts[i] += 1
 
             if counts[0] < highestfreq and counts[1] < highestfreq and counts[2] < highestfreq: # not all placed together
@@ -386,10 +388,12 @@ def place_5(game_state, cards, sim_timer):
          for state in final2:
             counts = [0,0,0]
             for i in range(0,3):
-                secondrank_char = backrankmappingdic[secondrank]
                 for x in state[i]:
                     if x is not None:
-                        if x[0] == secondrank_char:
+                        x = int(x[1] + x[2])
+                        if x == 1:
+                            x = 14
+                        if x == secondrank:
                             counts[i] += 1
 
             if counts[0] < nexthighestfreq and counts[1] < nexthighestfreq and counts[2] < nexthighestfreq: # not all placed together
@@ -432,7 +436,7 @@ def place_5(game_state, cards, sim_timer):
         
         s_ev = 0
         iterations = 0
-        while ( (current_milli_time() - stime) < (sim_timer / 20) ): # loop for 1/20 of sim timer in ms
+        while ( (current_milli_time() - stime) < (sim_timer / s_count) ): # each state gets an equal % of iteration time
             s_ev += simulateGame(gs_copy, None, None, False) # simulates random placements of rest of cards on game board and returns EV
             iterations += 1
         
@@ -646,19 +650,6 @@ def chooseMove(game_state, card, iterations_timer):
                 return 3             #top
             elif valid_middle == True:
                 return 2             #middle
-        
-        #else:              
-        #    print "\n\n####################################\nFAILED FIRST THREE CHECKS FOR PLACEMENT. DUMPING ANYWHERE\n#############################################\n"        
-        #    if valid_bottom == True:
-        #        return 1 
-        #    elif valid_middle == True:
-        #        return 2 
-        #    elif valid_top == True:
-        #        num_top_first_count += 1
-        #        return 3
-        #    else:
-        #        print "No valid placements available!\n", game_state
-        #        return None 
     
     else:
         print "Invalid cards.", cards, ". Need type: String e.g. 's01' (ace of spades)"
