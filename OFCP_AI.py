@@ -23,6 +23,9 @@ zeroscorehands = 0
 
 loop_elapsed = 0
 
+rankmappingdic = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14}
+backrankmappingdic = {2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'T',11:'J',12:'Q',13:'K',14:'A'}
+
 class Node:
     ''' A node in the game tree '''
     def __init__(self):
@@ -241,7 +244,32 @@ def simulate_append_card(game_state, row, card, force_place):
     
     #print "New AI board state:", str(game_state['properties2']['cards']['items']), '\n'
     return game_state
-  
+ 
+def produce_histogram(cards):
+    ''' takes in cards as input e.g. ['AS','AD','7H','5C','5H']
+    and returns histogram of ranks '''
+    
+    histogram = [
+        [2, 0],     # Deuce
+        [3, 0],     # 3
+        [4, 0],     # 4
+        [5, 0],     # 5
+        [6, 0],     # 6
+        [7, 0],     # 7
+        [8, 0],     # 8
+        [9, 0],     # 9
+        [10, 0],    # 10
+        [11, 0],    # Jack
+        [12, 0],    # Queen
+        [13, 0],    # King
+        [14, 0]     # Ace
+    ]
+
+    for i in range(0,5):
+        temp = rankmappingdic[cards[i][0]]
+        histogram[temp -2][1] += 1
+
+    return histogram 
 
 def place_5(game_state, cards, sim_timer):
     ''' takes game_state, first 5 cards and allocated simulated time in ms as inputs.
@@ -252,6 +280,18 @@ def place_5(game_state, cards, sim_timer):
     print "\n####\nPlace_5:", cards, "\nSimulation Timer:", sim_timer, "ms.\n"
     
     cdic = {cards[0]:1, cards[1]:2, cards[2]:3, cards[3]:4, cards[4]:5} # keep a permanent record of which card was which index 
+    
+    cstring = ""
+    for i in range(0,5):
+        cstring += cards[i][0] + cards[i][1] + cards[i][2]
+    print cstring
+
+    cstring = helpers.reformat_hand_xyy_yx(cstring, 5)
+
+    cformatted = []
+    for i in xrange(0,10,2):
+        tstr = cstring[i] + cstring[i+1]
+        cformatted.append(tstr)
 
     # ctemp = 13 elements: 5 cards + 8 '' blanks (13 containers on a player's OFC board)
     ctemp = cards[:]
@@ -270,6 +310,29 @@ def place_5(game_state, cards, sim_timer):
 
     x = set(itertools.product(*rowlists)) # product of all possible row combinations
 
+    # histogram maps frequency of each rank - used to prune states to reduce complexity when there are pairs, trips etc.
+    # e.g. if we have pair of Aces removes states where these aces are not placed together
+    # as it is very unlikely this would be an optimal placement
+    hist = produce_histogram(cformatted)
+    print "Histogram:", hist, "\n"
+
+    highestfreq = 1 # look for quads or trips or a pair
+    thatrank = None
+    for item in hist:
+        if item[1] > highestfreq:
+            highestfreq = item[1]
+            thatrank = item[0]
+
+    nexthighestfreq = 1 
+    secondrank = None
+    if highestfreq < 4: # look for e.g. 2nd pair
+        for item in hist:
+            if item[1] > nexthighestfreq and item[0] is not thatrank:
+                nexthighestfreq = item[1]
+                secondrank = item[0]
+
+    print "Highest Freq:",highestfreq,"Rank:",thatrank,"... Next Highest Freq:",nexthighestfreq,"Rank:",secondrank
+    
     final = []
     # post-processing removes duplicates and validates state has all cards placed 
     for rows in x:
@@ -295,10 +358,56 @@ def place_5(game_state, cards, sim_timer):
             if c_count == 5 and not duplicate:
                 final.append(rows)
 
+    final2 = []
+
+    # 2nd round of post-processing if there are pairs, trips or quads - remove states that don't place these optimally
+    if thatrank is not None:
+        for state in final:
+            counts = [0,0,0]
+            for i in range(0,3):
+                thatrank_char = backrankmappingdic[thatrank]
+                for x in state[i]:
+                    if x is not None:
+                        if x[0] == thatrank_char:
+                            counts[i] += 1
+
+            if counts[0] < highestfreq and counts[1] < highestfreq and counts[2] < highestfreq: # not all placed together
+                # remove this non-optimal state
+                pass
+            else:
+                final2.append(state) # append this state which has all instances of thatrank paired together
+    else:
+        final2 = final
+        
+    final3 = []
+    
+    # 3rd round for any second pair
+    if secondrank is not None:
+         for state in final2:
+            counts = [0,0,0]
+            for i in range(0,3):
+                secondrank_char = backrankmappingdic[secondrank]
+                for x in state[i]:
+                    if x is not None:
+                        if x[0] == secondrank_char:
+                            counts[i] += 1
+
+            if counts[0] < nexthighestfreq and counts[1] < nexthighestfreq and counts[2] < nexthighestfreq: # not all placed together
+                # remove this non-optimal state
+                pass
+            else:
+                final3.append(state) # append this state which has all instances of thatrank paired together
+    else:
+        final3 = final2
+
+    final = final3
+    final2 = None #wipe
+    final3 = None #wipe
+                 
     s_count = 0
     for state in final:
         s_count += 1
-        #print str(s_count) + ":", state
+        print str(s_count) + ":", state
         
     print "Total states:", s_count
     
@@ -351,9 +460,9 @@ def place_5(game_state, cards, sim_timer):
     ftw = open("states_ev.txt", "w")
     s = ""
     for line in states_scores:
-        s = "ID:", str(line[0]), ", EV:", str(line[1]), "from", str(line[2]), "iterations."
+        s = "ID: " + str(line[0]) + ", EV: " + str(line[1]) + " from " + str(line[2]) + " iterations. "
         s += str(final[line[0]-1]) + "\n"
-        ftw.write()
+        ftw.write(s)
     ftw.close()
     
     brow = best_state[0]
