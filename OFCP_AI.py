@@ -404,9 +404,31 @@ def place_5(game_state, cards, sim_timer):
     else:
         final3 = final2
 
-    final = final3
+    final4 = []    
+        
+    # 4th round - if there are still lots of states to consider, prune some sub-optimal placements e.g. all cards placed in middle 
+    if len(final3) > 50:
+        for state in final3:
+            # remove states with an empty or full bottom row
+            count = 0
+            for item in state[0]:
+                if item is not None:
+                    count += 1
+            if count > 0 and count < 5:
+                count = 0
+                for item in state[2]:
+                    if item is not None:
+                        count += 1
+                # prune states which have dumped 3 cards top
+                if count < 3:
+                    final4.append(state)
+    else:
+        final4 = final3  
+        
+    final = final4
     final2 = None #wipe
     final3 = None #wipe
+    final4 = None #wipe
                  
     s_count = 0
     for state in final:
