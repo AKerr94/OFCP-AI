@@ -497,7 +497,7 @@ def place_5(game_state, cards, sim_timer):
             best_state_score = result
             highest_ev = result[1]
     
-    #print "\nBest state score:", best_state_score
+    print "\nBest state score:", best_state_score
     
     best_state_id = best_state_score[0]
     best_state = final[best_state_id -1]

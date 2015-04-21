@@ -1,11 +1,9 @@
 var suits = ["h", "d", "s", "c"];
 var playButtonCounter = 0,
     cardsPlacedCount = 0,
-    deckIndex = 0,
     round_number = 1;
-var playLock = false,
-    playerFirst = false;
-var deck = [];
+var playLock = false;
+    playerFirst = true;
 var AI_positions = ["p2_bottom1", "p2_bottom2", "p2_bottom3", "p2_bottom4", "p2_bottom5",
     "p2_middle1", "p2_middle2", "p2_middle3", "p2_middle4", "p2_middle5",
     "p2_top1", "p2_top2", "p2_top3"
@@ -26,7 +24,7 @@ var player1 = "Player 1",
     player2 = "Computer Opponent";
 
 
-setupGame(); // initial set up stages
+setupGame(); // Initial set up of game
 
 
 function allowDrop(ev) {
@@ -77,97 +75,93 @@ function drop(ev) {
     }
 }
 
+function setupGame() {
+    console.log('Welcome to OFCP-AI, an application by Alastair Kerr!');
+    playerLabels(0,false,false); // set player name fields
+    var button = document.getElementById('playButton');
+    button.onclick = function() {
+        button.innerHTML = "Next"; // change button text from 'Play' to 'Next'
+        POST_reqwest(initial_5 ); // POST gamestate to backend and then calls initial_5 with response
+    };
+}
+
 function initial_5(resp) {
-    cards = JSON.parse(resp);
+    // displays player's first 5 cards to place
+    cards = JSON.parse(resp); // parse response to get array of cards to be placed
     for (i = 1; i < 6; i++) {
         var img = document.getElementById('place'+i+'card');
         var card = cards[i-1];
-        img.src = "../static/cards/" + card.toString() + ".png";
-        img.name = card.toString();
+        img.src = "../static/cards/" + card + ".png";
+        img.name = card;
         img.style.display = "block"; // set visible
         //img.src = "cards/d01.png"; //ace of diamonds
     }
     playLock = true;
 
-    document.getElementById('playButton').onclick = function() {
-        var button = document.getElementById("playButton");
-    button.style.display = "none"; // hide button while AI calculates moves
+    var button = document.getElementById("playButton");
+    button.onclick = function() {
+        // TODO remake this playLock functionality to be less buggy - ATM can place one card in 5 places to unlock button - pressing button will crash game
+        if (playLock == true) {
+            alert("You must place all your cards first!")
+            return;
+        }
+        button.style.display = "none"; // hide button while AI calculates moves
 
-    var b_text = document.getElementById("buttonTextReplacer");
-    b_text.innerHTML = "AI is calculating move..."
-    button.style.display = "block";
+        var b_text = document.getElementById("buttonTextReplacer");
+        b_text.innerHTML = "AI is calculating move..."
+
         POST_reqwest(handleAICards);
     };
 
 }
 
 function handleAICards(resp) {
-    var gs = JSON.parse(resp); // parse response
+    var gs = JSON.parse(resp); // parse game state from response
+    var b_text = document.getElementById("buttonTextReplacer");
+    b_text.style.display = "block";
+    alert(gs['cardtoplace']);
 
-
-
-    x = function(min,max,row) {
+    readAndPlace = function(min,max,row) { // read cards from backend response and updates frontend
         for (i = min; i < max+1; i++) {
-            t = gs['properties2']['cards']['items']['position'+i]
+            t = gs['properties2']['cards']['items']['position'+i] // get card info for appropriate position in game state
             if (t != null) {
                 var cardimg = document.createElement("img");
                 cardimg.src = "../static/cards/" + t + ".png";
-                //cardimg.name = t;
+                cardimg.name = t;
                 cardimg.width = 109;
                 cardimg.height = 150;
                 cardimg.ondragstart = function() {return false;};
-                console.log(i);
 
                 j=i;
+                // modify j to get correct row position
                 if (row == 'middle'){
                     j -= 5;
                 }else if (row == 'top') {
                     j -= 10;
                 }
 
-                console.log(row);
+                console.log("AI Placed " + cardimg.name + " in row " + row + " (position" + i + ")");
 
-                console.log(i);
-
-                document.getElementById('p2_'+row+j).appendChild(cardimg);
+                document.getElementById('p2_'+row+j).appendChild(cardimg); // append image for this card to position on game board
 
             }
         }
     }
-    x(1,5,'bottom');
-    x(6,10,'middle');
-    x(11,13,'top');
+    readAndPlace(1,5,'bottom');
+    readAndPlace(6,10,'middle');
+    readAndPlace(11,13,'top');
 
     var button = document.getElementById("playButton");
-    button.style.display = "block"; // hide button while AI calculates moves
+    button.style.display = "block";
 
     var b_text = document.getElementById("buttonTextReplacer");
-    b_text.innerHTML = "AI is calculating move..."
-     b_text.style.display = "none";
-
-    //var astring = "Placing card " + cardimg.name + " in pos " + recommended_move;
-    //alert(astring);
-
-    //alert("AI placement count: " + AI_placement_counter + ", Player first:" + playerFirst);
-    /*if (AI_placement_counter >= 9 && playerFirst == true) {
-        gamestage = "end";
-        play();
-    }
-    button.style.display = "inline";
-    b_text.innerHTML = ""*/
-}
-
-function setupGame() {
-console.log('sdfsdf');
-    createDeck(); // initialise deck
-    playerLabels(0,false,false); // set player name fields
-    document.getElementById('playButton').onclick = function() {
-        POST_reqwest(initial_5 );
-    };
+    b_text.style.display = "none";
 }
 
 // play function called from pressing button
 function play() {
+
+    alert("Play function called! waaaa");
 
     if (gamestage == "init") {
         gamestage = "game";
@@ -208,11 +202,7 @@ function play() {
         if (!playerFirst) {
             AI_main();
         }
-
-        var t = populate_game_state_arrays();
-        tarray1 = t[0];
-        tarray2 = t[1];
-
+        alert("The play function is not dead code!");
         POST_reqwest(initial_5) // gets first 5 cards for player to place from backend
         //AI_main()
     }
@@ -261,9 +251,7 @@ function resetGame() {
     // reset global vars
     playButtonCounter = 0;
     cardsPlacedCount = 0;
-    deckIndex = 0;
     AI_placement_counter = 0;
-    deck = [];
     gamestage = "init";
     rowScoresArr = [0, 0, 0, 0, 0, 0];
 
@@ -461,7 +449,7 @@ function handleRoundEnd() {
     playerLabels(scoop,p1foul,p2foul);
   })
   .fail(function (err, msg) {
-    alert("Error! Scoring Reqwest unsuccessful... check server connection and try again.");
+     alert("Error! Scoring Reqwest unsuccessful... check server connection and try again.");
   });
 
 }
@@ -472,38 +460,6 @@ function chooseScoreColour(num) {
     } else {
         return "#FF0000"; //red for negative
     }
-}
-
-function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function createDeck() {
-    var cstring, cname;
-
-    // add every card object to deck array
-    for (i = 0; i < 4; i++) {
-
-        for (j = 1; j < 14; j++) {
-            var card = document.createElement("img");
-            // build img and name strings
-            if (j < 10) {
-                // if single digit need padding for string (0 before num)
-                cstring = "../static/cards/" + suits[i] + "0" + j + ".png";
-                cname = suits[i] + "0" + j;
-            } else {
-                cstring = "../static/cards/" + suits[i] + j + ".png";
-                cname = suits[i] + "" + j;
-            }
-
-            card.src = cstring;
-            card.name = cname;
-
-            deck.push(card);
-        }
-    }
-
-    deck = shuffle(deck);
 }
 
 function playerLabels(scoop_id, p1_foul, p2_foul) {
@@ -543,34 +499,6 @@ function playerLabels(scoop_id, p1_foul, p2_foul) {
     temp3.innerHTML = temp2;
 }
 
-// Fisher-Yates Shuffle Algorithm
-function shuffle(cards) {
-    var count = cards.length;
-    var temp, i;
-
-    while (count > 0) {
-        i = Math.floor(Math.random() * count); // random index
-        count--;
-
-        // swap positions
-        temp = cards[count];
-        cards[count] = cards[i];
-        cards[i] = temp;
-    }
-
-    return cards;
-}
-
-// deal card from deck
-function dealCard() {
-    if (deckIndex < 52) {
-        deckIndex++;
-        return deck[deckIndex - 1];
-    } else {
-        return null;
-    }
-}
-
 function populate_game_state_arrays() {
     // populate temp arrays for game state. If no card placed in a position set appropriate index to null
 
@@ -587,7 +515,7 @@ function populate_game_state_arrays() {
         }
 
         try {
-            temp2 = document.getElementById(AI_positions[i]).childNodes[0].name;         // get AI's card at pos i
+            temp2 = document.getElementById(AI_positions[i]).childNodes[0].name;     // get AI's card at pos i
         }
         catch(err) {
             temp2 = null;
@@ -600,6 +528,7 @@ function populate_game_state_arrays() {
 
 function POST_reqwest(thenFunction) {
 
+    // get card info at each position on board (card name or null if empty)
     var t = populate_game_state_arrays();
     tarray1 = t[0];
     tarray2 = t[1];
@@ -655,175 +584,12 @@ function POST_reqwest(thenFunction) {
                 )
           }
         })
-       .then(thenFunction)
-      .fail(function (err, msg) {
-        alert("Error! Reqwest unsuccessful... check server connection and try again.");
+       .then(thenFunction) // calls this function after a successful reqwest
+       .fail(function (err, msg) {
+            astring = "Error! POST 'Reqwest' unsuccessful... check server connection and try again.\n" + err.toString();
+            alert(astring);
       });
      }
-
-AIs_place5 = function (resp) {
-
-    var button = document.getElementById("playButton");
-    button.style.display = "none"; // hide button while AI calculates moves
-
-    var b_text = document.getElementById("buttonTextReplacer");
-    b_text.innerHTML = "AI is calculating move..."
-
-    var gs = JSON.parse(resp); // parse response as list again
-    alert(recommended_moves);
-    for(k = 0; k < 5; k++) {
-        if (recommended_moves[k] == 1) {
-            // place card in bottom row
-            document.getElementById(AI_pos_bottom[0]).appendChild(first_5_cards[k]);
-            AI_pos_bottom.shift(); // removes first element from array - keeps up to date with available positions
-        }
-        else if (recommended_moves[k] == 2) {
-            // place card in middle row
-            document.getElementById(AI_pos_middle[0]).appendChild(first_5_cards[k]);
-            AI_pos_middle.shift();
-        }
-        else if (recommended_moves[k] == 3) {
-            // place card in top row
-            document.getElementById(AI_pos_top[0]).appendChild(first_5_cards[k]);
-            AI_pos_top.shift();
-        }
-        else {
-            alert("Invalid recommended row! Expected 1, 2 or 3. Actual: " + recommended_moves[k]);
-        }
-        //var astring = "Placing card " + first_5_cards[k].name + " in pos " + recommended_moves[k];
-        //alert(astring);
-    }
-    button.style.display = "inline";
-    b_text.innerHTML = ""
-}
-
-// main function for handling the AI - pass here once the player is done
-function AI_main() {
-
-    var button = document.getElementById("playButton");
-    button.style.display = "none"; // hide button while AI calculates moves
-
-    var b_text = document.getElementById("buttonTextReplacer");
-    b_text.innerHTML = "AI is calculating move..."
-
-    AI_placement_counter++;
-
-    // special case - first round
-    if (playButtonCounter == 1 || (playButtonCounter == 2 && playerFirst == true)) {
-
-        // deal first 5 cards out
-        var first_5_cards = [];
-
-        for (i = 0; i < 5; i++) {
-            var card = dealCard();
-            var cardimg = document.createElement("img");
-            cardimg.src = card.src;
-            cardimg.name = card.name;
-            cardimg.width = 109;
-            cardimg.height = 150;
-            cardimg.ondragstart = function() {return false;};
-            first_5_cards.push(cardimg);
-        }
-
-       POST_reqwest(AIs_place5)
-    }
-
-    // general case
-    else {
-
-        var t = populate_game_state_arrays();
-        tarray1 = t[0];
-        tarray2 = t[1];
-
-        reqwest({'url': 'http://alastairkerr.co.uk/ofc/subpage/AI-calculate-one'
-            , 'method': 'post'
-            , 'data': {'game-state':JSON.stringify(
-                                    {
-                                        "name1": "Player1",
-                                        "properties1": {
-                                            "cards": {
-                                                "type": "array",
-                                                "items": {
-                                                    "position1": tarray1[0],
-                                                    "position2": tarray1[1],
-                                                    "position3": tarray1[2],
-                                                    "position4": tarray1[3],
-                                                    "position5": tarray1[4],
-                                                    "position6": tarray1[5],
-                                                    "position7": tarray1[6],
-                                                    "position8": tarray1[7],
-                                                    "position9": tarray1[8],
-                                                    "position10": tarray1[9],
-                                                    "position11": tarray1[10],
-                                                    "position12": tarray1[11],
-                                                    "position13": tarray1[12],
-                                                }
-                                            }
-                                        },
-                                        "name2": "Player2",
-                                        "properties2": {
-                                            "cards": {
-                                                "type": "array",
-                                                "items": {
-                                                    "position1": tarray2[0],
-                                                    "position2": tarray2[1],
-                                                    "position3": tarray2[2],
-                                                    "position4": tarray2[3],
-                                                    "position5": tarray2[4],
-                                                    "position6": tarray2[5],
-                                                    "position7": tarray2[6],
-                                                    "position8": tarray2[7],
-                                                    "position9": tarray2[8],
-                                                    "position10": tarray2[9],
-                                                    "position11": tarray2[10],
-                                                    "position12": tarray2[11],
-                                                    "position13": tarray2[12],
-                                                    "card": cardimg.name,
-                                                }
-                                            }
-                                        }
-                                    }
-                    )
-              }
-        })
-        .then(function (resp) {
-            var gs = JSON.parse(resp); // parse response
-
-            x = function(min,max,row) {
-                for (i = min; i < max+1; i++) {
-                    t = gs['properties2']['cards']['items']['position'+i]
-                    if (t != null) {
-                        var cardimg = document.createElement("img");
-                        cardimg.src = "../static/cards/" + t + ".png";
-                        cardimg.name = card.name;
-                        cardimg.width = 109;
-                        cardimg.height = 150;
-                        cardimg.ondragstart = function() {return false;};
-                        document.getElementById(row[i-1]).appendChild(cardimg);
-                    }
-                }
-            }
-            x(1,5,AI_pos_bottom)
-            x(6,10,AI_pos_middle)
-            x(11,13,AI_pos_top)
-
-            //var astring = "Placing card " + cardimg.name + " in pos " + recommended_move;
-            //alert(astring);
-
-            //alert("AI placement count: " + AI_placement_counter + ", Player first:" + playerFirst);
-            if (AI_placement_counter >= 9 && playerFirst == true) {
-                gamestage = "end";
-                play();
-            }
-            button.style.display = "inline";
-            b_text.innerHTML = ""
-        })
-        .fail(function (err, msg) {
-            alert("Error! AI place one Reqwest unsuccessful... check server connection and try again.");
-        });
-    }
-}
-
 
 // © 2015 Alastair Kerr. All rights reserved.
 // formatted with http://jsbeautifier.org/

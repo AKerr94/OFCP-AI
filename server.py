@@ -161,6 +161,7 @@ class subpage(object):
         game_id = params['game-id']
         state =	games.find_one({'_id': ObjectId(game_id)})
 
+        # find if player acted first this round and how many cards have been placed in order to work out current game position
         count = 0
         playerFirst = state["playerFirst"]
         for i in range(0,13):
@@ -168,12 +169,10 @@ class subpage(object):
                 if game_state['properties'+str(j+1)]['cards']['items']['position'+str(i+1)] is not None:
                     count += 1
 
-        print game_state
-
-        print "\n### COUNT:", count
+        print game_state, "\nCards placed:", count
         if playerFirst:
             if count == 0: # player's first turn
-                cdeck = deck.Deck()
+                cdeck = deck.Deck() # create deck
                 cards = cdeck.deal_n(5)
                 state['deck'] = {} # initialise deck dic within game state
                 state['deck']['cards'] = cdeck.cards
@@ -183,14 +182,13 @@ class subpage(object):
                     }, {
                     '$set': state
                 })
-                #games.update({'deck':{'cards':cdeck.cards,'current-position':cdeck.current_position}}, {"$set": POST}, upsert=True)
 
                 return json.dumps(cards)
+
             if count == 5: # AI's first turn
-                print "\n HELLO"
+                print "\nAI's first turn!\n"
 
-
-                print state['deck']['cards'],"of len",len(state['deck']['cards']), ", current pos:", state['deck']['current-position']
+                print state['deck']['cards'], "of length", len(state['deck']['cards']), ", current pos:", state['deck']['current-position']
                 cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
 
                 dealt_cards = cdeck.cards[:5]
@@ -216,25 +214,6 @@ class subpage(object):
 
                 print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
 
-                # count = 0
-                # for placement in AI_placements: # update game state/ database
-                #     print placement
-                #     if placement == 1: # bottom
-                #         for i in range(0,5):
-                #             if state['properties2']['cards']['items']['position'+str(i+1)] is None:
-                #                 state['properties2']['cards']['items']['position'+str(i+1)] = cards[count]
-                #                 break
-                #     elif placement == 2: # middle
-                #         for i in range(5,10):
-                #             if state['properties2']['cards']['items']['position'+str(i+1)] is None:
-                #                 state['properties2']['cards']['items']['position'+str(i+1)] = cards[count]
-                #                 break
-                #     elif placement == 3: # top
-                #         for i in range(10,13):
-                #             if state['properties2']['cards']['items']['position'+str(i+1)] is None:
-                #                 state['properties2']['cards']['items']['position'+str(i+1)] = cards[count]
-                #                 break
-                #     count += 1
 
                 from itertools import izip
 
@@ -261,6 +240,8 @@ class subpage(object):
                 # update game state
                 state['deck']['cards'] = cdeck.cards
                 state['deck']['current-position'] = cdeck.current_position
+
+                # records game state in database
                 state['cardtoplace'] = card
                 update = games.update({
                     '_id': ObjectId(game_id)
@@ -268,21 +249,22 @@ class subpage(object):
                     '$set': state
                 })
 
-                print "Stored game state in database:", state
+                print "\nStored game state in database:", state
 
-                del state['deck'] # dont return deck info to frontend
+                del state['deck'] # don't return deck info to frontend
+                del state['_id']
+                #state.pop('_id', None)
 
-                state.pop('_id', None)
-
-                print "Returning state to player:", state
+                print "\nReturning state to player:", state
 
                 return json.dumps(state)
 
 
         else:
+            print "\n\nPlayer not First! ~Hello from server.py page ofc-backend!!\n"
             cdeck = Deck(game_state['deck']['cards'], game_state['deck']['current-position']) # recreates deck
 
-            games.update(game_state)
+            #games.update(game_state)
 
 
     #index.exposed = False
