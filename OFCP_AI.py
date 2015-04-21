@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from random import randint
 import random
 import helpers
@@ -277,10 +279,14 @@ def place_5(game_state, cards, sim_timer):
     and returns an optimal placement as a list with index i = card i+1's allocated row
     e.g. return [1,1,2,2,3] = card 1 in row 1, card 2 in row 1, card 3 in row 2, card 4 in row 2, card 5 in row 3'''
 
+    try:
+        cdic = {cards[0]:1, cards[1]:2, cards[2]:3, cards[3]:4, cards[4]:5} # keep a permanent record of which card was which index
+
+    except:
+        print "Invalid cards passed to place_5:", cards
+
     print "\n####\nPlace_5:", cards, "\nSimulation Timer:", sim_timer, "ms.\n"
-    
-    cdic = {cards[0]:1, cards[1]:2, cards[2]:3, cards[3]:4, cards[4]:5} # keep a permanent record of which card was which index 
-    
+
     cstring = ""
     for i in range(0,5):
         cstring += cards[i][0] + cards[i][1] + cards[i][2]
@@ -325,12 +331,27 @@ def place_5(game_state, cards, sim_timer):
 
     nexthighestfreq = 1 
     secondrank = None
-    if highestfreq < 4: # look for e.g. 2nd pair
+    if highestfreq < 4: # look for 2nd pair
         for item in hist:
             if item[1] > nexthighestfreq and item[0] is not thatrank:
                 nexthighestfreq = item[1]
                 secondrank = item[0]
-
+    
+    # look for straights 
+    if highestfreq == 1:
+        for item in hist: #find lowest rank
+            if item[1] > 0:
+                lowestrank = item[0]
+                break
+        for item in reversed(hist): #find highest rank
+            if item[1] > 0:
+                highestrank = item[0]
+                break
+        if highestrank - lowestrank == 4:
+            straight = True
+            
+        #TODO straight state handling
+    
     print "Highest Freq:",highestfreq,"Rank:",thatrank,"... Next Highest Freq:",nexthighestfreq,"Rank:",secondrank
     
     final = []
@@ -407,7 +428,7 @@ def place_5(game_state, cards, sim_timer):
     final4 = []    
         
     # 4th round - if there are still lots of states to consider, prune some sub-optimal placements e.g. all cards placed in middle 
-    if len(final3) > 50:
+    if len(final3) > 20:
         for state in final3:
             # remove states with an empty or full bottom row
             count = 0
@@ -476,7 +497,7 @@ def place_5(game_state, cards, sim_timer):
             best_state_score = result
             highest_ev = result[1]
     
-    print "\nBest state score:", best_state_score
+    #print "\nBest state score:", best_state_score
     
     best_state_id = best_state_score[0]
     best_state = final[best_state_id -1]

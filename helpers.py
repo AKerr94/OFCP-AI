@@ -19,7 +19,11 @@ def reformat_hand_xyy_yx(hand, numCards):
         
         def getKey(item): # returns rank for use in sorting
             return int(item[0])
-        
+
+        try:
+            hand = str(hand)
+        except:
+            pass # caught by if statement below
         
         if (type(hand) is not str):
             print "Invalid hand (required type = string), " + str(hand) + " is " + str(type(hand)) + "\n"
