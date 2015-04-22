@@ -49,7 +49,7 @@ function drop(ev) {
 
 function setupGame() {
     console.log('Welcome to OFCP-AI, an application by Alastair Kerr!');
-    playerLabels(0,false,false); // set player name fields
+    //playerLabels(0,false,false); // set player name fields
     var button = document.getElementById('playButton');
     button.onclick = function() {
         button.innerHTML = "Next"; // change button text from 'Play' to 'Next'
@@ -195,6 +195,7 @@ function resetGame() {
     } else {
         playerFirst = true;
     }
+
     POST_reqwest(initial_5);
 }
 
@@ -284,8 +285,9 @@ function handleRoundEnd(resp) {
     button.innerHTML = "Play next round";
 
     button.onclick = function() {
-        button.innerHTML = "Next";
-        resetGame();
+        //button.innerHTML = "Next";
+        window.location = window.location + '/next'; // reloads - goes to next page
+        //resetGame();
     }
   }
 

@@ -241,6 +241,46 @@ def scoring_helper(game_state):
     
     return scores_final
 
+def scores_arr_to_int(scores):
+    '''
+    scores: takes scores_array from scoring_helper
+    works out what player 1's score is and returns this
+    (p2's score is the inverse)
+    '''
+
+    p1score = 0
+    p2score = 0
+    p1_multiplier = 1
+    p2_multiplier = 1
+    if scores[3][0] == True: # p1 fouls, scores 0
+        p1_multiplier = 0
+    if scores[3][1] == True: # p2 fouls, scores 0
+        p2_multiplier = 0
+
+    # handle points for winning rows
+    p1wins = 0
+    p2wins = 0
+    for i in range(0,3):
+        if scores[i][0] == 2:
+            p2wins += 1
+        elif scores[i][0] == 1:
+            p1wins += 1
+    p2wins = p2wins - p1wins
+    if p2wins == 3:
+        p2score += 6
+        p1score += -6
+    elif p2wins == -3:
+        p2score += -6
+        p1score += 6
+    else:
+        p2score += p2wins
+        p1score += -p2wins
+
+    # add extra points for royalties
+    p1score = (scores[0][1] + scores[1][1] + scores[2][1]) * p1_multiplier
+    p2score = (scores[0][2] + scores[1][2] + scores[2][2]) * p2_multiplier
+
+    return p1score - p2score
 
 def classify_3(eval_result):
     ''' takes result tuple from simple_3card_evaluator output and classifies hand

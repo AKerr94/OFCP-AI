@@ -318,6 +318,12 @@ class subpage(object):
                 state['deck']['cards'] = cdeck.cards
                 state['deck']['current-position'] = cdeck.current_position
 
+                # score game board
+                scores_array = helpers.scoring_helper(game_state)
+
+                # store p1's score in database
+                state['score'] = helpers.scores_arr_to_int(scores_array)
+
                 # records game state in database
                 del state['cardtoplace']
                 update = games.update({
@@ -326,15 +332,13 @@ class subpage(object):
                     '$set': state
                 })
 
-                # score game board
-                scores_array = helpers.scoring_helper(game_state)
                 OFCP_AI.reset() # reset AI variables/ states
 
                 # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty],
                 #    [winnerid, winners_middle_royalty, losers_middle_royalty] ,
                 #    [winnerid, winners_top_royalty, losers_top_royalty] ]
 
-                print '\n   Back to server.py!\nScores -->', scores_array, '\n'
+                print '\n   Scores -->', scores_array, '\n'
 
                 return json.dumps(scores_array)
 
@@ -354,11 +358,12 @@ class Root(object):
     #make a subpage
     subpage = subpage()
 
-    def make_game(self, player_first=True):
+    def make_game(self, player_first=True, score =0 ):
         games = db_backend.get_database_collection()
         game_state = db_backend.make_state()
 
         game_state['playerFirst'] = player_first
+        game_state['score'] = score
 
         game_id = str(games.insert(game_state))
 
@@ -371,11 +376,13 @@ class Root(object):
         games = db_backend.get_database_collection()
         game_state = games.find_one({'_id': ObjectId(game_id)})
         playerFirst = game_state['playerFirst']
+        score = game_state['score']
 
         if next == 'next':
-            self.make_game(player_first = not playerFirst)
+            print "\nserver thinks that the Score is:", score, "\n"
+            self.make_game(player_first = not playerFirst, score=score)
 
-        return render_template('OFCP_game.html', game_id=game_id, playerFirst=playerFirst)
+        return render_template('OFCP_game.html', game_id=game_id, playerFirst=playerFirst, score=score)
 
     def index(self):
         raise cherrypy.HTTPRedirect("/ofc/play")
