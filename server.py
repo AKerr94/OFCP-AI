@@ -354,18 +354,27 @@ class Root(object):
     #make a subpage
     subpage = subpage()
 
-    def play(self, game_id=None):
+    def make_game(self, player_first=True):
+        games = db_backend.get_database_collection()
+        game_state = db_backend.make_state()
+
+        game_state['playerFirst'] = player_first
+
+        game_id = str(games.insert(game_state))
+
+        raise cherrypy.HTTPRedirect("/ofc/play/{}".format(game_id))
+
+    def play(self, game_id=None, next=None):
         if game_id is None:
-            games = db_backend.get_database_collection()
-            game_state = db_backend.make_state()
-
-            game_id = str(games.insert(game_state))
-
-            raise cherrypy.HTTPRedirect("/ofc/play/{}".format(game_id))
+            self.make_game()
 
         games = db_backend.get_database_collection()
         game_state = games.find_one({'_id': ObjectId(game_id)})
         playerFirst = game_state['playerFirst']
+
+        if next == 'next':
+            self.make_game(player_first = not playerFirst)
+
         return render_template('OFCP_game.html', game_id=game_id, playerFirst=playerFirst)
 
     def index(self):
