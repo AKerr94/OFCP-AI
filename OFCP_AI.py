@@ -28,12 +28,6 @@ loop_elapsed = 0
 rankmappingdic = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14}
 backrankmappingdic = {2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'T',11:'J',12:'Q',13:'K',14:'A'}
 
-class Node:
-    ''' A node in the game tree '''
-    def __init__(self):
-        #self.moves_to_try = ?.findMoves()
-        pass
-
 def reset():
     ''' reset variables for a new round '''
     global num_top_first_count
@@ -282,8 +276,9 @@ def place_5(game_state, cards, sim_timer):
     try:
         cdic = {cards[0]:1, cards[1]:2, cards[2]:3, cards[3]:4, cards[4]:5} # keep a permanent record of which card was which index
 
-    except:
+    except Exception:
         print "Invalid cards passed to place_5:", cards
+        raise Exception
 
     print "\n####\nPlace_5:", cards, "\nSimulation Timer:", sim_timer, "ms.\n"
 
@@ -337,7 +332,9 @@ def place_5(game_state, cards, sim_timer):
                 nexthighestfreq = item[1]
                 secondrank = item[0]
     
-    # look for straights 
+    # look for straights
+    highestrank = 0
+    lowestrank = 0
     if highestfreq == 1:
         for item in hist: #find lowest rank
             if item[1] > 0:
@@ -492,6 +489,7 @@ def place_5(game_state, cards, sim_timer):
     # find the state selection with the highest EV
     best_state = None
     highest_ev = 0
+    best_state_score = 0
     for result in states_scores:
         if result[1] > highest_ev:
             best_state_score = result
@@ -547,10 +545,12 @@ def chooseMove(game_state, card, iterations_timer):
     simulations and returns optimal move - 1 for bottom, 2 for middle, 3 for top '''
     
     #### calculate first 5 cards to place - recursively call this function with each individual card ####
+
+    global deck
+    global num_top_first_count
+
     if type(card) == type([]): 
         if (len(card) == 5):
-            global num_top_first_count 
-            global deck
             num_top_first_count = 0
             deck = produce_deck_of_cards()
             prune_deck_of_cards(game_state)
@@ -581,10 +581,8 @@ def chooseMove(game_state, card, iterations_timer):
         print "\n=========== Calculcating for card", card, "===========\n"
         
         global number_top
-        global numer_middle
+        global number_middle
         global number_bottom
-        global num_top_first_count
-        global deck
         
         #print "Current cards placed top,", number_top, ", middle,",number_middle,",bottom,",number_bottom,"and 1st it top",num_top_first_count,"\n"
         
@@ -695,7 +693,7 @@ def chooseMove(game_state, card, iterations_timer):
                 return 2             #middle
     
     else:
-        print "Invalid cards.", cards, ". Need type: String e.g. 's01' (ace of spades)"
+        print "Invalid cards.", card, ". Need type: String e.g. 's01' (ace of spades)"
         return None
 
 def place_one_test(game_state, card, iterations):

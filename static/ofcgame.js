@@ -8,15 +8,10 @@ var AI_positions = ["p2_bottom1", "p2_bottom2", "p2_bottom3", "p2_bottom4", "p2_
     "p2_middle1", "p2_middle2", "p2_middle3", "p2_middle4", "p2_middle5",
     "p2_top1", "p2_top2", "p2_top3"
 ];
-var AI_pos_bottom = AI_positions.slice(0,5);
-var AI_pos_middle = AI_positions.slice(5,10);
-var AI_pos_top = AI_positions.slice(10);
-var AI_placement_counter = 0;
 var player_positions = ["p1_bottom1", "p1_bottom2", "p1_bottom3", "p1_bottom4", "p1_bottom5",
     "p1_middle1", "p1_middle2", "p1_middle3", "p1_middle4", "p1_middle5",
     "p1_top1", "p1_top2", "p1_top3"
 ];
-var gamestage = "init";
 var rowScoresArr = [0, 0, 0, 0, 0, 0]; // player 1 top, p1 middle, p1 bottom, p2 top, p2 middle, p2 bottom
 var p1score = 0,
     p2score = 0;
@@ -49,29 +44,6 @@ function drop(ev) {
         // drop card into container
         var data = ev.dataTransfer.getData("text");
         ev.target.appendChild(document.getElementById(data));
-
-
-        // handle card count and unlocking of button
-        if (playLock == true) {
-            cardsPlacedCount++;
-        }
-
-        if (cardsPlacedCount == 5) {
-            playLock = false;
-        } else if (playButtonCounter > 1 && cardsPlacedCount == (playButtonCounter + 4)) {
-            playLock = false;
-        }
-
-        // check if all cards are placed. If yes set gamestage
-        if (cardsPlacedCount == 13) {
-            if (playerFirst) {
-                AI_main();
-            }
-            gamestage = "end";
-            if (playerFirst == false) {
-                play(); // automatically move on when last card is dropped
-            }
-        }
     }
 }
 
@@ -96,42 +68,35 @@ function initial_5(resp) {
         img.style.display = "block"; // set visible
         //img.src = "cards/d01.png"; //ace of diamonds
     }
-    playLock = true;
 
+    // change button's functionality for future hands
     var button = document.getElementById("playButton");
     button.onclick = function() {
-        // TODO remake this playLock functionality to be less buggy - ATM can place one card in 5 places to unlock button - pressing button will crash game
-        if (playLock == true) {
-            alert("You must place all your cards first!")
-            return;
-        }
         button.style.display = "none"; // hide button while AI calculates moves
 
+        // lock cards placed
+        for (i=0; i<13; i++) {
+            var temp = document.getElementById(player_positions[i]);
+            if (temp.hasChildNodes()) {
+                temp.firstChild.ondragstart = function() {return false;};
+            }
+        }
         var b_text = document.getElementById("buttonTextReplacer");
         b_text.innerHTML = "AI is calculating move..."
-
-        POST_reqwest(handleAICards);
+        b_text.style.display = "block";
+        
+        POST_reqwest(handlePlacements);
     };
 
 }
 
-function handleAICards(resp) {
+function handlePlacements(resp) {
     var gs = JSON.parse(resp); // parse game state from response
-    var b_text = document.getElementById("buttonTextReplacer");
-    b_text.style.display = "block";
-    alert(gs['cardtoplace']);
 
     readAndPlace = function(min,max,row) { // read cards from backend response and updates frontend
         for (i = min; i < max+1; i++) {
             t = gs['properties2']['cards']['items']['position'+i] // get card info for appropriate position in game state
             if (t != null) {
-                var cardimg = document.createElement("img");
-                cardimg.src = "../static/cards/" + t + ".png";
-                cardimg.name = t;
-                cardimg.width = 109;
-                cardimg.height = 150;
-                cardimg.ondragstart = function() {return false;};
-
                 j=i;
                 // modify j to get correct row position
                 if (row == 'middle'){
@@ -139,11 +104,19 @@ function handleAICards(resp) {
                 }else if (row == 'top') {
                     j -= 10;
                 }
+                if (document.getElementById('p2_'+row+j).hasChildNodes()) {
+                    continue; // skip over existing placements
+                }
+                var cardimg = document.createElement("img");
+                cardimg.src = "../static/cards/" + t + ".png";
+                cardimg.name = t;
+                cardimg.width = 109;
+                cardimg.height = 150;
+                cardimg.ondragstart = function() {return false;};
 
                 console.log("AI Placed " + cardimg.name + " in row " + row + " (position" + i + ")");
 
                 document.getElementById('p2_'+row+j).appendChild(cardimg); // append image for this card to position on game board
-
             }
         }
     }
@@ -156,111 +129,30 @@ function handleAICards(resp) {
 
     var b_text = document.getElementById("buttonTextReplacer");
     b_text.style.display = "none";
-}
 
-// play function called from pressing button
-function play() {
-
-    alert("Play function called! waaaa");
-
-    if (gamestage == "init") {
-        gamestage = "game";
-    } else if (gamestage == "end") {
-
-        //work out scores for each row and display these
-        handleRoundEnd();
-        round_number += 1;
-
-        // modify play button into play again
-        var button = document.getElementById("playButton");
-        button.innerHTML = "Play again!";
-
-        button.onclick = function() {
-            resetGame();
-        }
-
-        return;
-    }
-
-
-    // if cards from this round haven't been placed yet then button is disabled
-    if (playLock == true) {
-        if (gamestage == "game") {
-            alert("You must place all your cards first!");
-            return;
-        } else {
-            alert("Game state error");
-            return;
+    cardsPlacedCount = 0
+    for (i=0; i<14; i++) {
+        if (gs['properties1']['cards']['items']['position'+i] != null) {
+            cardsPlacedCount += 1;
         }
     }
 
-    playButtonCounter++;
-
-    // special case - first round
-    if (playButtonCounter == 1) {
-
-        if (!playerFirst) {
-            AI_main();
-        }
-        alert("The play function is not dead code!");
-        POST_reqwest(initial_5) // gets first 5 cards for player to place from backend
-        //AI_main()
+    if (cardsPlacedCount < 13) { // display player's next card
+        var playerCardToPlace = document.getElementById("place"+(cardsPlacedCount+1)+"card");
+        playerCardToPlace.src = "../static/cards/" + gs['cardtoplace'] + ".png"
+        playerCardToPlace.name = gs['cardtoplace'];
+        playerCardToPlace.style.display = "block";
     }
-
-    // general case
-    else {
-
-        if (!playerFirst) {
-            AI_main();
-        }
-
-        if (playButtonCounter == 2) { // lock current cards in place
-            for (i = 1; i < playButtonCounter + 4; i++) {
-                var temp = document.getElementById('place' + i + 'card');
-                temp.ondragstart = function() {return false;};
-
-            }
-        } else { // lock card from last round
-            var temp = document.getElementById('place' + (playButtonCounter + 3) + 'card');
-            temp.ondragstart = function() {return false;};
-        }
-
-        // generate next card
-        var img = document.getElementById('place' + (playButtonCounter + 4) + 'card');
-        img.style.display = "block"; // set visible
-        var card = dealCard();
-        img.src = card.src;
-        img.name = card.name;
-
-        playLock = true;
-
-        if (playerFirst) {
-            AI_main();
-        }
+    else { // handle end of game
+        POST_reqwest(handleRoundEnd);
     }
 }
 
 function resetGame() {
-    // reset button
-    var button = document.getElementById("playButton");
-    button.innerHTML = "Play!";
-    button.onclick = function() {
-        play();
-    }
 
-    // reset global vars
-    playButtonCounter = 0;
-    cardsPlacedCount = 0;
-    AI_placement_counter = 0;
-    gamestage = "init";
     rowScoresArr = [0, 0, 0, 0, 0, 0];
 
-    // recreate AI row temp arrays
-    AI_pos_bottom = AI_positions.slice(0,5);
-    AI_pos_middle = AI_positions.slice(5,10);
-    AI_pos_top = AI_positions.slice(10);
-
-    setupGame();
+    playerLabels(0,false,false); // set player name fields
 
     // reset player cards
     for (i = 1; i <= 13; i++) {
@@ -303,74 +195,14 @@ function resetGame() {
     } else {
         playerFirst = true;
     }
-
-    play(); // automatically play next hand
-    //window.location.reload();
+    POST_reqwest(initial_5);
 }
 
-function handleRoundEnd() {
+function handleRoundEnd(resp) {
 
-    var temp1 = "", temp2 = "";
-    var tarray1 = [], tarray2 = [];
+    var b_text = document.getElementById("buttonTextReplacer");
+    b_text.style.display = "none";
 
-    for (i = 0; i < 13; i++) {
-        temp1 = document.getElementById(player_positions[i]).childNodes[0].name; // get player's card at pos i
-        temp2 = document.getElementById(AI_positions[i]).childNodes[0].name;         // get AI's card at pos i
-        tarray1.push(temp1); // player's cards array
-        tarray2.push(temp2); // AI's cards array
-    }
-
-    reqwest({'url': 'http://alastairkerr.co.uk/ofc/subpage/calculate-scores/'
-        , 'method': 'post'
-        , 'data': {'game-state':JSON.stringify(
-                                {
-                                    "name1": "Player1",
-                                    "properties1": {
-                                        "cards": {
-                                            "type": "array",
-                                            "items": {
-                                                "position1": tarray1[0],
-                                                "position2": tarray1[1],
-                                                "position3": tarray1[2],
-                                                "position4": tarray1[3],
-                                                "position5": tarray1[4],
-                                                "position6": tarray1[5],
-                                                "position7": tarray1[6],
-                                                "position8": tarray1[7],
-                                                "position9": tarray1[8],
-                                                "position10": tarray1[9],
-                                                "position11": tarray1[10],
-                                                "position12": tarray1[11],
-                                                "position13": tarray1[12],
-                                            }
-                                        }
-                                    },
-                                    "name2": "Player2",
-                                    "properties2": {
-                                        "cards": {
-                                            "type": "array",
-                                            "items": {
-                                                "position1": tarray2[0],
-                                                "position2": tarray2[1],
-                                                "position3": tarray2[2],
-                                                "position4": tarray2[3],
-                                                "position5": tarray2[4],
-                                                "position6": tarray2[5],
-                                                "position7": tarray2[6],
-                                                "position8": tarray2[7],
-                                                "position9": tarray2[8],
-                                                "position10": tarray2[9],
-                                                "position11": tarray2[10],
-                                                "position12": tarray2[11],
-                                                "position13": tarray2[12],
-                                            }
-                                        }
-                                    }
-                                }
-                )
-          }
-    })
-  .then(function (resp) {
     scores_obj = JSON.parse(resp); // parse response as list again
     //  finalise scoring - update frontend to reflect scores
 
@@ -447,12 +279,15 @@ function handleRoundEnd() {
 
     // change player labels to reflect their total scores
     playerLabels(scoop,p1foul,p2foul);
-  })
-  .fail(function (err, msg) {
-     alert("Error! Scoring Reqwest unsuccessful... check server connection and try again.");
-  });
 
-}
+    var button = document.getElementById("playButton");
+    button.innerHTML = "Play next round";
+
+    button.onclick = function() {
+        button.innerHTML = "Next";
+        resetGame();
+    }
+  }
 
 function chooseScoreColour(num) {
     if (num >= 0) {
