@@ -34,13 +34,16 @@ function drag(ev) {
 function drop(ev) {
     ev.preventDefault();
 
-    // if the container isnt empty (stops user from dragging multiple cards onto one box)
+    // stop user from dragging multiple cards onto one container
     if (ev.target.hasChildNodes()) {
-        return;
+        // nodeType 3 is text. This will be true if the container is 'empty' (with blank space from template). If false return
+        if (ev.target.childNodes[0].nodeType != 3) {
+            return;
+        }
+        ev.target.removeChild(ev.target.firstChild);
     }
 
     if (ev.target.className == "cardl") {
-
         // drop card into container
         var data = ev.dataTransfer.getData("text");
         ev.target.appendChild(document.getElementById(data));
@@ -96,6 +99,7 @@ function handlePlacements(resp) {
     readAndPlace = function(min,max,row) { // read cards from backend response and updates frontend
         for (i = min; i < max+1; i++) {
             t = gs['properties2']['cards']['items']['position'+i] // get card info for appropriate position in game state
+            console.log("Iteration " + i + ", card: " + t + ", row: " + row + ". Min -> Max = " + min + " " + max);
             if (t != null) {
                 j=i;
                 // modify j to get correct row position
@@ -104,8 +108,12 @@ function handlePlacements(resp) {
                 }else if (row == 'top') {
                     j -= 10;
                 }
-                if (document.getElementById('p2_'+row+j).hasChildNodes()) {
-                    continue; // skip over existing placements
+                container = document.getElementById('p2_'+row+j);
+                if (container.hasChildNodes()) {
+                    if (container.firstChild.nodeType != 3) { // true if default blank text node from jinja2 template
+                        continue; // skip over existing card placements
+                    }
+                    container.removeChild(container.firstChild);
                 }
                 var cardimg = document.createElement("img");
                 cardimg.src = "../static/cards/" + t + ".png";
@@ -116,7 +124,7 @@ function handlePlacements(resp) {
 
                 console.log("AI Placed " + cardimg.name + " in row " + row + " (position" + i + ")");
 
-                document.getElementById('p2_'+row+j).appendChild(cardimg); // append image for this card to position on game board
+                container.appendChild(cardimg); // append image for this card to position on game board
             }
         }
     }
@@ -346,6 +354,9 @@ function populate_game_state_arrays() {
     for (i = 0; i < 13; i++) {
         try {
             temp1 = document.getElementById(player_positions[i]).childNodes[0].name; // get player's card at pos i
+            if (typeof temp1 == "undefined")  {
+                temp1 = null;
+            }
         }
         catch(err) {
             temp1 = null;
@@ -353,6 +364,9 @@ function populate_game_state_arrays() {
 
         try {
             temp2 = document.getElementById(AI_positions[i]).childNodes[0].name;     // get AI's card at pos i
+            if (typeof temp2 == "undefined")  {
+                temp2 = null;
+            }
         }
         catch(err) {
             temp2 = null;

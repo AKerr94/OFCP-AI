@@ -134,6 +134,8 @@ class subpage(object):
                 state['deck']['cards'] = cdeck.cards
                 state['deck']['current-position'] = cdeck.current_position
 
+                state['first5cards'] = cards
+
                 # update game state in database
                 update = games.update({
                     '_id': ObjectId(game_id)
@@ -145,6 +147,8 @@ class subpage(object):
 
             elif count == 5: # AI's first turn
                 print "\nAI's first turn!\n"
+
+                del state['first5cards']
 
                 print "Deck:", state['deck']['cards'], "of length", len(state['deck']['cards']), ", current pos:", state['deck']['current-position']
                 cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
@@ -384,7 +388,7 @@ class Root(object):
             print "\nserver thinks that the Score is:", score, "\n"
             self.make_game(player_first = not playerFirst, score=score)
 
-        return render_template('OFCP_game.html', game_id=game_id, playerFirst=playerFirst, score=score)
+        return render_template('OFCP_game.html', game_id=game_id, playerFirst=playerFirst, score=score, game_state=game_state)
 
     def index(self):
         raise cherrypy.HTTPRedirect("/ofc/play")

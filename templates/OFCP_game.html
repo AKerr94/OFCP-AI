@@ -30,59 +30,78 @@
 <p>
 
 	<!-- top row for player 1 -->
-	<div class="cardl" id="p1_top1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_top2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_top3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    {% for i in range(1,4) %}
+        <div class="cardl" id="p1_top{{ i }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% if game_state['properties1']['cards']['items']['position' ~ (i+10)] is not none %}
+                <img ondragstart="return false;" width="109" height="150" src="../static/cards/{{game_state['properties1']['cards']['items']['position' ~ (i+10)]}}.png" name="{{game_state['properties1']['cards']['items']['position' ~ (i+10)]}}" style="display: block;">
+            {% endif %}
+        </div>
+    {% endfor %}
 
 	<div class="scorecontainerl" id="p1_text1" style="margin-left:290px;"></div>
-	
+
 	<!-- top row for player 2 -->
-	<div class="cardr" id="p2_top1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_top2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_top3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	
+    {% for i in range(1,4) %}
+        <div class="cardr" id="p2_top{{ i }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% if game_state['properties2']['cards']['items']['position' ~ (i+10)] is not none %}
+                <img ondragstart="return false;" width="109" height="150" src="../static/cards/{{game_state['properties2']['cards']['items']['position' ~ (i+10)]}}.png" name="{{game_state['properties2']['cards']['items']['position' ~ (i+10)]}}" style="display: block;">
+            {% endif %}
+        </div>
+    {% endfor %}
+
 	<div class="scorecontainerr" id="p2_text1" style="margin-right:220px;"></div>
-	
+
 	<p style="margin-top:250px;"></p>
-	
+
 	<!-- middle row for player 1 -->
-	<div class="cardl" id="p1_middle1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_middle2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_middle3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_middle4" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_middle5" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	
+    {% for i in range(1,6) %}
+        <div class="cardl" id="p1_middle{{ i }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% if game_state['properties1']['cards']['items']['position' ~ (i+5)] is not none %}
+                <img ondragstart="return false;" width="109" height="150" src="../static/cards/{{game_state['properties1']['cards']['items']['position' ~ (i+5)]}}.png" name="{{game_state['properties1']['cards']['items']['position' ~ (i+5)]}}" style="display: block;">
+            {% endif %}
+        </div>
+    {% endfor %}
+
 	<div class="scorecontainerl" id="p1_text2" style="margin-left:70px;"></div>
-	
+
 	<!-- middle row for player 2 -->
-	<div class="cardr" id="p2_middle1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_middle2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_middle3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_middle4" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_middle5" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    {% for i in range(1,6) %}
+        <div class="cardr" id="p2_middle{{ i }}">
+            {% if game_state['properties2']['cards']['items']['position' ~ (i+5)] is not none %}
+                <img ondragstart="return false;" width="109" height="150" src="../static/cards/{{game_state['properties2']['cards']['items']['position' ~ (i+5)]}}.png" name="{{game_state['properties2']['cards']['items']['position' ~ (i+5)]}}" style="display: block;">
+            {% endif %}
+        </div>
+    {% endfor %}
 
 	<div class="scorecontainerr" id="p2_text2"></div>
-	
+
 	<p style="margin-top:410px;"></p>
-	
+
 	<!-- bottom row for player 1 -->
-	<div class="cardl" id="p1_bottom1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_bottom2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_bottom3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_bottom4" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardl" id="p1_bottom5" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+    {% for i in range(1,6) %}
+        <div class="cardl" id="p1_bottom{{ i }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% if game_state['properties1']['cards']['items']['position' ~ i] is not none %}
+                <img ondragstart="return false;" width="109" height="150" src="../static/cards/{{game_state['properties1']['cards']['items']['position' ~ i]}}.png" name="{{game_state['properties1']['cards']['items']['position' ~ i]}}" style="display: block;">
+            {% endif %}
+        </div>
+    {% endfor %}
+
+
 
 	<div class="scorecontainerl" id="p1_text3" style="margin-left:70px;"></div>
-	
+
 	<!-- bottom row for player 2 -->
-	<div class="cardr" id="p2_bottom1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_bottom2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_bottom3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_bottom4" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	<div class="cardr" id="p2_bottom5" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-	
+    {% for i in range(1,6) %}
+        <div class="cardr" id="p2_bottom{{ i }}">
+            {% if game_state['properties2']['cards']['items']['position' ~ i] is not none %}
+                <img ondragstart="return false;" width="109" height="150" src="../static/cards/{{game_state['properties2']['cards']['items']['position' ~ i]}}.png" name="{{game_state['properties2']['cards']['items']['position' ~ i]}}" style="display: block;">
+            {% endif %}
+        </div>
+    {% endfor %}
+
 	<div class="scorecontainerr" id="p2_text3"></div>
-	
+
 </p>
 
 
@@ -99,8 +118,14 @@
 
 <div style="margin-bottom:160px;">
 	<div class="cardl" id="place1" ondrop="drop(event)" ondragover="allowDrop(event)">
-		<img id="place1card" draggable="true" ondragstart="drag(event)" width="109" height="150">
-		
+
+        {% if 'first5cards' in game_state.keys() %}
+            {% set cardsrc = "src='../static/cards/" ~ game_state['first5cards'][0] ~ ".png'" %}
+        {% else %}
+            {% set cardsrc = "" %}
+        {% endif %}
+		<img id="place1card" draggable="true" ondragstart="drag(event)" width="109" height="150" {{cardsrc}}>
+
 		<!-- these are the cards for the following rounds -->
 		<img id="place6card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
 		<img id="place7card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
@@ -112,21 +137,19 @@
 		<img id="place13card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
 	</div>
 
-	<div class="cardl" id="place2" ondrop="drop(event)" ondragover="allowDrop(event)">
-		<img id="place2card" draggable="true" ondragstart="drag(event)" width="109" height="150">
-	</div>
-
-	<div class="cardl" id="place3" ondrop="drop(event)" ondragover="allowDrop(event)">
-		<img id="place3card" draggable="true" ondragstart="drag(event)" width="109" height="150">
-	</div>
-
-	<div class="cardl" id="place4" ondrop="drop(event)" ondragover="allowDrop(event)">
-		<img id="place4card" draggable="true" ondragstart="drag(event)" width="109" height="150">
-	</div>
-
-	<div class="cardl" id="place5" ondrop="drop(event)" ondragover="allowDrop(event)">
-		<img id="place5card" draggable="true" ondragstart="drag(event)" width="109" height="150">
-	</div>
+    <!-- cards 2-5 for initial 5 placements -->
+    {% for i in range(2,6) %}
+        <div class="cardl" id="place{{ i }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+            {% if 'first5cards' in game_state.keys() %}
+                {% set cardsrc = "src='../static/cards/" ~ game_state['first5cards'][i - 1] ~ ".png'" %}
+                {% set cardname = "name='" ~ game_state['first5cards'][i - 1] ~ "'" %}
+            {% else %}
+                {% set cardsrc = "" %}
+                {% set cardname = "" %}
+            {% endif %}
+            <img id="place{{ i }}card" draggable="true" ondragstart="drag(event)" width="109" height="150" {{cardsrc}} {{cardname}}>
+        </div>
+    {% endfor %}
 </div>
 
 <p style="margin-top:180px;" onclick="alert('Try zooming out with Ctrl -');"><disp>Display problems?</disp></p>

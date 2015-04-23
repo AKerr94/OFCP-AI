@@ -457,9 +457,8 @@ def place_5(game_state, cards, sim_timer):
     print "\nSTATE SCORES:", states_scores      
         
     # find the state selection with the highest EV
-    best_state = None
     highest_ev = 0
-    best_state_score = 0
+    best_state_score = [0,0,0]
     for result in states_scores:
         if result[1] > highest_ev:
             best_state_score = result
