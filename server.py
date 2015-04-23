@@ -323,6 +323,8 @@ class subpage(object):
 
                 # store p1's score in database
                 state['score'] = helpers.scores_arr_to_int(scores_array)
+                print "\nState score recorded as:", state['score'], "!\n"
+                print "scores_array was", scores_array
 
                 # records game state in database
                 del state['cardtoplace']
