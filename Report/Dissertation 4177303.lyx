@@ -629,9 +629,9 @@ The game tree in MCTS grows asymmetrically, concentrating on searching more
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename MCTS basic algorithm graphic.png
-	lyxscale 70
-	scale 70
+	filename MCTS algorithm graphic.png
+	lyxscale 85
+	scale 85
 
 \end_inset
 
@@ -794,8 +794,8 @@ That said, permutations for OFCP game state: deck of 52 cards, each player
 Methods e,g, database look ups impractical to implement due to space complexity
  of game.
  Need a method which has a suitable compromise between time and space complexity.
- Monte CarloTree Search is perfect for this, especially considering the
- usage of heuristics which can optimise the algorithm e.g.
+ Monte Carlo methods are perfect for this, especially considering the usage
+ of heuristics which can optimise the algorithm e.g.
  UCT, pruning tree branches 
 \end_layout
 
@@ -833,6 +833,13 @@ A faster, more efficient algorithm means more hands can be evaluated more
  (cherrypy server)
 \end_layout
 
+\begin_layout Standard
+More efficient poker hand evaluators are availavble, however generally written
+ in much more efficient languages such as C - cannot be used in conjunction
+ with pypy.
+ 
+\end_layout
+
 \begin_layout Section
 Design and Implementation
 \end_layout
@@ -843,10 +850,13 @@ Approach
 
 \begin_layout Standard
 html css and javascript for website/ app.
- Javascript handles front end, sends POST ‘reqwest’s to cherrypy server
- – backend – which calls helper functions (python scripts) for hand evaluation,
- handling AI simulations etc.
- 
+ Javascript handles front end, sends POST ‘reqwest’s with game state to
+ cherrypy server – backend – which validates the sent game state and then
+ calls helper functions (python scripts) for hand evaluation, handling AI
+ simulations etc.
+ , updates the game state in the database, and returns appropriate response
+ e.g.
+ cards to be placed, scores at end of game
 \end_layout
 
 \begin_layout Subsection
@@ -894,10 +904,34 @@ Technologies
 \end_layout
 
 \begin_layout Standard
-Website and application created with HTML, CSS and Javascript.
- [ SQL Database for moves/ history? ], python backend + cherrypy networking
- Hosted using VPS running Ubuntu 14.04 with nginx Version control with github:
- OFCP-AI private repository 
+Website and application created with HTML, CSS and Javascript with pages
+ created dynamically with jinja2 templates.
+\end_layout
+
+\begin_layout Standard
+Python backend handling processing and AI
+\end_layout
+
+\begin_layout Standard
+Pure python networking with cherrypy.
+ Site hosted using DigitialOcean VPS running Ubuntu 14.04 with nginx reverse-prox
+y.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-6"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Game states stored in database using pymongodb.
+ 
+\end_layout
+
+\begin_layout Standard
+Version control with github: OFCP-AI private repository 
 \end_layout
 
 \begin_layout Subsection
@@ -907,7 +941,7 @@ Implementation
 \begin_layout Standard
 
 \color blue
-http://www.alastairkerr.co.uk/OFCP_game.html
+http://www.alastairkerr.co.uk/ofc
 \end_layout
 
 \begin_layout Section
@@ -1051,6 +1085,24 @@ Reflection
 Reflection on project, decisions, performance etc.
 \end_layout
 
+\begin_layout Standard
+Design - frontend is functional but could have been designed better from
+ the start.
+ e.g.
+ hardcoding 
+\end_layout
+
+\begin_layout Standard
+Backend works well but if different technologies and languages were used
+ could be more efficient - e.g.
+ hand evaluators written in C using bitwise operators could evaluate millions
+ of hands per second rather than hundreds of thousands - could shave off
+ seconds of processing time which could either lead to increased responsivess
+ or allow for more games to be simulated by the AI making it more likely
+ to find optimal solutions for hand placements.
+ 
+\end_layout
+
 \begin_layout Subsection
 Improvements
 \end_layout
@@ -1069,6 +1121,14 @@ Limitations: “With any method based on random simulation, it is inevitable
 http://www.aaai.org/ocs/index.php/AIIDE/AIIDE13/paper/viewFile/7369/7595
 \color inherit
  page 5 
+\end_layout
+
+\begin_layout Standard
+Due to the need for a compromise between finding the optimal solution and
+ finishing the request in a reasonable amount of time the number of simulated
+ games is limited and therefore it is possible that sub-optimal plays will
+ be over-valued due to the element of randomness.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1152,6 +1212,19 @@ http://scrambledeggsontoast.github.io/2014/06/26/artificial-intelligence-ofcp/
 \color inherit
  - Intelligent Agent ‘Kachushi’ for Open Face Chinese Poker using Monte
  Carlo methods, implemented in Haskell, accessed 2015
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-6"
+
+\end_inset
+
+
+\color blue
+https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applica
+tions-using-a-cherrypy-web-server-behind-nginx 
 \end_layout
 
 \end_body
