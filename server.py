@@ -19,79 +19,6 @@ import OFCP_AI
 
 
 class subpage(object):
-        
-    def calculate_scores(self, **params):
-        ''' takes game_state as input. Converts hands, classifies them and returns the scores for each row '''
-        try:
-                game_state = json.loads(params['game-state']) # loads as dictionary 
-        except: 
-                ef = open('error_log.txt','a')
-                ef.write( '\n{} invalid json: {}'.format(datetime.now(), params) )
-                raise cherrypy.HTTPError(403, "There was an error with the given game state.")
-                
-                
-        scores_array = helpers.scoring_helper(game_state)
-        OFCP_AI.reset() # reset AI variables/ states 
-        
-        # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty], 
-        #    [winnerid, winners_middle_royalty, losers_middle_royalty] , 
-        #    [winnerid, winners_top_royalty, losers_top_royalty] ]
-        
-        print '\n   Back to server.py!\nScores -->', scores_array, '\n'     
-        
-        return json.dumps(scores_array)
-    
-    def AI_calculate_first_5(self, **params):
-        ''' calculate where AI will place first 5 cards '''
-        try:
-                game_state = json.loads(params['game-state']) # loads as dictionary
-
-        except: 
-                ef = open('error_log.txt','a')
-                ef.write( '\n{} invalid json: {}'.format(datetime.now(), params) )
-                raise cherrypy.HTTPError(403, "There was an error with the given game state.")
-        
-        OFCP_AI.loop_elapsed = 0
-        
-        current_milli_time = lambda: int(round(time.time() * 1000))
-        stime = current_milli_time()
-        
-        # read in cards to be placed 
-        cards = []
-        for i in range(0,5):
-            cards.append(str(game_state['properties2']['cards']['items']['card'+str(i+1)]))
-        iterations_timer = 4500   # Sets time in ms to spend simulating games. As iterations increases diverges to optimal solution 
-        AI_placements = OFCP_AI.chooseMove(game_state,cards,iterations_timer)
-        
-        print "\nTime taken calculating 5 placements:", current_milli_time() - stime, "ms"
-        
-        print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
-        
-        return json.dumps(AI_placements)
-    
-    def AI_calculate_one(self, **params):
-        ''' calculate where AI should placed a given card '''
-        try:
-                game_state = json.loads(params['game-state']) # loads as dictionary 
-        except: 
-                ef = open('error_log.txt','a')
-                ef.write( '\n{} invalid json: {}'.format(datetime.now(), params) )
-                raise cherrypy.HTTPError(403, "There was an error with the given game state.")
-        
-        OFCP_AI.loop_elapsed = 0
-        
-        current_milli_time = lambda: int(round(time.time() * 1000))
-        stime = current_milli_time()
-        
-        card = str(game_state['properties2']['cards']['items']['card'])
-        iterations_timer = 3000
-        AI_placement = OFCP_AI.chooseMove(game_state,card,iterations_timer)
-        
-        print "\nTime taken calculating 1 placement:", current_milli_time() - stime, "ms"
-        
-        print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
-        
-        return json.dumps(AI_placement)
 
     def ofc_backend(self, **params):
         ''' This page handles the OFC backend
@@ -219,13 +146,13 @@ class subpage(object):
                 }
                 })
 
-                print "\nStored game state in database:", state
+                #print "\nStored game state in database:", state
 
                 del state['deck'] # don't return deck info to frontend
                 del state['_id']
                 #state.pop('_id', None)
 
-                print "\nReturning state to player:", state
+                #print "\nReturning state to player:", state
 
                 return json.dumps(state)
 
@@ -360,9 +287,6 @@ class subpage(object):
 
 
     ofc_backend.exposed = True
-    calculate_scores.exposed = True
-    AI_calculate_first_5.exposed = True
-    AI_calculate_one.exposed = True
 
 class Root(object):
     #make a subpage
