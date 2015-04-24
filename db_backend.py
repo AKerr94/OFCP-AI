@@ -51,9 +51,3 @@ def make_state():
                   "playerFirst":True
                 }
     return game_state
-
-def next_move(self, game_id):
-    games = get_database_collection()
-    state =	games.find_one({'_id': ObjectId(game_id)})
-
-    state['position-15'] = 'AK'
