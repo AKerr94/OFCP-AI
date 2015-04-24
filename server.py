@@ -148,9 +148,10 @@ class subpage(object):
             elif count == 5: # AI's first turn
                 print "\nAI's first turn!\n"
 
+                # remove first 5 cards entry from db now that these have been placed on the board
                 del state['first5cards']
 
-                print "Deck:", state['deck']['cards'], "of length", len(state['deck']['cards']), ", current pos:", state['deck']['current-position']
+                #print "Deck:", state['deck']['cards'], "of length", len(state['deck']['cards']), ", current pos:", state['deck']['current-position']
                 cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
 
                 # validate game state
@@ -163,7 +164,7 @@ class subpage(object):
                             dealt_cards.remove(t)
                             state['properties1']['cards']['items']['position'+str(i)] = t
                         else:
-                            raise cherrypy.HTTPError(500, "Error in player's POSTed game state")
+                            raise cherrypy.HTTPError(500, "Error in player's POSTed game state: inconsistency with stored state in database!")
 
                 # calculate AI's first 5 card placements
                 cards = cdeck.deal_n(5)
@@ -213,6 +214,9 @@ class subpage(object):
                     '_id': ObjectId(game_id)
                     }, {
                     '$set': state
+                    ,'$unset': {
+                    'first5cards': 1
+                }
                 })
 
                 print "\nStored game state in database:", state
@@ -232,7 +236,7 @@ class subpage(object):
 
                 # validate game state
                 dealt_cards = cdeck.cards[:count]
-                print "\nDEALT CARDS:\n", dealt_cards, "\n"
+                #print "\nDEALT CARDS:\n", dealt_cards, "\n"
                 for i in range(1,14):
                     t = game_state['properties1']['cards']['items']['position'+str(i)]
                     if t is not None:
@@ -295,7 +299,7 @@ class subpage(object):
                 del state['deck'] # don't return deck info to frontend
                 del state['_id']
 
-                print "\nReturning state to player:", state
+                #print "\nReturning state to player:", state
 
                 return json.dumps(state)
 
@@ -387,6 +391,8 @@ class Root(object):
         if next == 'next':
             print "\nserver thinks that the Score is:", score, "\n"
             self.make_game(player_first = not playerFirst, score=score)
+
+        print game_state.keys()
 
         return render_template('OFCP_game.html', game_id=game_id, playerFirst=playerFirst, score=score, game_state=game_state)
 

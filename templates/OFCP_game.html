@@ -121,10 +121,15 @@
 
         {% if 'first5cards' in game_state.keys() %}
             {% set cardsrc = "src='../static/cards/" ~ game_state['first5cards'][0] ~ ".png'" %}
+            {% set cardname = "name='" ~ game_state['first5cards'][0] ~ "'" %}
+        {% elif 'cardtoplace' in game_state.keys() %}
+            {% set cardsrc = "src='../static/cards/" ~ game_state['cardtoplace'] ~ ".png'" %}
+            {% set cardname = "name='" ~ game_state['cardtoplace'] ~ "'" %}
         {% else %}
             {% set cardsrc = "" %}
+            {% set cardname = "" %}
         {% endif %}
-		<img id="place1card" draggable="true" ondragstart="drag(event)" width="109" height="150" {{cardsrc}}>
+		<img id="place1card" draggable="true" ondragstart="drag(event)" width="109" height="150" {{cardsrc}} {{cardname}}>
 
 		<!-- these are the cards for the following rounds -->
 		<img id="place6card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
