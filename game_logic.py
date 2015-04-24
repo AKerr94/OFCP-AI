@@ -83,6 +83,7 @@ def handle_game_logic(game_state, game_id):
             print "\nTime taken calculating 5 placements:", current_milli_time() - stime, "ms"
             print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
 
+            # TODO convert stuff like the zipping below into functions for reuse across multiple if clauses
             # zip optimal placements -> appropriate cards, and update state dic with each placement
             for placement, card in izip(AI_placements, cards):
                 # row 1 (bottom) pos 1-5, row 2 (middle) pos 6-10, row 3 (top) pos 11-13
@@ -200,23 +201,14 @@ def handle_game_logic(game_state, game_id):
             return json.dumps(state)
 
         else:
-            # game over - score game board
+            # game over - validate and score game board
 
             cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
 
             # validate game state
-            dealt_cards = cdeck.cards[:count]
-            print "\nDEALT CARDS:\n", dealt_cards, "\n"
-            for i in range(1,14):
-                t = game_state['properties1']['cards']['items']['position'+str(i)]
-                if t is not None:
-                    if t in dealt_cards:
-                        dealt_cards.remove(t)
-                        state['properties1']['cards']['items']['position'+str(i)] = t
-                    else:
-                        print "Player posted game state:\n", game_state
-                        print "\nError with card:", t, "with remaining deck:", dealt_cards
-                        raise cherrypy.HTTPError(500, "Error in player's POSTed game state")
+            state = validate_state(cdeck, count, game_state, state)
+            if state == 0:
+                return 0 # raise cherrypy 500 error
 
             # update game state with deck info
             state['deck']['cards'] = cdeck.cards
@@ -256,7 +248,7 @@ def handle_game_logic(game_state, game_id):
 
 def validate_state(cdeck, dealt_count, game_state, state):
     '''
-    validate game state
+    validate game state. Return updated state with player's placements if valid, else return 0
     '''
     dealt_cards = cdeck.cards[:dealt_count]
     for i in range(1,14):
