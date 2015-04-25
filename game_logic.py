@@ -1,4 +1,5 @@
-__author__ = 'Ali'
+__author__ = 'Alastair Kerr'
+# -*- coding: utf-8 -*-
 
 from bson.objectid import ObjectId
 import json
@@ -83,29 +84,10 @@ def handle_game_logic(game_state, game_id):
             print "\nTime taken calculating 5 placements:", current_milli_time() - stime, "ms"
             print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
 
-            # TODO convert stuff like the zipping below into functions for reuse across multiple if clauses
-            # zip optimal placements -> appropriate cards, and update state dic with each placement
-            for placement, card in izip(AI_placements, cards):
-                # row 1 (bottom) pos 1-5, row 2 (middle) pos 6-10, row 3 (top) pos 11-13
-                if placement == 1:
-                    start = 1
-                    end = 5
-                elif placement == 2:
-                    start = 6
-                    end = 10
-                    pass
-                elif placement == 3:
-                    start = 11
-                    end = 13
-                    pass
-                else:
-                    print "Invalid row returned from OFCP_AI.chooseMove(...):", AI_placement
-                    return None
-
-                for i in range(start, end+1):
-                    if state['properties2']['cards']['items']['position'+str(i)] is None:
-                        state['properties2']['cards']['items']['position'+str(i)] = card
-                        break
+            state = zip_placements_cards(AI_placements, cards, state)
+            if state == 1:
+                # Error with AI placement
+                return 1
 
             # deal player's next card
             card = cdeck.deal_one()
@@ -114,7 +96,7 @@ def handle_game_logic(game_state, game_id):
             state['deck']['cards'] = cdeck.cards
             state['deck']['current-position'] = cdeck.current_position
 
-            # records game state in database
+            # records game state in database + remove first5cards key
             state['cardtoplace'] = card
             update = games.update({
                 '_id': ObjectId(game_id)
@@ -125,13 +107,9 @@ def handle_game_logic(game_state, game_id):
             }
             })
 
-            #print "\nStored game state in database:", state
-
             del state['deck'] # don't return deck info to frontend
             del state['_id']
             #state.pop('_id', None)
-
-            #print "\nReturning state to player:", state
 
             return json.dumps(state)
 
@@ -156,25 +134,10 @@ def handle_game_logic(game_state, game_id):
             print "\nTime taken calculating 1 placement:", current_milli_time() - stime, "ms"
             print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
 
-            if AI_placement == 1:
-                start = 1
-                end = 5
-            elif AI_placement == 2:
-                start = 6
-                end = 10
-                pass
-            elif AI_placement == 3:
-                start = 11
-                end = 13
-                pass
-            else:
-                print "Invalid row returned from OFCP_AI.chooseMove(...):", AI_placement
-                return None
-
-            for i in range(start, end+1):
-                if state['properties2']['cards']['items']['position'+str(i)] is None:
-                    state['properties2']['cards']['items']['position'+str(i)] = card
-                    break
+            state = zip_placements_cards([AI_placement], [card], state)
+            if state == 1:
+                # Error with AI placement
+                return 1
 
             # deal player's next card
             card = cdeck.deal_one()
@@ -259,4 +222,31 @@ def validate_state(cdeck, dealt_count, game_state, state):
                 state['properties1']['cards']['items']['position'+str(i)] = t
             else:
                 return 0 # will raise cherry py 500 error in server.py
+    return state
+
+def zip_placements_cards(placements, card_list, state):
+    ''' zip optimal placements -> appropriate cards, and update state dic with each placement '''
+
+    for placement, card in izip(placements, card_list):
+        # row 1 (bottom) pos 1-5, row 2 (middle) pos 6-10, row 3 (top) pos 11-13
+        if placement == 1:
+            start = 1
+            end = 5
+        elif placement == 2:
+            start = 6
+            end = 10
+            pass
+        elif placement == 3:
+            start = 11
+            end = 13
+            pass
+        else:
+            print "Invalid row returned from OFCP_AI.chooseMove(...):", placements
+            return 1
+
+        for i in range(start, end+1):
+            if state['properties2']['cards']['items']['position'+str(i)] is None:
+                state['properties2']['cards']['items']['position'+str(i)] = card
+                break
+
     return state

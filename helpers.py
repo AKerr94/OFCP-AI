@@ -1,3 +1,4 @@
+__author__ = 'Alastair Kerr'
 # -*- coding: utf-8 -*-
 
 import hands
@@ -404,5 +405,3 @@ def simple_3card_evaluator(hand):
         
 if __name__ == "__main__":
     print "helper functions: import to use"
-    
-# © 2015 Alastair Kerr

@@ -1,3 +1,4 @@
+__author__ = 'Alastair Kerr'
 # -*- coding: utf-8 -*-
 
 from random import randint

@@ -1,3 +1,4 @@
+__author__ = 'Alastair Kerr'
 # -*- coding: utf-8 -*-
 
 import cherrypy
@@ -32,6 +33,8 @@ class subpage(object):
         response = game_logic.handle_game_logic(game_state, game_id)
         if response == 0:
             raise cherrypy.HTTPError(500, "Error in player's POSTed game state: inconsistency with stored state in database!")
+        elif response == 1:
+            raise cherrypy.HTTPError(500, "Error with AI's turn handling!")
         else:
             return response
 
@@ -61,6 +64,7 @@ class Root(object):
         playerFirst = game_state['playerFirst']
         score = game_state['score']
 
+        # if next round then invert playerFirst boolean and make game carrying over score from previous rounds
         if next == 'next':
             print "\nserver thinks that the Score is:", score, "\n"
             self.make_game(player_first = not playerFirst, score=score)

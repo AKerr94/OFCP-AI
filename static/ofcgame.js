@@ -3,7 +3,7 @@ var playButtonCounter = 0,
     cardsPlacedCount = 0,
     round_number = 1;
 var playLock = false;
-    playerFirst = true;
+    //playerFirst = true;
 var AI_positions = ["p2_bottom1", "p2_bottom2", "p2_bottom3", "p2_bottom4", "p2_bottom5",
     "p2_middle1", "p2_middle2", "p2_middle3", "p2_middle4", "p2_middle5",
     "p2_top1", "p2_top2", "p2_top3"
@@ -52,12 +52,21 @@ function drop(ev) {
 
 function setupGame() {
     console.log('Welcome to OFCP-AI, an application by Alastair Kerr!');
+    console.log('Player first: ' + playerFirst);
     //playerLabels(0,false,false); // set player name fields
     var button = document.getElementById('playButton');
     button.onclick = function() {
         button.innerHTML = "Next"; // change button text from 'Play' to 'Next'
         POST_reqwest(initial_5 ); // POST gamestate to backend and then calls initial_5 with response
     };
+
+    if (playerFirst == 'False') {
+        button.style.display = "none";
+        POST_reqwest(initial_5);
+        var b_text = document.getElementById("buttonTextReplacer");
+        b_text.style.display = "block";
+        POST_reqwest(handlePlacements);
+    }
 }
 
 function initial_5(resp) {
@@ -72,25 +81,26 @@ function initial_5(resp) {
         //img.src = "cards/d01.png"; //ace of diamonds
     }
 
-    // change button's functionality for future hands
-    var button = document.getElementById("playButton");
-    button.onclick = function() {
-        button.style.display = "none"; // hide button while AI calculates moves
+    if (playerFirst) {
+        // change button's functionality for future hands
+        var button = document.getElementById("playButton");
+        button.onclick = function() {
+            button.style.display = "none"; // hide button while AI calculates moves
 
-        // lock cards placed
-        for (i=0; i<13; i++) {
-            var temp = document.getElementById(player_positions[i]);
-            if (temp.hasChildNodes()) {
-                temp.firstChild.ondragstart = function() {return false;};
+            // lock cards placed
+            for (i=0; i<13; i++) {
+                var temp = document.getElementById(player_positions[i]);
+                if (temp.hasChildNodes()) {
+                    temp.firstChild.ondragstart = function() {return false;};
+                }
             }
-        }
-        var b_text = document.getElementById("buttonTextReplacer");
-        b_text.innerHTML = "AI is calculating move..."
-        b_text.style.display = "block";
-        
-        POST_reqwest(handlePlacements);
-    };
+            var b_text = document.getElementById("buttonTextReplacer");
+            //b_text.innerHTML = "AI is calculating move..."
+            b_text.style.display = "block";
 
+            POST_reqwest(handlePlacements);
+        };
+    }
 }
 
 function handlePlacements(resp) {
@@ -154,57 +164,6 @@ function handlePlacements(resp) {
     else { // handle end of game
         POST_reqwest(handleRoundEnd);
     }
-}
-
-function resetGame() {
-
-    rowScoresArr = [0, 0, 0, 0, 0, 0];
-
-    playerLabels(0,false,false); // set player name fields
-
-    // reset player cards
-    for (i = 1; i <= 13; i++) {
-        var temp = document.getElementById("place" + i + "card");
-        temp.style.display = "none";
-        temp.draggable = "true";
-        temp.ondragstart = function(event) {
-            drag(event);
-        };
-        temp.ondrop = function(event) {
-            drop(event);
-        };
-        if (i <= 5) {
-            document.getElementById("place" + i).appendChild(temp);
-        } else {
-            document.getElementById("place1").appendChild(temp);
-        }
-    }
-
-    // remove AI cards
-    var elements = document.getElementsByClassName("cardr");
-    for (i = 0; i < elements.length; i++) {
-        var temp = elements[i].firstChild;
-        temp.parentElement.removeChild(temp);
-    }
-
-    // hide row scores from previous round
-    var textString, temp;
-    for (pID = 1; pID <= 2; pID++) {
-        for (rowID = 1; rowID <= 3; rowID++) {
-            textString = "p" + pID + "_text" + rowID;
-            temp = document.getElementById(textString);
-            temp.innerHTML = "";
-        }
-    }
-
-    // handle whose turn it is first next round
-    if (playerFirst) {
-        playerFirst = false;
-    } else {
-        playerFirst = true;
-    }
-
-    POST_reqwest(initial_5);
 }
 
 function handleRoundEnd(resp) {
@@ -293,9 +252,7 @@ function handleRoundEnd(resp) {
     button.innerHTML = "Play next round";
 
     button.onclick = function() {
-        //button.innerHTML = "Next";
         window.location = window.location + '/next'; // reloads - goes to next page
-        //resetGame();
     }
   }
 
