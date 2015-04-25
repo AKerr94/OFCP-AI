@@ -5,7 +5,7 @@
 \textclass article
 \use_default_options true
 \maintain_unincluded_children false
-\language english
+\language british
 \language_package default
 \inputencoding auto
 \fontencoding global
@@ -105,7 +105,7 @@ Intelligent Agent for Open Face Chinese Poker Web-Application
 \align center
 
 \size large
-Submitted May 2015 in partial fulfillment of the conditions of the award
+Submitted May 2015 in partial fulfilment of the conditions of the award
  of the degree BSc (Honours) Computer Science
 \end_layout
 
@@ -859,8 +859,50 @@ html css and javascript for website/ app.
  cards to be placed, scores at end of game
 \end_layout
 
-\begin_layout Subsection
-Requirements
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+data flow diagram of a game of chinese poker
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+system flow diagram for application / system architecture diagram 
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The design principle adhered to throughout the process of creating the applicati
+on was Rapid Application Development using Evolutionary Prototyping, creating
+ a functional prototype which was refined and updated to meet changing requireme
+nts and to implement new features.
+ This approach was perfect for the needs of the project as it allowed for
+ lots of flexibility and meant that emphasis could be put on development,
+ creating a functional or semi-functional application at each stage which
+ implemented some of the planned features, meeting some of the requirements
+ and being ready to build upon and develop further into a new version which
+ improves upon itself.
+ This flexible style is naturally advantageous over a more traditional approach
+ such as the Waterfall model which involves rigorously defining specifications
+ from the start, which means making changes down the line becomes increasingly
+ difficult and costly; such a style of development was appropriated from
+ other industries before more suitable methodologies of software development
+ were formalised.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -909,7 +951,8 @@ Website and application created with HTML, CSS and Javascript with pages
 \end_layout
 
 \begin_layout Standard
-Python backend handling processing and AI
+Python backend handling processing of cards and game state, AI's placements
+ and scoring of game board 
 \end_layout
 
 \begin_layout Standard
@@ -1089,7 +1132,8 @@ Reflection on project, decisions, performance etc.
 Design - frontend is functional but could have been designed better from
  the start.
  e.g.
- hardcoding 
+ originally hard-coding player's card image objects rather than dynamically
+ creating them with javascript
 \end_layout
 
 \begin_layout Standard
@@ -1097,9 +1141,53 @@ Backend works well but if different technologies and languages were used
  could be more efficient - e.g.
  hand evaluators written in C using bitwise operators could evaluate millions
  of hands per second rather than hundreds of thousands - could shave off
- seconds of processing time which could either lead to increased responsivess
+ seconds of processing time which could either lead to increased responsiveness
  or allow for more games to be simulated by the AI making it more likely
  to find optimal solutions for hand placements.
+ 
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The choice of a flexible software methodology worked well overall because
+ of the evolving requirements and design choices, as well as the individual
+ nature of the project.
+ In comparison, in a large team of developers issues with this approach
+ could arise from lacking a clear design focus and having limited control
+ - a necessary trade-off that is an inevitable consequence of the increased
+ flexibility this methodology enables.
+ One important pitfall to avoid with Rapid Application Development is focusing
+ too much on individual components without getting a clear view of the system's
+ design, making minor changes without considering possibilities for an improved
+ design structure.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-7"
+
+\end_inset
+
+ Design choices in early prototypes had a carry-on effect which meant that
+ later down the line code refactoring was necessary in order to create a
+ more coherent system structure, which potentially could have been avoided
+ or reduced with a stricter design philosophy.
+ 
+\end_layout
+
+\begin_layout Standard
+An apt example of this is seen in legacy prototypes of the application,
+ which were client-side only.
+ This was a choice that was made in order to quickly create a functional
+ prototype, using JavaScript to simulate processes that would be handled
+ elsewhere in the final application's architecture (such as dealing cards).
+ This was useful because it resulted in a functional application which implement
+ed some of the planned features, leading to a clearer understanding of the
+ needs of the project, but had to be adapted later in order to create a
+ more logical system structure which could meet the requirements, such as
+ backend processing to handle the game states and calculate the Intelligent
+ Agent's moves.
  
 \end_layout
 
@@ -1142,6 +1230,68 @@ Multiplayer support for players vs players as well as players vs AI(s) or
 
 \begin_layout Standard
 Add support for other variants of OFC such as pineapple 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Intelligent Agent generally favours optimal card placements, but because
+ of the element of randomness in evaluating moves there is the potential
+ for the AI to mistakenly over-value a sub-optimal move.
+ As Whitehouse.
+ D Et.
+ al state 
+\begin_inset Quotes eld
+\end_inset
+
+With any method based on random simulation, it is inevitable that poor quality
+ moves will be chosen with nonzero probability, due to a particularly lucky
+ run of simulations making the move appear better than it is
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-3"
+
+\end_inset
+
+ page 5.
+ This potential for inaccurate evaluation of a move's strength has an inverse
+ relationship with the number of iterations of simulated games - as the
+ number of iterations increase the result diverges to the optimal solution,
+ meaning that with an infinite amount of simulations the probability of
+ finding the best move is 1.
+ The performance of the Intelligent Agent therefore could be improved with
+ more processing power and/or a longer allocated time to simulate games,
+ although it is important to note that there are diminishing returns with
+ this strategy; doubling the iterations does not mean that the results will
+ be twice as good.
+ This ties in with the choices made for the implementation and configuration
+ of the AI, specifically in regards to compromises between responsiveness
+ and finding the best move - in the specified requirements the AI was intended
+ to take no more than 5 seconds to calculate its turn, and the application
+ satisfies this requirement.
+ However, increasing the iterations would make satisfying this criteria
+ infeasible without increased processing power or optimisation.
+ This could be achieved in various ways, for example by rewriting the applicatio
+n in a more efficient language such as C, or by implementing more advanced
+ heuristics to reduce the complexity of the calculations, or using a different
+ algorithm such as a more advanced implementation of the Monte Carlo method
+ like Monte Carlo Tree Search with UCT, as discussed in Section 2 of this
+ dissertation.
+ Overall the AI satisfies the specified requirements and works well for
+ its intended purpose in the scope of this application, but for larger scale
+ implementations would likely need to make use of one or more of these changes
+ in order to achieve increased scalability, for example for use in a commercial
+ application with thousands of concurrent users.
+ 
 \end_layout
 
 \begin_layout Bibliography
@@ -1225,6 +1375,17 @@ key "key-6"
 \color blue
 https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applica
 tions-using-a-cherrypy-web-server-behind-nginx 
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-7"
+
+\end_inset
+
+Gerber, A.
+ Et al, 2007, Implications of Rapid Development Methodologies, CSITEd 2007
 \end_layout
 
 \end_body
