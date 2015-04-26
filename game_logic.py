@@ -205,9 +205,79 @@ def handle_game_logic(game_state, game_id):
 
     else:
         print "\n\nPlayer not First! ~Hello from server.py page ofc-backend!!\n"
-        cdeck = Deck(game_state['deck']['cards'], game_state['deck']['current-position']) # recreates deck
 
-        #games.update(game_state)
+        if count == 0:
+            # AI acts first, but return player's first 5 cards first while AI calculates
+            if 'first5cards' not in state:
+                print "\n\n HI HI HELLO ~~~ 1\n\n"
+                cdeck = deck.Deck()     # creates deck
+                cards_5_player = cdeck.deal_n(5) # player's first 5 cards
+                state['deck'] = {}      # initialise deck dic within game state
+                state['deck']['cards'] = cdeck.cards
+                state['deck']['current-position'] = cdeck.current_position
+
+                # validate game state
+                state = validate_state(cdeck, count, game_state, state)
+                if state == 0:
+                    return 0 # raise cherrypy 500 error
+
+                state['first5cards'] = cards_5_player
+
+                # update game state in database
+                update = games.update({
+                    '_id': ObjectId(game_id)
+                    }, {
+                    '$set': state
+                })
+
+                return json.dumps(cards_5_player)
+
+            else:
+                print "\n\n YES MAN FIRST5CARDS NOT FOUND\n\n"
+                cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
+                cards_5_AI = cdeck.deal_n(5)
+
+                # validate game state
+                state = validate_state(cdeck, count, game_state, state)
+                if state == 0:
+                    return 0 # raise cherrypy 500 error
+
+                # calculate AI's first 5 card placements
+                OFCP_AI.loop_elapsed = 0
+
+                stime = current_milli_time()
+
+                iterations_timer = 4000   # Sets time in ms to spend simulating games. As iterations increases diverges to optimal solution
+                AI_placements = OFCP_AI.chooseMove(game_state,cards_5_AI,iterations_timer)
+
+                print "\nTime taken calculating 5 placements:", current_milli_time() - stime, "ms"
+                print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
+
+                state = zip_placements_cards(AI_placements, cards_5_AI, state)
+                if state == 1:
+                    # Error with AI placement
+                    return 1
+
+                # deal player's next card
+                card_to_place = cdeck.deal_one()
+
+                # update game state with deck info
+                state['deck']['cards'] = cdeck.cards
+                state['deck']['current-position'] = cdeck.current_position
+
+                # records game state in database + remove first5cards key
+                state['cardtoplace'] = card_to_place
+                update = games.update({
+                    '_id': ObjectId(game_id)
+                    }, {
+                    '$set': state
+                })
+
+                del state['deck'] # don't return deck info to frontend
+                del state['_id']
+                #state.pop('_id', None)
+
+                return json.dumps(state)
 
 def validate_state(cdeck, dealt_count, game_state, state):
     '''

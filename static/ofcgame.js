@@ -61,12 +61,17 @@ function setupGame() {
     };
 
     if (playerFirst == 'False') {
+        button.innerHTML = "Next";
         button.style.display = "none";
-        POST_reqwest(initial_5);
+        POST_reqwest(bonus_initial_5);
         var b_text = document.getElementById("buttonTextReplacer");
         b_text.style.display = "block";
-        POST_reqwest(handlePlacements);
     }
+}
+
+function bonus_initial_5(resp) {
+    initial_5(resp);
+    POST_reqwest(handlePlacements);
 }
 
 function initial_5(resp) {
@@ -156,7 +161,12 @@ function handlePlacements(resp) {
     }
 
     if (cardsPlacedCount < 13) { // display player's next card
-        var playerCardToPlace = document.getElementById("place"+(cardsPlacedCount+1)+"card");
+        var place_i = cardsPlacedCount;
+        if (playerFirst == 'False') {
+            // adjust for cards placed by AI first
+            place_i = cardsPlacedCount - 5;
+        }
+        var playerCardToPlace = document.getElementById("place"+(place_i+1)+"card");
         playerCardToPlace.src = "../static/cards/" + gs['cardtoplace'] + ".png"
         playerCardToPlace.name = gs['cardtoplace'];
         playerCardToPlace.style.display = "block";

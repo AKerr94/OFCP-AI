@@ -548,13 +548,13 @@ def chooseMove(game_state, card, iterations_timer):
     
         find_valid_moves(game_state)  # finds free spaces in each row and records counts in global vars number_bottom, number_middle, number_top
 
-        print "\n=========== Calculcating for card", card, "===========\n"
+        print "\n=========== Calculcating for card", card, "==========="
         
         global number_top
         global number_middle
         global number_bottom
         
-        #print "Current cards placed top,", number_top, ", middle,",number_middle,",bottom,",number_bottom,"and 1st it top",num_top_first_count,"\n"
+        print "Current cards placed top:", number_top, ", middle:",number_middle,",bottom:",number_bottom,"and original top:",num_top_first_count,"\n"
         
         # booleans - True if there are free slots in row 
         valid_bottom = True

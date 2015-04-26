@@ -951,8 +951,8 @@ Website and application created with HTML, CSS and Javascript with pages
 \end_layout
 
 \begin_layout Standard
-Python backend handling processing of cards and game state, AI's placements
- and scoring of game board 
+Python backend handling dealing of cards, processing game state, AI's card
+ lacements and scoring of game board 
 \end_layout
 
 \begin_layout Standard
@@ -969,7 +969,8 @@ key "key-6"
 \end_layout
 
 \begin_layout Standard
-Game states stored in database using pymongodb.
+Game states stored in database using pymongodb run in docker.io virtual environme
+nt.
  
 \end_layout
 
@@ -1273,13 +1274,16 @@ key "key-3"
  although it is important to note that there are diminishing returns with
  this strategy; doubling the iterations does not mean that the results will
  be twice as good.
- This ties in with the choices made for the implementation and configuration
+\end_layout
+
+\begin_layout Standard
+This ties in with the choices made for the implementation and configuration
  of the AI, specifically in regards to compromises between responsiveness
  and finding the best move - in the specified requirements the AI was intended
  to take no more than 5 seconds to calculate its turn, and the application
  satisfies this requirement.
  However, increasing the iterations would make satisfying this criteria
- infeasible without increased processing power or optimisation.
+ infeasible without increased processing power or through further optimisation.
  This could be achieved in various ways, for example by rewriting the applicatio
 n in a more efficient language such as C, or by implementing more advanced
  heuristics to reduce the complexity of the calculations, or using a different

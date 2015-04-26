@@ -2,14 +2,7 @@
 <html>
 
 <head>
-<meta charset="utf-8"/>
-<style>
-	.cardl {width:109px;height:150px;padding:0px;border:1px solid #aaaaaa;float: left;}
-	.cardr {width:109px;height:150px;padding:0px;border:1px solid #aaaaaa;float: right;}
-	.scorecontainerl {width:109px;height:150px;padding:0px;border:0px solid #aaaaaa;float: left;font-size:15pt;}
-	.scorecontainerr {width:109px;height:150px;padding:0px;border:0px solid #aaaaaa;float: right;font-size:15pt;}
-    disp { text-decoration:underline; color:blue; }
-</style>
+  <meta charset="utf-8"/>
   <title>Open Face Chinese Poker (vs AI)</title>
   <link href="../static/site.css" rel="stylesheet">
 </head>
@@ -108,10 +101,10 @@
 <p style="margin-top:570px;"></p>
 
 
-<!-- play button -->
-<div id="buttonDiv">
-	<button id="playButton" style="margin-top:10px;margin-bottom:10px;" >Play!</button>
-    <p id="buttonTextReplacer" style="display:none;">AI is calculating move...</p>
+<!-- play button area -->
+<div id="buttonDiv" style="min-height:40px">
+	<button id="playButton" class="btn">Play!</button>
+    <p id="buttonTextReplacer" style="display:none; color:#2c6080; font-size:20px;">AI is calculating move...</p>
 </div>
 
 <!-- cards to be placed by player -->
@@ -156,8 +149,6 @@
         </div>
     {% endfor %}
 </div>
-
-<p style="margin-top:180px;" onclick="alert('Try zooming out with Ctrl -');"><disp>Display problems?</disp></p>
 
 <footer style="margin-top:10px;" id="footer1"></footer>
 
