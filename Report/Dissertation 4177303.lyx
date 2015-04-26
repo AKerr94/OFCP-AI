@@ -952,13 +952,18 @@ Website and application created with HTML, CSS and Javascript with pages
 
 \begin_layout Standard
 Python backend handling dealing of cards, processing game state, AI's card
- lacements and scoring of game board 
+ placements and scoring of game board 
 \end_layout
 
 \begin_layout Standard
-Pure python networking with cherrypy.
- Site hosted using DigitialOcean VPS running Ubuntu 14.04 with nginx reverse-prox
-y.
+Pure python networking with cherrypy, which is efficient and can handle
+ up to 1000 concurrent requests which is more than enough for the requirements
+ of this project.
+ 
+\end_layout
+
+\begin_layout Standard
+Site hosted using DigitialOcean VPS running Ubuntu 14.04 with nginx reverse-proxy.
 \begin_inset CommandInset citation
 LatexCommand cite
 key "key-6"
@@ -969,13 +974,33 @@ key "key-6"
 \end_layout
 
 \begin_layout Standard
-Game states stored in database using pymongodb run in docker.io virtual environme
-nt.
+Game states stored in database using mongodb (which is a document-oriented
+ database as opposed to a traditional relational database which decreases
+ development time and reduces complexity as there is no need to constantly
+ transform the data when reading from the database into the python backend.
+ Mongodb is scalable and high performance, and allows for flexible data
+ structures for example with optional values being handled trivially, with
+ the databases getting type information from the data itself meaning they
+ can map easily into program objects, which is specifically advantageous
+ in this application because of the use of dictionaries to store the game
+ state.
+ The flexibility and ease of deployment of such a style of database makes
+ their use well suited for web-applications such as this one) run in docker
+ virtual environment.
  
 \end_layout
 
 \begin_layout Standard
-Version control with github: OFCP-AI private repository 
+Version control with github: OFCP-AI private repository.
+ Use of version control is paramount as it allows for undesirable changes
+ to be rolled back easily, and if something goes wrong there is always working
+ versions available to roll back to.
+ Using multiple branches (master and experimental) meant that a stable version
+ could be maintained while new features were implemented safely on the experimen
+tal branch without affecting or potentially breaking the master version.
+ Also allows for 'releases' for different versions of the software e.g.
+ legacy client-side only, current with feature-full self-contained application
+ 
 \end_layout
 
 \begin_layout Subsection
