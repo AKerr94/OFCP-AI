@@ -209,7 +209,6 @@ def handle_game_logic(game_state, game_id):
         if count == 0:
             # AI acts first, but return player's first 5 cards first while AI calculates
             if 'first5cards' not in state:
-                print "\n\n HI HI HELLO ~~~ 1\n\n"
                 cdeck = deck.Deck()     # creates deck
                 cards_5_player = cdeck.deal_n(5) # player's first 5 cards
                 state['deck'] = {}      # initialise deck dic within game state
@@ -233,7 +232,6 @@ def handle_game_logic(game_state, game_id):
                 return json.dumps(cards_5_player)
 
             else:
-                print "\n\n YES MAN FIRST5CARDS NOT FOUND\n\n"
                 cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
                 cards_5_AI = cdeck.deal_n(5)
 
@@ -258,15 +256,11 @@ def handle_game_logic(game_state, game_id):
                     # Error with AI placement
                     return 1
 
-                # deal player's next card
-                card_to_place = cdeck.deal_one()
-
                 # update game state with deck info
                 state['deck']['cards'] = cdeck.cards
                 state['deck']['current-position'] = cdeck.current_position
 
                 # records game state in database + remove first5cards key
-                state['cardtoplace'] = card_to_place
                 update = games.update({
                     '_id': ObjectId(game_id)
                     }, {
@@ -278,6 +272,96 @@ def handle_game_logic(game_state, game_id):
                 #state.pop('_id', None)
 
                 return json.dumps(state)
+
+        # general case for every other round after initial 5 placements by player and AI
+        elif count < 26:
+
+            cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
+
+            # validate game state
+            state = validate_state(cdeck, count, game_state, state)
+            if state == 0:
+                return 0 # raise cherrypy 500 error
+
+            # AI's next move
+            card = str(cdeck.deal_one())
+            OFCP_AI.loop_elapsed = 0
+
+            stime = current_milli_time()
+            iterations_timer = 3000
+            AI_placement = OFCP_AI.chooseMove(game_state,card,iterations_timer)
+
+            print "\nTime taken calculating 1 placement:", current_milli_time() - stime, "ms"
+            print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
+
+            state = zip_placements_cards([AI_placement], [card], state)
+            if state == 1:
+                # Error with AI placement
+                return 1
+
+            # deal player's next card
+            card = cdeck.deal_one()
+
+            # update game state with deck info
+            state['deck']['cards'] = cdeck.cards
+            state['deck']['current-position'] = cdeck.current_position
+
+            # records game state in database
+            state['cardtoplace'] = card
+            update = games.update({
+                '_id': ObjectId(game_id)
+                }, {
+                '$set': state
+            })
+
+            print "\nStored game state in database:", state
+
+            del state['deck'] # don't return deck info to frontend
+            del state['_id']
+
+            #print "\nReturning state to player:", state
+
+            return json.dumps(state)
+
+        else:
+            # game over - validate and score game board
+
+            cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
+
+            # validate game state
+            state = validate_state(cdeck, count, game_state, state)
+            if state == 0:
+                return 0 # raise cherrypy 500 error
+
+            # update game state with deck info
+            state['deck']['cards'] = cdeck.cards
+            state['deck']['current-position'] = cdeck.current_position
+
+            # score game board
+            scores_array = helpers.scoring_helper(game_state)
+
+            # store p1's score in database
+            state['score'] = helpers.scores_arr_to_int(scores_array)
+            print "\nState score recorded as:", state['score'], "!\n"
+            print "scores_array was", scores_array
+
+            # records game state in database
+            del state['cardtoplace']
+            update = games.update({
+                '_id': ObjectId(game_id)
+                }, {
+                '$set': state
+            })
+
+            OFCP_AI.reset() # reset AI variables/ states
+
+            # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty],
+            #    [winnerid, winners_middle_royalty, losers_middle_royalty] ,
+            #    [winnerid, winners_top_royalty, losers_top_royalty] ]
+
+            print '\n   Scores -->', scores_array, '\n'
+
+            return json.dumps(scores_array)
 
 def validate_state(cdeck, dealt_count, game_state, state):
     '''
