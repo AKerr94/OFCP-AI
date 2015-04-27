@@ -115,6 +115,7 @@ ul#menu li a:hover
 	background: #567082;
 	border-radius: 5px;
 	color: #ffffff;
+	font-size: 16px;
 	padding: 5px 10px 5px 10px;
 	text-decoration: none;
 }

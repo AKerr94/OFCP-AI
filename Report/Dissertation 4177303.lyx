@@ -225,6 +225,40 @@ height "0.5pt"
 
 \end_layout
 
+\begin_layout Abstract
+Artificial Intelligence is a crucial and high-interest area of research
+ in the field of Computer Science, which has gained increased traction in
+ recent decades due largely to the application of AI algorithms in games.
+ Poker games provide a challenge to Intelligent Agents because of elements
+ of hidden information such as the cards which are yet to be dealt.
+ This differentiates Poker games from more traditional games such as Checkers,
+ which is a zero-sum full information game meaning that at any stage there
+ is an optimal move leading to a winning strategy.
+ In this manner these games can effectively be solved, and playing against
+ a competent Agent for such a game means it is impossible to win, only to
+ draw.
+ Poker games are different because of the variance from the element of randomnes
+s due to unknown cards.
+ This means that more advanced algorithms are necessary for an Agent to
+ perform competently versus intelligent opponents.
+ While there has been lots of research into Intelligent Agents for traditional
+ board games and variants of Poker such as Texas Hold'Em, lesser known variants
+ such as the relatively new Open-Face-Chinese Poker have not been explored
+ to the same degree.
+ Agents for Open-Face-Chinese Poker often suffer from poor performance due
+ to reliance on simple algorithms and methods such as Rule-Based Systems,
+ which can lead to predictable or sub-optimal play.
+ This dissertation considers the merits of various AI algorithms, and implements
+ an Intelligent Agent for a bespoke Open-Face-Chinese Poker Web Application.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 \begin_inset CommandInset toc
 LatexCommand tableofcontents
@@ -235,24 +269,6 @@ LatexCommand tableofcontents
 \end_layout
 
 \begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Abstract
-Problem description: poor AI performance in OFCP, not much work done on
- the subject.
- Traditional board games and more popular variants of poker such as Texas
- Hold'Em and Omaha have had much more research.
- OFCP AIs generally underperform, playing sub-optimally.
- This dissertation considers different approaches and algorithms, and implements
- an AI for a bespoke OFC web-app.
- 
-\end_layout
-
-\begin_layout Abstract
 \begin_inset Newpage pagebreak
 \end_inset
 
@@ -834,7 +850,7 @@ A faster, more efficient algorithm means more hands can be evaluated more
 \end_layout
 
 \begin_layout Standard
-More efficient poker hand evaluators are availavble, however generally written
+More efficient poker hand evaluators are available, however generally written
  in much more efficient languages such as C - cannot be used in conjunction
  with pypy.
  
