@@ -246,7 +246,7 @@ def scores_arr_to_int(scores):
     '''
     scores: takes scores_array from scoring_helper
     works out what player 1's score is and returns this
-    (p2's score is the inverse)
+    (p2's score is the inverse of this in a heads up scenario)
     '''
 
     #print "\nScoring a board! Scores array:", scores
@@ -269,25 +269,29 @@ def scores_arr_to_int(scores):
         elif scores[i][0] == 1:
             p1wins += 1
 
+    # +/-6 if a player scoops, else +1 per row
     if p2wins == 3:
         p2score += 6
-        p1score += -6
+        p1score -= 6
     elif p1wins == 3:
-        p2score += -6
+        p2score -= 6
         p1score += 6
     else:
-        p2score += (p2wins - p1wins)
         p1score += (p1wins - p2wins)
+        p2score += (p2wins - p1wins)
 
     # add extra points for royalties
-    p1score += (scores[0][1] + scores[1][1] + scores[2][1]) * p1_multiplier
-    p2score += (scores[0][2] + scores[1][2] + scores[2][2]) * p2_multiplier
+    p1_royalties = (scores[0][1] + scores[1][1] + scores[2][1]) * p1_multiplier
+    p2_royalties = (scores[0][2] + scores[1][2] + scores[2][2]) * p2_multiplier
 
     #print "Helpers scores:" 
     #print "p1 score:", p1score, "wins:", p1wins, "multiplier:", p1_multiplier
     #print "p2 score:", p2score, "wins:", p2wins, "multiplier:", p2_multiplier
     #print "from:", scores
-    
+
+    p1score += (p1_royalties - p2_royalties)
+    p2score += (p2_royalties - p1_royalties)
+
     # finalise scores
     if p1score > p2score:
         p2score = -p1score
