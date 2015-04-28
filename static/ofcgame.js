@@ -1,9 +1,4 @@
 var suits = ["h", "d", "s", "c"];
-var playButtonCounter = 0,
-    cardsPlacedCount = 0,
-    round_number = 1;
-var playLock = false;
-//playerFirst = true;
 var AI_positions = ["p2_bottom1", "p2_bottom2", "p2_bottom3", "p2_bottom4", "p2_bottom5",
     "p2_middle1", "p2_middle2", "p2_middle3", "p2_middle4", "p2_middle5",
     "p2_top1", "p2_top2", "p2_top3"
@@ -13,8 +8,8 @@ var player_positions = ["p1_bottom1", "p1_bottom2", "p1_bottom3", "p1_bottom4", 
     "p1_top1", "p1_top2", "p1_top3"
 ];
 var rowScoresArr = [0, 0, 0, 0, 0, 0]; // player 1 top, p1 middle, p1 bottom, p2 top, p2 middle, p2 bottom
-var p1score = 0,
-    p2score = 0;
+var p1score = t_score,
+    p2score = -t_score;
 var player1 = "Player 1",
     player2 = "Computer Opponent";
 
@@ -63,13 +58,13 @@ function setupGame() {
     if (playerFirst == 'False') {
         button.innerHTML = "Next";
         button.style.display = "none";
-        POST_reqwest(bonus_initial_5);
+        POST_reqwest(auto_initial_5);
         var b_text = document.getElementById("buttonTextReplacer");
         b_text.style.display = "block";
     }
 }
 
-function bonus_initial_5(resp) {
+function auto_initial_5(resp) {
     // called on alternate rounds when player does not act first, allowing them to see their cards while AI calculates their move
     initial_5(resp);
     POST_reqwest(handlePlacements);
@@ -87,28 +82,36 @@ function initial_5(resp) {
         //img.src = "cards/d01.png"; //ace of diamonds
     }
 
-    if (playerFirst) {
-        // change button's functionality for future hands
-        var button = document.getElementById("playButton");
-        button.onclick = function() {
-            button.style.display = "none"; // hide button while AI calculates moves
+    // change button's functionality for future hands
+    var button = document.getElementById("playButton");
+    button.onclick = function() {
+        button.style.display = "none"; // hide button while AI calculates moves
 
-            // lock cards placed
-            for (i = 0; i < 13; i++) {
-                var temp = document.getElementById(player_positions[i]);
-                if (temp.hasChildNodes()) {
-                    temp.firstChild.ondragstart = function() {
-                        return false;
-                    };
-                }
+        // lock cards placed and count them
+        var count = 0;
+        for (i = 0; i < 13; i++) {
+            var temp = document.getElementById(player_positions[i]);
+            if (temp.hasChildNodes() && temp.firstChild.nodeType != 3) {
+                temp.firstChild.ondragstart = function() {
+                    return false;
+                };
+                count += 1;
             }
-            var b_text = document.getElementById("buttonTextReplacer");
-            //b_text.innerHTML = "AI is calculating move..."
-            b_text.style.display = "block";
+        }
 
-            POST_reqwest(handlePlacements);
-        };
-    }
+        // special case - if player acts second and the 13th card has just been placed handle round end
+        // otherwise carry on and handle AI placements
+        if (count == 13 && playerFirst == 'False') {
+            POST_reqwest(handleRoundEnd);
+            return;
+        }
+
+        var b_text = document.getElementById("buttonTextReplacer");
+        //b_text.innerHTML = "AI is calculating move..."
+        b_text.style.display = "block";
+
+        POST_reqwest(handlePlacements);
+    };
 }
 
 function handlePlacements(resp) {
@@ -158,6 +161,7 @@ function handlePlacements(resp) {
     // this is called on alternate rounds where player acts second - handle end of game (expected resp - scores object)
     else {
         POST_reqwest(handleRoundEnd);
+        return;
     }
 
     var button = document.getElementById("playButton");
@@ -192,6 +196,11 @@ function handleRoundEnd(resp) {
     scores_obj = JSON.parse(resp); // parse response as list again
     //  finalise scoring - update frontend to reflect scores
 
+    // calculate scores for labels
+    p1_t_score = p1score
+    p2_t_score = p2score
+
+    // use scores_obj information to make frontend changes e.g. individual row scores for this round
     p1_wins = 0; // keep track of how many rows are won by each player
     p2_wins = 0; // (if a player wins all 3 rows, they scoop for +3 points)
     p1foul = scores_obj[3][0]; // boolean - true if p1's hand fouled
@@ -233,17 +242,17 @@ function handleRoundEnd(resp) {
         p2_wins += 1;
     }
 
-    p1score += rowScoresArr[0] + rowScoresArr[1] + rowScoresArr[2]; // player's top middle bottom
-    p2score += rowScoresArr[3] + rowScoresArr[4] + rowScoresArr[5]; // AI's top middle bottom
+    p1_t_score += rowScoresArr[0] + rowScoresArr[1] + rowScoresArr[2]; // player's top middle bottom
+    p2_t_score += rowScoresArr[3] + rowScoresArr[4] + rowScoresArr[5]; // AI's top middle bottom
 
     scoop = 0;
     if (p1_wins == 3) { // player 1 scoops for + 3 extra points
-        p1score += 3;
-        p2score -= 3;
+        p1_t_score += 3;
+        p2_t_score -= 3;
         scoop = 1;
     } else if (p2_wins == 3) { // player 2 scoops for + 3 extra points
-        p1score -= 3;
-        p2score += 3;
+        p1_t_score -= 3;
+        p2_t_score += 3;
         scoop = 2;
     }
 
@@ -263,13 +272,14 @@ function handleRoundEnd(resp) {
     }
 
     // change player labels to reflect their total scores
-    playerLabels(scoop, p1foul, p2foul);
+    playerLabels(p1_t_score, p2_t_score, scoop, p1foul, p2foul);
 
     var button = document.getElementById("playButton");
     button.innerHTML = "Play next round";
+    button.style.display = "block";
 
     button.onclick = function() {
-        window.location = window.location + '/next'; // reloads - goes to next page
+        window.location = window.location + '/next'; // loads next page
     }
 }
 
@@ -281,7 +291,7 @@ function chooseScoreColour(num) {
     }
 }
 
-function playerLabels(scoop_id, p1_foul, p2_foul) {
+function playerLabels(p1_t_score, p2_t_score, scoop_id, p1_foul, p2_foul) {
     /* update player labels. Sccop id = 0 (no scoop)
        scoop id = 1 (player 1 scoops)
        scoop id = 2 (player 2 scoops) */
@@ -289,8 +299,8 @@ function playerLabels(scoop_id, p1_foul, p2_foul) {
     p1_label_tail = "";
     p2_label_tail = "";
 
-    p1_t_score = p1score;
-    p2_t_score = p2score;
+    //p1_t_score = p1score;
+    //p2_t_score = p2score;
 
     if (scoop_id == 1) { // if player 1 scoops
         p1_label_tail += " + Scoop (3)!"

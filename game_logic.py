@@ -68,7 +68,7 @@ def handle_game_logic(game_state, game_id):
             cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
 
             # validate game state
-            state = validate_state(cdeck, count, game_state, state)
+            state = validate_and_update_state(cdeck, count, game_state, state)
             if state == 0:
                 return 0 # raise cherrypy 500 error
 
@@ -119,7 +119,7 @@ def handle_game_logic(game_state, game_id):
             cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
 
             # validate game state
-            state = validate_state(cdeck, count, game_state, state)
+            state = validate_and_update_state(cdeck, count, game_state, state)
             if state == 0:
                 return 0 # raise cherrypy 500 error
 
@@ -169,7 +169,7 @@ def handle_game_logic(game_state, game_id):
             cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
 
             # validate game state
-            state = validate_state(cdeck, count, game_state, state)
+            state = validate_and_update_state(cdeck, count, game_state, state)
             if state == 0:
                 return 0 # raise cherrypy 500 error
 
@@ -181,7 +181,7 @@ def handle_game_logic(game_state, game_id):
             scores_array = helpers.scoring_helper(game_state)
 
             # store p1's score in database
-            state['score'] = helpers.scores_arr_to_int(scores_array)
+            state['score'] += helpers.scores_arr_to_int(scores_array)
             print "\nState score recorded as:", state['score'], "!\n"
             print "scores_array was", scores_array
 
@@ -195,9 +195,12 @@ def handle_game_logic(game_state, game_id):
 
             OFCP_AI.reset() # reset AI variables/ states
 
+            scores_array.append([state['score']])
             # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty],
             #    [winnerid, winners_middle_royalty, losers_middle_royalty] ,
-            #    [winnerid, winners_top_royalty, losers_top_royalty] ]
+            #    [winnerid, winners_top_royalty, losers_top_royalty] ],
+            #    [p1foulbool, p2foulbool],
+            #    [p1_existing_score]
 
             print '\n   Scores -->', scores_array, '\n'
 
@@ -216,7 +219,7 @@ def handle_game_logic(game_state, game_id):
                 state['deck']['current-position'] = cdeck.current_position
 
                 # validate game state
-                state = validate_state(cdeck, count, game_state, state)
+                state = validate_and_update_state(cdeck, count, game_state, state)
                 if state == 0:
                     return 0 # raise cherrypy 500 error
 
@@ -236,7 +239,7 @@ def handle_game_logic(game_state, game_id):
                 cards_5_AI = cdeck.deal_n(5)
 
                 # validate game state
-                state = validate_state(cdeck, count, game_state, state)
+                state = validate_and_update_state(cdeck, count, game_state, state)
                 if state == 0:
                     return 0 # raise cherrypy 500 error
 
@@ -279,7 +282,7 @@ def handle_game_logic(game_state, game_id):
             cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
 
             # validate game state
-            state = validate_state(cdeck, count, game_state, state)
+            state = validate_and_update_state(cdeck, count, game_state, state)
             if state == 0:
                 return 0 # raise cherrypy 500 error
 
@@ -329,7 +332,7 @@ def handle_game_logic(game_state, game_id):
             cdeck = deck.Deck(state['deck']['cards'], state['deck']['current-position'])
 
             # validate game state
-            state = validate_state(cdeck, count, game_state, state)
+            state = validate_and_update_state(cdeck, count, game_state, state)
             if state == 0:
                 return 0 # raise cherrypy 500 error
 
@@ -341,7 +344,7 @@ def handle_game_logic(game_state, game_id):
             scores_array = helpers.scoring_helper(game_state)
 
             # store p1's score in database
-            state['score'] = helpers.scores_arr_to_int(scores_array)
+            state['score'] += helpers.scores_arr_to_int(scores_array)
             print "\nState score recorded as:", state['score'], "!\n"
             print "scores_array was", scores_array
 
@@ -355,15 +358,18 @@ def handle_game_logic(game_state, game_id):
 
             OFCP_AI.reset() # reset AI variables/ states
 
-            # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty],
+            scores_array.append([state['score']])
+            #    scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty],
             #    [winnerid, winners_middle_royalty, losers_middle_royalty] ,
-            #    [winnerid, winners_top_royalty, losers_top_royalty] ]
+            #    [winnerid, winners_top_royalty, losers_top_royalty] ],
+            #    [p1foulbool, p2foulbool],
+            #    [p1_existing_score]
 
             print '\n   Scores -->', scores_array, '\n'
 
             return json.dumps(scores_array)
 
-def validate_state(cdeck, dealt_count, game_state, state):
+def validate_and_update_state(cdeck, dealt_count, game_state, state):
     '''
     validate game state. Return updated state with player's placements if valid, else return 0
     '''
