@@ -10,7 +10,7 @@
 <body>
 <nav id="navigator"></nav>
 <div id="main" style="min-width:1400px;">
-<h1>Open Face Chinese Poker</h1>
+<h1>Open Face Chinese Poker (Round {{roundNumber}})</h1>
 
 <p>Create the best poker hands possible in each row. Each row must have a stronger hand than the row above it!</p>
 
@@ -158,6 +158,7 @@
     var gameId = '{{ game_id }}';
     var playerFirst = '{{ playerFirst }}';
     var t_score = {{ score }};
+    var roundNumber = {{ roundNumber }};
 </script>
 
 <script src="../static/ofcgame.js"></script>

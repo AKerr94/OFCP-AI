@@ -62,6 +62,9 @@ function setupGame() {
         var b_text = document.getElementById("buttonTextReplacer");
         b_text.style.display = "block";
     }
+    else if (roundNumber > 1) {
+        POST_reqwest(initial_5);
+    }
 }
 
 function auto_initial_5(resp) {
@@ -85,6 +88,7 @@ function initial_5(resp) {
     // change button's functionality for future hands
     var button = document.getElementById("playButton");
     button.onclick = function() {
+        button.innerHTML = "Next";
         button.style.display = "none"; // hide button while AI calculates moves
 
         // lock cards placed and count them

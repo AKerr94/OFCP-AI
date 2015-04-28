@@ -44,12 +44,13 @@ class Root(object):
     #make a subpage
     subpage = subpage()
 
-    def make_game(self, player_first=True, score =0 ):
+    def make_game(self, player_first=True, score =0, roundNum =0 ):
         games = db_backend.get_database_collection()
         game_state = db_backend.make_state()
 
         game_state['playerFirst'] = player_first
         game_state['score'] = score
+        game_state['roundNumber'] = roundNum + 1
 
         game_id = str(games.insert(game_state))
 
@@ -63,15 +64,16 @@ class Root(object):
         game_state = games.find_one({'_id': ObjectId(game_id)})
         playerFirst = game_state['playerFirst']
         score = game_state['score']
+        roundNumber = game_state['roundNumber']
 
         # if next round then invert playerFirst boolean and make game carrying over score from previous rounds
         if next == 'next':
             print "\nserver thinks that the Score is:", score, "\n"
-            self.make_game(player_first = not playerFirst, score=score)
+            self.make_game(player_first = not playerFirst, score=score, roundNum=roundNumber)
 
         print game_state.keys()
 
-        return render_template('OFCP_game.html', game_id=game_id, playerFirst=playerFirst, score=score, game_state=game_state)
+        return render_template('OFCP_game.html', game_id=game_id, playerFirst=playerFirst, score=score, roundNumber=roundNumber, game_state=game_state)
 
     def index(self):
         raise cherrypy.HTTPRedirect("/ofc/play")
