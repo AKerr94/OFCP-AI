@@ -1,3 +1,6 @@
+__author__ = 'Alastair Kerr'
+# -*- coding: utf-8 -*-
+
 from random import randint
 import random
 import helpers
@@ -25,12 +28,6 @@ loop_elapsed = 0
 
 rankmappingdic = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14}
 backrankmappingdic = {2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'T',11:'J',12:'Q',13:'K',14:'A'}
-
-class Node:
-    ''' A node in the game tree '''
-    def __init__(self):
-        #self.moves_to_try = ?.findMoves()
-        pass
 
 def reset():
     ''' reset variables for a new round '''
@@ -129,37 +126,7 @@ def simulateGame(game_state, row, card, bAppend):
     global loop_elapsed
     loop_elapsed += (current_milli_time() - stime2)
     
-    p1score = 0 
-    p2score = 0
-    p1_multiplier = 1 
-    p2_multiplier = 1
-    if scores[3][0] == True: # p1 fouls, scores 0
-        p1_multiplier = 0 
-    if scores[3][1] == True: # p2 fouls, scores 0
-        p2_multiplier = 0 
-    
-    # handle points for winning rows
-    p1wins = 0
-    p2wins = 0
-    for i in range(0,3):
-        if scores[i][0] == 2:
-            p2wins += 1
-        elif scores[i][0] == 1:
-            p1wins += 1
-    p2wins = p2wins - p1wins
-    if p2wins == 3:
-        p2score += 6
-        p1score += -6
-    elif p2wins == -3:
-        p2score += -6
-        p1score += 6
-    else:
-        p2score += p2wins
-        p1score += -p2wins
-    
-    # add extra points for royalties 
-    p1score = (scores[0][1] + scores[1][1] + scores[2][1]) * p1_multiplier
-    p2score = (scores[0][2] + scores[1][2] + scores[2][2]) * p2_multiplier
+    p2score = (helpers.scores_arr_to_int(scores)) * -1 # function returns p1's score. Get the inverse of this for AI's EV
     
     global counthands
     counthands += 1
@@ -183,10 +150,10 @@ def simulateGame(game_state, row, card, bAppend):
                   
         print "\n******************************\n*Hand simulation", counthands, "\n", scores_string, "\n++++++  game state info  ++++++\n", AIstring, "\n", p1string, "\n======================================================"
         '''
-        if p2score > p1score:
+        if p2score > 0:
             global scoringhands
             scoringhands += 1
-        elif p2score - p1score == 0:
+        elif p2score == 0:
             global zeroscorehands
             zeroscorehands += 1
         else:
@@ -197,7 +164,7 @@ def simulateGame(game_state, row, card, bAppend):
         global nullscoringhands
         nullscoringhands += 1
         
-    return p2score - p1score
+    return p2score
     #return randint(0,50) # return random score between 0-50 inclusive for test purposes
 
 def simulate_append_card(game_state, row, card, force_place):
@@ -277,10 +244,15 @@ def place_5(game_state, cards, sim_timer):
     and returns an optimal placement as a list with index i = card i+1's allocated row
     e.g. return [1,1,2,2,3] = card 1 in row 1, card 2 in row 1, card 3 in row 2, card 4 in row 2, card 5 in row 3'''
 
+    try:
+        cdic = {cards[0]:1, cards[1]:2, cards[2]:3, cards[3]:4, cards[4]:5} # keep a permanent record of which card was which index
+
+    except Exception:
+        print "Invalid cards passed to place_5:", cards
+        raise Exception
+
     print "\n####\nPlace_5:", cards, "\nSimulation Timer:", sim_timer, "ms.\n"
-    
-    cdic = {cards[0]:1, cards[1]:2, cards[2]:3, cards[3]:4, cards[4]:5} # keep a permanent record of which card was which index 
-    
+
     cstring = ""
     for i in range(0,5):
         cstring += cards[i][0] + cards[i][1] + cards[i][2]
@@ -325,12 +297,29 @@ def place_5(game_state, cards, sim_timer):
 
     nexthighestfreq = 1 
     secondrank = None
-    if highestfreq < 4: # look for e.g. 2nd pair
+    if highestfreq < 4: # look for 2nd pair
         for item in hist:
             if item[1] > nexthighestfreq and item[0] is not thatrank:
                 nexthighestfreq = item[1]
                 secondrank = item[0]
-
+    
+    # look for straights
+    highestrank = 0
+    lowestrank = 0
+    if highestfreq == 1:
+        for item in hist: #find lowest rank
+            if item[1] > 0:
+                lowestrank = item[0]
+                break
+        for item in reversed(hist): #find highest rank
+            if item[1] > 0:
+                highestrank = item[0]
+                break
+        if highestrank - lowestrank == 4:
+            straight = True
+            
+        #TODO straight state handling
+    
     print "Highest Freq:",highestfreq,"Rank:",thatrank,"... Next Highest Freq:",nexthighestfreq,"Rank:",secondrank
     
     final = []
@@ -407,7 +396,7 @@ def place_5(game_state, cards, sim_timer):
     final4 = []    
         
     # 4th round - if there are still lots of states to consider, prune some sub-optimal placements e.g. all cards placed in middle 
-    if len(final3) > 50:
+    if len(final3) > 20:
         for state in final3:
             # remove states with an empty or full bottom row
             count = 0
@@ -469,8 +458,8 @@ def place_5(game_state, cards, sim_timer):
     print "\nSTATE SCORES:", states_scores      
         
     # find the state selection with the highest EV
-    best_state = None
     highest_ev = 0
+    best_state_score = [0,0,0]
     for result in states_scores:
         if result[1] > highest_ev:
             best_state_score = result
@@ -526,10 +515,12 @@ def chooseMove(game_state, card, iterations_timer):
     simulations and returns optimal move - 1 for bottom, 2 for middle, 3 for top '''
     
     #### calculate first 5 cards to place - recursively call this function with each individual card ####
+
+    global deck
+    global num_top_first_count
+
     if type(card) == type([]): 
         if (len(card) == 5):
-            global num_top_first_count 
-            global deck
             num_top_first_count = 0
             deck = produce_deck_of_cards()
             prune_deck_of_cards(game_state)
@@ -557,15 +548,13 @@ def chooseMove(game_state, card, iterations_timer):
     
         find_valid_moves(game_state)  # finds free spaces in each row and records counts in global vars number_bottom, number_middle, number_top
 
-        print "\n=========== Calculcating for card", card, "===========\n"
+        print "\n=========== Calculcating for card", card, "==========="
         
         global number_top
-        global numer_middle
+        global number_middle
         global number_bottom
-        global num_top_first_count
-        global deck
         
-        #print "Current cards placed top,", number_top, ", middle,",number_middle,",bottom,",number_bottom,"and 1st it top",num_top_first_count,"\n"
+        print "Current cards placed top:", number_top, ", middle:",number_middle,",bottom:",number_bottom,"and original top:",num_top_first_count,"\n"
         
         # booleans - True if there are free slots in row 
         valid_bottom = True
@@ -674,7 +663,7 @@ def chooseMove(game_state, card, iterations_timer):
                 return 2             #middle
     
     else:
-        print "Invalid cards.", cards, ". Need type: String e.g. 's01' (ace of spades)"
+        print "Invalid cards.", card, ". Need type: String e.g. 's01' (ace of spades)"
         return None
 
 def place_one_test(game_state, card, iterations):

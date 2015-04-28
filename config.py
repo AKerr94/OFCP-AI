@@ -12,6 +12,9 @@ application_config = {
 
 cherrypy_config = {
          'global': {
+                'log.screen': True,
+                'log.access_file': os.path.abspath(os.path.join(os.path.dirname(__file__), 'cherrypy-access.log')),
+                'log.error_file': os.path.abspath(os.path.join(os.path.dirname(__file__), 'cherrypy-error.log')),
                 'server.socket_host': '0.0.0.0',
                 'server.socket_port': 8080
             },

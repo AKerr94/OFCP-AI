@@ -5,7 +5,7 @@
 \textclass article
 \use_default_options true
 \maintain_unincluded_children false
-\language english
+\language british
 \language_package default
 \inputencoding auto
 \fontencoding global
@@ -105,7 +105,7 @@ Intelligent Agent for Open Face Chinese Poker Web-Application
 \align center
 
 \size large
-Submitted May 2015 in partial fulfillment of the conditions of the award
+Submitted May 2015 in partial fulfilment of the conditions of the award
  of the degree BSc (Honours) Computer Science
 \end_layout
 
@@ -225,6 +225,80 @@ height "0.5pt"
 
 \end_layout
 
+\begin_layout Abstract
+
+\shape italic
+Artificial Intelligence (AI)
+\shape default
+ is a crucial and high-interest area of research in the field of Computer
+ Science, which has gained increased traction in recent decades due largely
+ to the application of AI algorithms in games and the implications that
+ development of AI in this area can have on other fields of study.
+ Poker games provide a challenge to 
+\shape italic
+Intelligent Agents
+\shape default
+ because of elements of 
+\shape italic
+hidden information
+\shape default
+ such as the cards other player's hold, as well as elements of randomness
+ due to not knowing which cards are yet to be dealt.
+ This differentiates Poker games from more traditional games such as Checkers,
+ which is a 
+\shape italic
+zero-zum
+\shape default
+ 
+\shape italic
+perfect information
+\shape default
+ game meaning that each player has the same complete knowledge of the game
+ state at any stage.
+ Therefore at each stage there is an 
+\shape italic
+optimal move
+\shape default
+ leading to a 
+\shape italic
+winning strategy
+\shape default
+, and in this manner these games can effectively be 
+\shape italic
+solved
+\shape default
+, and so when playing against a competent Agent for such a game it is impossible
+ to win, only to draw.
+ Many Poker games are different because of hidden elements due to unknown
+ cards, in addition to variance because of the random nature of dealing
+ shuffled cards, necessitating the use of more sophisticated algorithms
+ in order for an Agent to perform competently versus intelligent opponents.
+ While there has been lots of research into Intelligent Agents for traditional
+ board games and variants of Poker such as Texas Hold'Em, lesser known variants
+ such as the relatively new 
+\shape italic
+Open Face Chinese Poker
+\shape default
+ have not been explored to the same degree.
+ Agents for Open Face Chinese Poker often suffer from poor performance due
+ to reliance on simple algorithms and methods such as 
+\shape italic
+Rule-Based Systems
+\shape default
+, which can lead to predictable or sub-optimal play.
+ This dissertation considers the merits of various AI algorithms, and implements
+ an Intelligent Agent for a bespoke Open-Face-Chinese Poker Web Application,
+ with discussions of the range of technologies used and methodologies employed
+ in creating a functional platform for the application.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 \begin_inset CommandInset toc
 LatexCommand tableofcontents
@@ -235,24 +309,6 @@ LatexCommand tableofcontents
 \end_layout
 
 \begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Abstract
-Problem description: poor AI performance in OFCP, not much work done on
- the subject.
- Traditional board games and more popular variants of poker such as Texas
- Hold'Em and Omaha have had much more research.
- OFCP AIs generally underperform, playing sub-optimally.
- This dissertation considers different approaches and algorithms, and implements
- an AI for a bespoke OFC web-app.
- 
-\end_layout
-
-\begin_layout Abstract
 \begin_inset Newpage pagebreak
 \end_inset
 
@@ -629,9 +685,9 @@ The game tree in MCTS grows asymmetrically, concentrating on searching more
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename MCTS basic algorithm graphic.png
-	lyxscale 70
-	scale 70
+	filename MCTS algorithm graphic.png
+	lyxscale 85
+	scale 85
 
 \end_inset
 
@@ -794,8 +850,8 @@ That said, permutations for OFCP game state: deck of 52 cards, each player
 Methods e,g, database look ups impractical to implement due to space complexity
  of game.
  Need a method which has a suitable compromise between time and space complexity.
- Monte CarloTree Search is perfect for this, especially considering the
- usage of heuristics which can optimise the algorithm e.g.
+ Monte Carlo methods are perfect for this, especially considering the usage
+ of heuristics which can optimise the algorithm e.g.
  UCT, pruning tree branches 
 \end_layout
 
@@ -833,6 +889,13 @@ A faster, more efficient algorithm means more hands can be evaluated more
  (cherrypy server)
 \end_layout
 
+\begin_layout Standard
+More efficient poker hand evaluators are available, however generally written
+ in much more efficient languages such as C - cannot be used in conjunction
+ with pypy.
+ 
+\end_layout
+
 \begin_layout Section
 Design and Implementation
 \end_layout
@@ -843,14 +906,59 @@ Approach
 
 \begin_layout Standard
 html css and javascript for website/ app.
- Javascript handles front end, sends POST ‘reqwest’s to cherrypy server
- – backend – which calls helper functions (python scripts) for hand evaluation,
- handling AI simulations etc.
- 
+ Javascript handles front end, sends POST ‘reqwest’s with game state to
+ cherrypy server – backend – which validates the sent game state and then
+ calls helper functions (python scripts) for hand evaluation, handling AI
+ simulations etc.
+ , updates the game state in the database, and returns appropriate response
+ e.g.
+ cards to be placed, scores at end of game
 \end_layout
 
-\begin_layout Subsection
-Requirements
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+data flow diagram of a game of chinese poker
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+system flow diagram for application / system architecture diagram 
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The design principle adhered to throughout the process of creating the applicati
+on was Rapid Application Development using Evolutionary Prototyping, creating
+ a functional prototype which was refined and updated to meet changing requireme
+nts and to implement new features.
+ This approach was perfect for the needs of the project as it allowed for
+ lots of flexibility and meant that emphasis could be put on development,
+ creating a functional or semi-functional application at each stage which
+ implemented some of the planned features, meeting some of the requirements
+ and being ready to build upon and develop further into a new version which
+ improves upon itself.
+ This flexible style is naturally advantageous over a more traditional approach
+ such as the Waterfall model which involves rigorously defining specifications
+ from the start, which means making changes down the line becomes increasingly
+ difficult and costly; such a style of development was appropriated from
+ other industries before more suitable methodologies of software development
+ were formalised.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -894,10 +1002,61 @@ Technologies
 \end_layout
 
 \begin_layout Standard
-Website and application created with HTML, CSS and Javascript.
- [ SQL Database for moves/ history? ], python backend + cherrypy networking
- Hosted using VPS running Ubuntu 14.04 with nginx Version control with github:
- OFCP-AI private repository 
+Website and application created with HTML, CSS and Javascript with pages
+ created dynamically with jinja2 templates.
+\end_layout
+
+\begin_layout Standard
+Python backend handling dealing of cards, processing game state, AI's card
+ placements and scoring of game board 
+\end_layout
+
+\begin_layout Standard
+Pure python networking with cherrypy, which is efficient and can handle
+ up to 1000 concurrent requests which is more than enough for the requirements
+ of this project.
+ 
+\end_layout
+
+\begin_layout Standard
+Site hosted using DigitialOcean VPS running Ubuntu 14.04 with nginx reverse-proxy.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-6"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Game states stored in database using mongodb (which is a document-oriented
+ database as opposed to a traditional relational database which decreases
+ development time and reduces complexity as there is no need to constantly
+ transform the data when reading from the database into the python backend.
+ Mongodb is scalable and high performance, and allows for flexible data
+ structures for example with optional values being handled trivially, with
+ the databases getting type information from the data itself meaning they
+ can map easily into program objects, which is specifically advantageous
+ in this application because of the use of dictionaries to store the game
+ state.
+ The flexibility and ease of deployment of such a style of database makes
+ their use well suited for web-applications such as this one) run in docker
+ virtual environment.
+ 
+\end_layout
+
+\begin_layout Standard
+Version control with github: OFCP-AI private repository.
+ Use of version control is paramount as it allows for undesirable changes
+ to be rolled back easily, and if something goes wrong there is always working
+ versions available to roll back to.
+ Using multiple branches (master and experimental) meant that a stable version
+ could be maintained while new features were implemented safely on the experimen
+tal branch without affecting or potentially breaking the master version.
+ Also allows for 'releases' for different versions of the software e.g.
+ legacy client-side only, current with feature-full self-contained application
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -907,7 +1066,7 @@ Implementation
 \begin_layout Standard
 
 \color blue
-http://www.alastairkerr.co.uk/OFCP_game.html
+http://www.alastairkerr.co.uk/ofc
 \end_layout
 
 \begin_layout Section
@@ -1051,6 +1210,69 @@ Reflection
 Reflection on project, decisions, performance etc.
 \end_layout
 
+\begin_layout Standard
+Design - frontend is functional but could have been designed better from
+ the start.
+ e.g.
+ originally hard-coding player's card image objects rather than dynamically
+ creating them with javascript
+\end_layout
+
+\begin_layout Standard
+Backend works well but if different technologies and languages were used
+ could be more efficient - e.g.
+ hand evaluators written in C using bitwise operators could evaluate millions
+ of hands per second rather than hundreds of thousands - could shave off
+ seconds of processing time which could either lead to increased responsiveness
+ or allow for more games to be simulated by the AI making it more likely
+ to find optimal solutions for hand placements.
+ 
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The choice of a flexible software methodology worked well overall because
+ of the evolving requirements and design choices, as well as the individual
+ nature of the project.
+ In comparison, in a large team of developers issues with this approach
+ could arise from lacking a clear design focus and having limited control
+ - a necessary trade-off that is an inevitable consequence of the increased
+ flexibility this methodology enables.
+ One important pitfall to avoid with Rapid Application Development is focusing
+ too much on individual components without getting a clear view of the system's
+ design, making minor changes without considering possibilities for an improved
+ design structure.
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-7"
+
+\end_inset
+
+ Design choices in early prototypes had a carry-on effect which meant that
+ later down the line code refactoring was necessary in order to create a
+ more coherent system structure, which potentially could have been avoided
+ or reduced with a stricter design philosophy.
+ 
+\end_layout
+
+\begin_layout Standard
+An apt example of this is seen in legacy prototypes of the application,
+ which were client-side only.
+ This was a choice that was made in order to quickly create a functional
+ prototype, using JavaScript to simulate processes that would be handled
+ elsewhere in the final application's architecture (such as dealing cards).
+ This was useful because it resulted in a functional application which implement
+ed some of the planned features, leading to a clearer understanding of the
+ needs of the project, but had to be adapted later in order to create a
+ more logical system structure which could meet the requirements, such as
+ backend processing to handle the game states and calculate the Intelligent
+ Agent's moves.
+ 
+\end_layout
+
 \begin_layout Subsection
 Improvements
 \end_layout
@@ -1072,6 +1294,14 @@ http://www.aaai.org/ocs/index.php/AIIDE/AIIDE13/paper/viewFile/7369/7595
 \end_layout
 
 \begin_layout Standard
+Due to the need for a compromise between finding the optimal solution and
+ finishing the request in a reasonable amount of time the number of simulated
+ games is limited and therefore it is possible that sub-optimal plays will
+ be over-valued due to the element of randomness.
+ 
+\end_layout
+
+\begin_layout Standard
 Improve frontend – make the app more visually appealing 
 \end_layout
 
@@ -1082,6 +1312,71 @@ Multiplayer support for players vs players as well as players vs AI(s) or
 
 \begin_layout Standard
 Add support for other variants of OFC such as pineapple 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Intelligent Agent generally favours optimal card placements, but because
+ of the element of randomness in evaluating moves there is the potential
+ for the AI to mistakenly over-value a sub-optimal move.
+ As Whitehouse.
+ D Et.
+ al state 
+\begin_inset Quotes eld
+\end_inset
+
+With any method based on random simulation, it is inevitable that poor quality
+ moves will be chosen with nonzero probability, due to a particularly lucky
+ run of simulations making the move appear better than it is
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-3"
+
+\end_inset
+
+ page 5.
+ This potential for inaccurate evaluation of a move's strength has an inverse
+ relationship with the number of iterations of simulated games - as the
+ number of iterations increase the result diverges to the optimal solution,
+ meaning that with an infinite amount of simulations the probability of
+ finding the best move is 1.
+ The performance of the Intelligent Agent therefore could be improved with
+ more processing power and/or a longer allocated time to simulate games,
+ although it is important to note that there are diminishing returns with
+ this strategy; doubling the iterations does not mean that the results will
+ be twice as good.
+\end_layout
+
+\begin_layout Standard
+This ties in with the choices made for the implementation and configuration
+ of the AI, specifically in regards to compromises between responsiveness
+ and finding the best move - in the specified requirements the AI was intended
+ to take no more than 5 seconds to calculate its turn, and the application
+ satisfies this requirement.
+ However, increasing the iterations would make satisfying this criteria
+ infeasible without increased processing power or through further optimisation.
+ This could be achieved in various ways, for example by rewriting the applicatio
+n in a more efficient language such as C, or by implementing more advanced
+ heuristics to reduce the complexity of the calculations, or using a different
+ algorithm such as a more advanced implementation of the Monte Carlo method
+ like Monte Carlo Tree Search with UCT, as discussed in Section 2 of this
+ dissertation.
+ Overall the AI satisfies the specified requirements and works well for
+ its intended purpose in the scope of this application, but for larger scale
+ implementations would likely need to make use of one or more of these changes
+ in order to achieve increased scalability, for example for use in a commercial
+ application with thousands of concurrent users.
+ 
 \end_layout
 
 \begin_layout Bibliography
@@ -1152,6 +1447,30 @@ http://scrambledeggsontoast.github.io/2014/06/26/artificial-intelligence-ofcp/
 \color inherit
  - Intelligent Agent ‘Kachushi’ for Open Face Chinese Poker using Monte
  Carlo methods, implemented in Haskell, accessed 2015
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-6"
+
+\end_inset
+
+
+\color blue
+https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applica
+tions-using-a-cherrypy-web-server-behind-nginx 
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-7"
+
+\end_inset
+
+Gerber, A.
+ Et al, 2007, Implications of Rapid Development Methodologies, CSITEd 2007
 \end_layout
 
 \end_body

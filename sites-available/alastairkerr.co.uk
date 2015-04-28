@@ -19,6 +19,12 @@
 
 server {
 	listen 80;
+        server_name www.alastairkerr.co.uk;
+        return 301 http://alastairkerr.co.uk/$request_uri;
+}
+
+server {
+	listen 80;
          
         location = /freddie403.jpg {
                 root /home/ali/nginx/errorpages;
@@ -35,6 +41,10 @@ server {
         location = /404.html {
                 root /home/ali/nginx/errorpages;
         }
+	
+	location /ofc/static {
+		alias /home/ali/nginx/static;
+	}
 
 	location /ofc/ {
         	rewrite /ofc/(.*) /$1 break;
@@ -60,7 +70,7 @@ server {
 	index index.html index.htm index.php;
 
 	# Make site accessible from http://localhost/
-	server_name alastairkerr.co.uk www.alastairkerr.co.uk;
+	server_name alastairkerr.co.uk;
 
 	location / {
 		# First attempt to serve request as file, then
