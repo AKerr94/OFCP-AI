@@ -154,7 +154,7 @@ def handle_game_logic(game_state, game_id):
                 '$set': state
             })
 
-            print "\nStored game state in database:", state
+            #print "\nStored game state in database:", state
 
             del state['deck'] # don't return deck info to frontend
             del state['_id']
@@ -183,6 +183,7 @@ def handle_game_logic(game_state, game_id):
             # store p1's score in database
             state['score'] += helpers.scores_arr_to_int(scores_array)
             print "\nState score recorded as:", state['score'], "!\n"
+            scores_array.append([state['score']])
             print "scores_array was", scores_array
 
             # records game state in database
@@ -195,7 +196,6 @@ def handle_game_logic(game_state, game_id):
 
             OFCP_AI.reset() # reset AI variables/ states
 
-            scores_array.append([state['score']])
             # scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty],
             #    [winnerid, winners_middle_royalty, losers_middle_royalty] ,
             #    [winnerid, winners_top_royalty, losers_top_royalty] ],
@@ -207,8 +207,6 @@ def handle_game_logic(game_state, game_id):
             return json.dumps(scores_array)
 
     else:
-        print "\n\nPlayer not First! ~Hello from server.py page ofc-backend!!\n"
-
         if count == 0:
             # AI acts first, but return player's first 5 cards first while AI calculates
             if 'first5cards' not in state:
@@ -317,7 +315,7 @@ def handle_game_logic(game_state, game_id):
                 '$set': state
             })
 
-            print "\nStored game state in database:", state
+            #print "\nStored game state in database:", state
 
             del state['deck'] # don't return deck info to frontend
             del state['_id']
@@ -346,6 +344,7 @@ def handle_game_logic(game_state, game_id):
             # store p1's score in database
             state['score'] += helpers.scores_arr_to_int(scores_array)
             print "\nState score recorded as:", state['score'], "!\n"
+            scores_array.append([state['score']])
             print "scores_array was", scores_array
 
             # records game state in database
@@ -358,7 +357,6 @@ def handle_game_logic(game_state, game_id):
 
             OFCP_AI.reset() # reset AI variables/ states
 
-            scores_array.append([state['score']])
             #    scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty],
             #    [winnerid, winners_middle_royalty, losers_middle_royalty] ,
             #    [winnerid, winners_top_royalty, losers_top_royalty] ],

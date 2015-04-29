@@ -1311,7 +1311,12 @@ Multiplayer support for players vs players as well as players vs AI(s) or
 \end_layout
 
 \begin_layout Standard
-Add support for other variants of OFC such as pineapple 
+Add support for other variants of OFC such as pineapple - includes elements
+ of hidden information as players choose to discard one card, the identity
+ of which is known only to them.
+ Will increase complexity of game requiring further modifications/ improvements
+ to Agent, and would make any performance issues even more of an obstacle.
+ 
 \end_layout
 
 \begin_layout Standard

@@ -131,7 +131,7 @@ def simulateGame(game_state, row, card, bAppend):
     global counthands
     counthands += 1
     
-    if scores[3][1] == False and scores[3][0] == False: # only printing valid results (fouled simulated hands omitted) 
+    if scores[3][1] == False or scores[3][0] == False: # only printing valid results (fouled simulated hands from both players omitted)
         '''
         scores_string = map(str, ["\nAi calculates potential score of ", p2score - p1score, " for placing " , card , " in " , row, "\n    ", scores, "\n"])
         scores_string = ''.join(scores_string)
@@ -560,13 +560,18 @@ def chooseMove(game_state, card, iterations_timer):
         valid_bottom = True
         valid_middle = True
         valid_top = True
-        
-        if number_bottom == 5: # if top full set false
+        valid_rows = [1,2,3]
+
+        # if a row is full set bool to false - disallow more placements there
+        if number_bottom == 5:
             valid_bottom = False
-        if number_middle == 5: # ' middle '
+            valid_rows.remove(1)
+        if number_middle == 5:
             valid_middle = False
-        if number_top == 3 or num_top_first_count == 3: # ' top '
+            valid_rows.remove(2)
+        if number_top == 3 or num_top_first_count == 3:
             valid_top = False
+            valid_rows.remove(3)
         
         # if there is only one row with free slots save some processing time and just return that move without calculating scores
         if valid_bottom == False and valid_middle == False and valid_top == True:
@@ -597,37 +602,30 @@ def chooseMove(game_state, card, iterations_timer):
         counthands = 0
         zeroscorehands = 0
         
-        predicted_scores = [ [1,0], [2,0], [3,0] ] # first index: row choice, second index: total score
+        predicted_scores = [ [1,0], [2,0], [3,0] ] # first index: row choice, second index: EV
         
         count = 0
+        row_sim_counts = [[1,0],[2,0],[3,0]]
         
         current_milli_time = lambda: int(round(time.time() * 1000))
         stime = current_milli_time()
         
         while ( (current_milli_time() - stime) < iterations_timer ):
-            while ( True ): # select a random valid row to place card in
-                row = randint(1,3)       
-                if row == 1:
-                    if valid_top == True:
-                        break
-                elif row == 2:
-                    if valid_middle == True:
-                        break
-                else:
-                    if valid_top == True:
-                        break
-            predicted_scores[row -1][1] += simulateGame(game_state, row, card, True) # get expected value for random simulated game with card placed in that row
-            count += 1
-        
+            #row = random.choice(valid_rows)
+            for row in valid_rows:
+                predicted_scores[row -1][1] += simulateGame(game_state, row, card, True) # get expected value for random simulated game with card placed in that row
+                count += 1
+                row_sim_counts[row -1][1] += 1
+
         print "\nSimulated", count, "games with asserted time limit of", iterations_timer, "ms. Actual time taken:", current_milli_time() - stime, "ms"
         
         print "There were", nullscoringhands, "null boards &", scoringhands, "positive scoring boards &", zeroscorehands, "zero-scoring boards &", losinghands, "losing boards. Total simulations:", counthands
-        print "Final scores predictions~~\nAvg. EV from placing",str(card),"in bottom:", str(predicted_scores[0][1]),", middle:",str(predicted_scores[1][1]),", top:",str(predicted_scores[2][1])
+        print "Final scores predictions~~\nEV Totals from placing",str(card),"in bottom:", str(predicted_scores[0][1]),"~ iter:",row_sim_counts[0][1],", middle:",str(predicted_scores[1][1]),"~ iter:", row_sim_counts[1][1],", top:",str(predicted_scores[2][1]),"~ iter:", row_sim_counts[2][1]
         
         #print str(game_state)
         
         # do not recommend placement in an invalid row
-        if valid_top == False:
+        if valid_bottom == False:
             predicted_scores[0][1] = -99999
         if valid_middle == False:
             predicted_scores[1][1] = -99999
@@ -755,7 +753,7 @@ def place_five_initial_test(game_state, cards, iterations):
     
 if __name__ == "__main__":
 
-    print "Test run: Modelling 100 simulations of placing cards!...\n"
+    print "Test run: Modelling simulations of placing cards!...\n"
     user_choice = raw_input(" Type 0 to test a single card,\n Type 1 to test 5 card initial placement.\n\
     Anything else: exit.\n")
     
