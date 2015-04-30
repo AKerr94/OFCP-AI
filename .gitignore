@@ -7,3 +7,5 @@ Report/Dissertation 4177303.lyx~
 .idea/scopes/scope_settings.xml
 .idea/modules.xml
 .idea/OFCP-AI.iml
+*.pyc
+states_ev.txt

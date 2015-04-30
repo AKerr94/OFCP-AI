@@ -513,31 +513,17 @@ def place_5(game_state, cards, sim_timer):
 def chooseMove(game_state, card, iterations_timer):
     ''' takes game state and dealt card as input, produces tree from monte carlo
     simulations and returns optimal move - 1 for bottom, 2 for middle, 3 for top '''
-    
-    #### calculate first 5 cards to place - recursively call this function with each individual card ####
 
     global deck
     global num_top_first_count
 
+    #### calculate 5 card placements ####
     if type(card) == type([]): 
         if (len(card) == 5):
             num_top_first_count = 0
             deck = produce_deck_of_cards()
             prune_deck_of_cards(game_state)
-            moves = []
             moves = place_5(game_state, card, iterations_timer)
-            #for c in card:
-            #    move = chooseMove(game_state, c, iterations_timer) # store recommend row id placement for each card c 
-            #    moves.append(move)
-            #    print "Recommended placement of", c, "in row", str(move)
-            #    force_place = False
-            #    global placed_cards_s
-            #    if c in placed_cards_s: 
-            #        force_place = True
-            #    game_state = simulate_append_card(game_state, move, c, force_place)  # updates game_state with placement choice 
-            #    print "Game state updated with this change!"
-            #print "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-            #print "First 5 placements:", card[0], moves[0], ",", card[1], moves[1], ",", card[2], moves[2], ",", card[3], moves[3], ",", card[4], moves[4], "\n"
             return moves
         else:
             print "Invalid amount of cards - need 5!"
@@ -770,21 +756,33 @@ if __name__ == "__main__":
         valid = True 
     except:
         print "Invalid input! Required type: integer.\n"
-    
+
+    # create empty game state
+    game_state = {}
+    game_state['properties1'] = {}
+    game_state['properties1']['cards'] = {}
+    game_state['properties1']['cards']['items'] = {}
+    game_state['properties2'] = {}
+    game_state['properties2']['cards'] = {}
+    game_state['properties2']['cards']['items'] = {}
+
+    for i in range(1,3):
+        for j in range(1,14):
+            game_state['properties'+str(i)]['cards']['items']['position'+str(j)] = None
+
     #### 1 card test ####
     if user_choice == "0" and valid == True:
-        game_state = None
+
         card = 's01' # example test card (ace of spades)
-        num_iterations = 500
+        iteration_timer = 500
         for i in range(0, times_to_run):
-            chosenrow = place_one_test(game_state, card, num_iterations)
+            chosenrow = place_one_test(game_state, card, iteration_timer)
             print "Recommendation: Place card in", chosenrow, "row!"
     
     
     #### 5 card test ####
     elif user_choice == "1" and valid == True:
-        
-        game_state = None
+
         cards = ['s01', 'd01', 'h01', 'c10', 'd05']  # example test cards 
         num_iterations = 500
         placements_array = []

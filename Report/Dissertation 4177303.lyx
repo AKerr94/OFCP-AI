@@ -993,6 +993,11 @@ nts and to implement new features.
 
 \begin_layout Standard
 5.
+ Website should be responsive and quick to load
+\end_layout
+
+\begin_layout Standard
+6.
  Footprint of application must be low – if it were to be scaled up e.g.
  hundreds of concurrent users, server has to be able to handle this 
 \end_layout
@@ -1200,6 +1205,11 @@ Aims and Objectives
 \begin_layout Standard
 To what extent were the aims met? Sophistication and performance of AI?
  Were all features implemented?
+\end_layout
+
+\begin_layout Standard
+Performance of website: http://tools.pingdom.com/fpt/#!/cXxmxY/http://alastairkerr.
+co.uk/ofc/play/5540d2e7b878ce06943c74f2/next 
 \end_layout
 
 \begin_layout Subsection
