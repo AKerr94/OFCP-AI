@@ -268,9 +268,13 @@ function handleRoundEnd(resp) {
         for (rowID = 3; rowID >= 1; rowID--) {
             textString = "p" + pID + "_text" + rowID;
             colourString = chooseScoreColour(rowScoresArr[count]);
-            temp = document.getElementById(textString);
-            temp.innerHTML = rowScoresArr[count];
-            temp.style.color = colourString;
+            var optionalPlus = "";
+            if (rowScoresArr[count] > 0) {
+                optionalPlus = "+";
+            }
+            tempLabel = document.getElementById(textString);
+            tempLabel.innerHTML = "<br />" + optionalPlus + rowScoresArr[count];
+            tempLabel.style.color = colourString;
             count++;
         }
     }

@@ -26,6 +26,7 @@ h1
 h2
 {
 	color: #4d3300;
+	font-size: 26px;
 }
 footer
 {
@@ -96,19 +97,41 @@ ul#menu li a:hover
 {
 	border: 0px solid #aaaaaa;
 	float: left;
-	font-size: 15pt;
+	font-size: 25pt;
 	height: 150px;
 	padding: 0px;
 	width: 109px;
+	font-weight: 900;
+	text-shadow:
+	    -1px -1px 1px #000,
+        1px -1px 1px #000,
+        -1px 1px 1px #000,
+        1px 1px 1px #000,
+
+        -1px -1px 10px #0072BC,
+        1px -1px 10px #0072BC,
+        -1px 1px 10px #0072BC,
+        1px 1px 10px #0072BC;
 }
 .scorecontainerr
 {
 	border: 0px solid #aaaaaa;
 	float: right;
-	font-size: 15pt;
+	font-size: 25pt;
 	height: 150px;
 	padding: 0px;
 	width: 109px;
+	font-weight: 900;
+	text-shadow:
+	    -1px -1px 1px #000,
+        1px -1px 1px #000,
+        -1px 1px 1px #000,
+        1px 1px 1px #000,
+
+        -1px -1px 10px #0072BC,
+        1px -1px 10px #0072BC,
+        -1px 1px 10px #0072BC,
+        1px 1px 10px #0072BC;
 }
 .btn
 {
