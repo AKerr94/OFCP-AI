@@ -3,4 +3,4 @@
 
 View and play online at http://www.alastairkerr.co.uk/ofc
 
-[![screenshot of game](https://raw.githubusercontent.com/AKerr94/OFCP-AI/master/Report/Updated%20UI.png?token=AFcFgerH3zn2Ch9ebwRNW1p7T2GY0lsqks5VTQKAwA%3D%3D)](http://www.alastairkerr.co.uk/ofc)
+[![screenshot of game](https://raw.githubusercontent.com/AKerr94/OFCP-AI/master/Report/Updated%20UI%202.png?token=AFcFgQNM22AzKgeJzu_ls-TK7kwtgqeSks5VTmNtwA%3D%3D)](http://www.alastairkerr.co.uk/ofc)
