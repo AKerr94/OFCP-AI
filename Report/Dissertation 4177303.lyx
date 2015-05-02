@@ -259,11 +259,8 @@ perfect information
 \shape italic
 optimal move
 \shape default
- leading to a 
-\shape italic
-winning strategy
-\shape default
-, and in this manner these games can effectively be 
+ leading to a winning strategy, and in this manner these games can effectively
+ be 
 \shape italic
 solved
 \shape default
@@ -274,22 +271,33 @@ solved
  shuffled cards, necessitating the use of more sophisticated algorithms
  in order for an Agent to perform competently versus intelligent opponents.
  While there has been lots of research into Intelligent Agents for traditional
- board games and variants of Poker such as Texas Hold'Em, lesser known variants
- such as the relatively new 
+ board games and variants of Poker such as 
+\shape italic
+Texas Hold'Em
+\shape default
+, lesser known variants such as the relatively new 
 \shape italic
 Open Face Chinese Poker
 \shape default
  have not been explored to the same degree.
  Agents for Open Face Chinese Poker often suffer from poor performance due
- to reliance on simple algorithms and methods such as 
+ to reliance on simple 
+\shape italic
+algorithms
+\shape default
+ and methods such as 
 \shape italic
 Rule-Based Systems
 \shape default
 , which can lead to predictable or sub-optimal play.
  This dissertation considers the merits of various AI algorithms, and implements
- an Intelligent Agent for a bespoke Open-Face-Chinese Poker Web Application,
+ an Intelligent Agent for a bespoke Open Face Chinese Poker Web-Application,
  with discussions of the range of technologies used and methodologies employed
  in creating a functional platform for the application.
+ It is advisable for readers unfamiliar with Poker, Computer Science or
+ any of the italicised terms found throughout to familiarise themselves
+ with the definitions found in the glossary section.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -324,18 +332,55 @@ Introduction to Open Face Chinese Poker
 \end_layout
 
 \begin_layout Standard
-Open Face Chinese Poker is a variant of Chinese poker where players take
- turns placing cards face-up into three distinct rows, creating the best
- possible poker hand combinations they can in order to score points from
- each other.
- Stronger hands score ‘royalties’ for extra points and better hands in higher
- rows score more points than an equivalent hand in a lower row.
- For example, a Royal House gives +25 bonus points in bottom row, or +50
- in the middle row.
+Open Face Chinese Poker (commonly abbreviated to 
+\shape italic
+OFCP
+\shape default
+) is a perfect or imperfect information (depending on variant) card game
+ with elements of randomness.
+ OFCP is a variant of 
+\shape italic
+Chinese Poker 
+\shape default
+where players take turns placing cards face-up into three distinct 
+\shape italic
+rows
+\shape default
+ (
+\shape italic
+bottom
+\shape default
+, 
+\shape italic
+middle
+\shape default
+ and 
+\shape italic
+top
+\shape default
+), creating the best possible 
+\shape italic
+poker hands
+\shape default
+ they can in order to score points from each other.
+ Stronger hands score 
+\shape italic
+royalties
+\shape default
+ for extra points and royalty-scoring hands in higher rows score more points
+ than an equivalent hand in a lower row.
+ For example, a 
+\shape italic
+Royal House
+\shape default
+ gives +25 bonus points in bottom row, or +50 in the middle row.
  Players score +1 point for each row they win in addition to any royalties.
- In the case that a player wins all 3 rows they score a ‘scoop’ bonus which
- grants an additional point for each row, for a total of +6 base points
- before royalties are calculated.
+ In the case that a player wins all 3 rows they score a 
+\shape italic
+scoop
+\shape default
+ bonus which grants an additional point for each row, for a total of +6
+ base points before royalties are calculated.
  
 \end_layout
 
@@ -356,9 +401,7 @@ Open Face Chinese Poker is a variant of Chinese poker where players take
 
 \shape italic
 Fig 1.1.1 – example layout of the board after a single round of Open Face
- Chinese Poker
-\shape default
- 
+ Chinese Poker (screenshot from an early prototype of the application)
 \end_layout
 
 \begin_layout Standard
@@ -369,20 +412,41 @@ Fig 1.1.1 – example layout of the board after a single round of Open Face
 \end_layout
 
 \begin_layout Standard
-In this game, neither player scores any royalties because none of the hands
- are strong enough.
- Player 1 wins bottom with Two Pair 8s and 4s versus Pair of Qs for +1 point.
+Figure 1.1.1 shows the results and layout of the board after a game of OFCP.
+ Player 1 wins bottom with a 
+\shape italic
+Two Pair
+\shape default
+ 8s and 4s versus a 
+\shape italic
+Pair
+\shape default
+ of Qs for +1 point.
  Player 1 also wins middle row with Two Pair 7s and 2s versus Pair of 6s
  for +1 point.
  In top row Player 1 and the computer opponent both have a Pair of 3s, and
- so the third card is taken into account as the ‘kicker’, with Player 1
- clinching the win for +1 point with a King kicker versus a 7.
+ so the third card is taken into account as the 
+\shape italic
+kicker
+\shape default
+, with Player 1 clinching the win for +1 point with a King kicker versus
+ a 7.
  Further to the individual row scores, because Player 1 won every row they
  score an additional scoop bonus of +3.
- If a player creates a top-heavy board (i.e.
- a row’s hand is stronger than the row below it) the player’s hand is invalid
- and they have ‘fouled’; when a player fouls their opponent automatically
- scoops for +6 (+1 for each row and +3 scoop bonus) in addition to any royalties.
+\end_layout
+
+\begin_layout Standard
+One important caveat of the game is that hands in lower rows must be stronger
+ than those on the rows above; if a player creates a top-heavy board then
+ that player’s hand is invalid, which is known as 
+\shape italic
+fouling
+\shape default
+.
+ When a player fouls their opponents automatically scoop them for +6 each
+ (+1 for each row and +3 scoop bonus) in addition to any royalties, and
+ any of the fouled player's royalties are disqualified.
+ In the case that all players foul, no points are awarded.
  
 \end_layout
 
@@ -414,10 +478,21 @@ Fig 1.1.2 – Player 1 fouls and so their opponent wins an automatic scoop bonus
 \end_layout
 
 \begin_layout Standard
-Player 1 has Pair of 10s in bottom, Pair of 3s in middle and Pair of 6s
- in top.
+In the game shown in Fig 1.1.2 Player 1 has Pair of 10s in bottom, Pair of
+ 3s in middle and Pair of 6s in top.
  Because the top row contains a stronger poker hand than the row below it,
  the hand is invalid and the player fouls.
+ On top of the +3 scoop bonus, the computer opponent wins further points
+ for royalties because of its 
+\shape italic
+Flush
+\shape default
+ in bottom and 
+\shape italic
+Three of A Kind
+\shape default
+ in middle.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -448,21 +523,34 @@ Fig 1.1.3 – Player 1 wins a lot of bonus points from royalties for strong
 \end_layout
 
 \begin_layout Standard
-Player 1 wins bottom row with Four of a Kind 8s versus the computer opponent’s
- Pair of Jacks.
+Fig 1.1.3 indicates how many points can be won from strong hands.
+ Player 1 wins bottom row with 
+\shape italic
+Four of a Kind
+\shape default
+ 8s versus the computer opponent’s Pair of Jacks.
  Player 1 receives +1 point for winning the row, with an additional +10
  points royalty for Four of a Kind on bottom.
- Player 1 also wins middle row with a Full House, Aces full of Deuces versus
- the computer opponent’s Pair of 9s, scoring +1 point for winning the row
- and an additional +12 royalty.
- Player 1 and Player 2 both have King High in the top row, but the computer
- opponent wins the row because their next highest card (kicker) is 10, whereas
- Player 1’s kicker is a lower rank – 6.
- Player 2 wins +1 point for winning but the hand is not strong enough to
- score any additional royalties.
+ Player 1 also wins middle row with a 
+\shape italic
+Full House
+\shape default
+, Aces full of Deuces versus the computer opponent’s Pair of 9s, scoring
+ +1 point for winning the row and an additional +12 royalty.
+ Player 1 and Player 2 both have 
+\shape italic
+High Card
+\shape default
+ King in the top row, but the computer opponent wins the row because their
+ kicker of 10 beats Player 1's 6 kicker.
+ Player 2 wins +1 point for winning this row but the hand is not strong
+ enough to score any additional royalties.
  The points each player wins are taken from their opponent, so the final
- score for Player 1 is ‘-1 + 13 + 11 = 23’, and the computer opponent’s
- score is the inverse of this, -23.
+ score for Player 1 is 
+\begin_inset Formula $-1+13+11=23$
+\end_inset
+
+, and the computer opponent’s score is the inverse of this, -23.
  
 \end_layout
 
@@ -1255,12 +1343,24 @@ The choice of a flexible software methodology worked well overall because
  too much on individual components without getting a clear view of the system's
  design, making minor changes without considering possibilities for an improved
  design structure.
-\begin_inset CommandInset citation
-LatexCommand cite
-key "key-7"
-
+ While there is generally a clear design phase before entering the initial
+ implementation stage, there can be a tendency to omit a renewed design
+ phase in subsequent implementation cycles leading to a lack of documentation
+ which can have large consequences down the line; as Gerber et al.
+ (2007) state in the analysis of one case study 
+\begin_inset Quotes eld
 \end_inset
 
+...
+ due to the fact that the design was not formally documented and reviewed,
+ the discrepancy was only discovered after the implementation phase.
+ This situation caused conflict between developers and analysts and in the
+ end necessitated a redesign effort which put unnecessary pressure due to
+ time constraints and limited resources on the whole development team
+\begin_inset Quotes erd
+\end_inset
+
+.
  Design choices in early prototypes had a carry-on effect which meant that
  later down the line code refactoring was necessary in order to create a
  more coherent system structure, which potentially could have been avoided
@@ -1340,9 +1440,8 @@ Add support for other variants of OFC such as pineapple - includes elements
 The Intelligent Agent generally favours optimal card placements, but because
  of the element of randomness in evaluating moves there is the potential
  for the AI to mistakenly over-value a sub-optimal move.
- As Whitehouse.
- D Et.
- al state 
+ As Whitehouse et al.
+ (2013) state 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1352,14 +1451,7 @@ With any method based on random simulation, it is inevitable that poor quality
 \begin_inset Quotes erd
 \end_inset
 
- 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "key-3"
-
-\end_inset
-
- page 5.
+.
  This potential for inaccurate evaluation of a move's strength has an inverse
  relationship with the number of iterations of simulated games - as the
  number of iterations increase the result diverges to the optimal solution,
@@ -1374,10 +1466,10 @@ key "key-3"
 
 \begin_layout Standard
 This ties in with the choices made for the implementation and configuration
- of the AI, specifically in regards to compromises between responsiveness
- and finding the best move - in the specified requirements the AI was intended
- to take no more than 5 seconds to calculate its turn, and the application
- satisfies this requirement.
+ of the Agent, specifically in regards to compromises between responsiveness
+ and finding the best move - in the specified requirements the Agent was
+ intended to take no more than 5 seconds to calculate its turn, and the
+ application satisfies this requirement.
  However, increasing the iterations would make satisfying this criteria
  infeasible without increased processing power or through further optimisation.
  This could be achieved in various ways, for example by rewriting the applicatio
@@ -1386,21 +1478,424 @@ n in a more efficient language such as C, or by implementing more advanced
  algorithm such as a more advanced implementation of the Monte Carlo method
  like Monte Carlo Tree Search with UCT, as discussed in Section 2 of this
  dissertation.
- Overall the AI satisfies the specified requirements and works well for
- its intended purpose in the scope of this application, but for larger scale
- implementations would likely need to make use of one or more of these changes
- in order to achieve increased scalability, for example for use in a commercial
- application with thousands of concurrent users.
+ Overall the implementation of the Intelligent Agent satisfies the specified
+ requirements and works well for its intended purpose in the scope of this
+ application, but for larger scale implementations would likely need to
+ make use of one or more of these changes in order to achieve increased
+ scalability, for example for use in a commercial application with thousands
+ of concurrent users.
  
 \end_layout
 
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "key-1"
+\begin_layout Section
+Glossary of Terms 
+\end_layout
 
-\end_inset
+\begin_layout Subsection
+Poker Variants
+\end_layout
 
+\begin_layout Itemize
+
+\series bold
+Texas Hold'Em
+\series default
+ is a popular variant of Poker where each player receives 2 cards for use
+ individually in combination with 5 community cards shared between all players,
+ with players combining any of their available cards in order to create
+ the strongest standard poker hand possible
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Chinese Poker
+\series default
+ is a variant of poker where players are dealt 13 cards which they must
+ arrange into three rows, placed face down.
+ Players announce in clockwise order whether or not they wish to play their
+ hand, and then all players announce their royalties and show their cards
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Open Face Chinese Poker
+\series default
+ is a variant of Chinese Poker where players act in clockwise order, receiving
+ first 5 cards which are placed face up and then one card at a time until
+ all players have placed 13 cards.
+ Players must create valid hands consisting of stronger poker hands in lower
+ rows, and score points from their opponents for winning corresponding rows.
+ Additional points known as royalties can be won for particularly strong
+ hands
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Pineapple OFC 
+\series default
+is a sub-variant of Open Face Chinese Poker, following the same basic rules
+ as the standard variant with the distinction that in subsequent rounds
+ after the initial 5 card placements, players receive 3 cards and choose
+ to place 2 and discard 1.
+ This introduces higher action play as well as elements of hidden information
+ as other players are unaware of which cards their opponents have discarded,
+ although there is potential to infer this information based off of how
+ the player acts 
+\end_layout
+
+\begin_layout Subsection
+Poker Hands Guide (Weakest to Strongest)
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+High Card
+\series default
+ is the lowest ranking poker hand and is the default when no other hands
+ have been made.
+ An example High Card is the Jack of Spades, which would beat any hand comprised
+ of a High Card ranked 10 or less, but would lose to a High Card Queen,
+ King, Ace, or any stronger poker hand.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Pair
+\series default
+ is the second weakest poker hand.
+ A player has a pair when they have two cards of the same rank, for example
+ the 7 of Hearts and 7 and Clubs would form a Pair of 7s.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Two Pair
+\series default
+ is the next strongest hand rank, consisting of two different pairs.
+ For example having the 5 of Spades, 5 of Diamonds, 9 of Hearts and 9 of
+ Clubs would form Two Pair 9s and 5s.
+ When comparing a Two Pair to another Two Pair the highest ranked pair takes
+ precedence.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Three of a Kind
+\series default
+ or a 
+\series bold
+Set
+\series default
+ beats Two Pairs, Pairs and High Cards and consists of three same-ranked
+ cards, such as the Ace of Spades, Ace of Diamonds and Ace of Hearts, which
+ would form Three of a Kind Aces
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Straight
+\series default
+ is a hand where a player has 5 sequential cards, such as 4 of Diamonds,
+ 5 of Hearts, 6 of Hearts, 7 of Clubs, 8 of Spades, which would form a Straight
+ 8 High.
+ The lowest ranked straight spans Ace to 5 and the highest ranked straight
+ spans 10 to Ace.
+ It is important to note that straights do not wrap around; you cannot form
+ a straight such as Queen, King, Ace, Deuce, 3.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Flush
+\series default
+ is one of the stronger poker hands, consisting of cards which are all the
+ same suit.
+ For example the 6 of Hearts, 9 of Hearts, Jack of Hearts, Queen of Hearts
+ and King of Hearts would form a King High Flush.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Full House
+\series default
+, sometimes known as a 
+\series bold
+Boat
+\series default
+, is one of the strongest poker hands available, and comprises both a Three
+ of a Kind and an additional Pair.
+ For example Three of a Kind Tens with Pair of Jacks would combine to form
+ a Full House, Tens full of Jacks.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Four of a Kind
+\series default
+ is a hand obtained when a player has every instance of a particular card
+ rank, such as King of Hearts, King of Diamonds, King of Clubs and King
+ of Spades which would form Four of a Kind Kings.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Straight Flush
+\series default
+ is effectively the strongest poker hand possible, consisting of 5 sequential
+ same suited cards.
+ For example the 4 of Spades, 5 of Spades, 6 of Spades, 7 of Spades and
+ 8 of Spades would form a Straight Flush 8 High.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Royal Flush
+\series default
+ is a special instance of a Straight Flush where a player has the 10, Jack,
+ Queen, King and Ace of a particular suit.
+ Royal Flushes are particularly rare; in Texas Hold'Em the probability of
+ getting a Royal Flush is roughly 0.000154%.
+ 
+\end_layout
+
+\begin_layout Subsection
+Open Face Chinese Poker Terminology 
+\end_layout
+
+\begin_layout Itemize
+A 
+\series bold
+row
+\series default
+ is a set structure for placing cards.
+ At the end of a game when scoring occurs poker hands in each player's rows
+ are compared to the opposing player's hand in their corresponding row.
+ There are three different rows as described below
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Bottom Row
+\series default
+ or 
+\series bold
+Back Hand
+\series default
+ is the foundation row, and consists of 5 cards.
+ Out of all three rows this must have the strongest poker hand or the player
+ fouls.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Middle Row 
+\series default
+or 
+\series bold
+Middle Hand 
+\series default
+also consists of 5 cards.
+ It must have a weaker hand than Bottom Row in order for the player's hand
+ to be valid.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Top Row
+\series default
+ or 
+\series bold
+Front Hand
+\series default
+ consists of 3 cards, meaning the best possible hand here is a Three of
+ a Kind (in most variant 3 card straights and flushes do not count).
+ Top Row must have a weaker hand than both middle and bottom row.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Scoop
+\series default
+ is a bonus awarded to a player when they win all 3 rows against an opponent.
+ On top of the standard +1 point per row won, the player is granted an additiona
+l bonus of +3 points which is also taken from their opponent.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Fouling
+\series default
+ occurs when a player plays an invalid hand, for example by putting a stronger
+ hand in their middle row than their bottom row.
+ When a player fouls any of their royalties are null, and their opponent
+ is automatically awarded a scoop bonus so long as their hand is valid.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Kicker
+\series default
+ is the term used to describe the next card taken into account when comparing
+ two otherwise equal hands.
+ For example, if both Player 1 and Player 2 have a Pair of 8s then the rest
+ of their cards would be considered, and whichever player has the highest
+ rank wins.
+ If both players kicker is equivalent then the next highest kicker will
+ come into play and so on.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Royalties
+\series default
+ are bonus points awarded to player's for particularly strong hands.
+ Just like any other points a player wins, they are taken directly from
+ opposing players.
+ Hands in higher rows score higher royalties than equivalent hands in lower
+ rows.
+ For example, a Full House in bottom row is worth 6 points in bottom or
+ 12 points in middle.
+ Another example is that a Three of a Kind in bottom row scores no royalty,
+ but gets 2 bonus points in middle and between 10 and 22 points in top depending
+ on the rank (Three of a Kind Deuces scores 10 points up to Three of a Kind
+ Aces with 22 points).
+ See here for a full list of royalties: http://www.wsop.com/2013/Open_Face_Chinese
+_Structure_Sheet.pdf 
+\end_layout
+
+\begin_layout Subsection
+Computer Science and Mathematical Terminology 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Artificial Intelligence 
+\series default
+is a field of study in Computer Science which focuses on simulating intelligent
+ behaviour in computers.
+\end_layout
+
+\begin_layout Itemize
+An 
+\series bold
+Intelligent Agent
+\series default
+ is an autonomous software entity that perceives and acts upon its environment,
+ performing reasoning in order to solve problems and determine actions,
+ exhibiting goal-oriented behaviour.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Algorithms
+\series default
+ are step-by-step instructions describing a set of operations to be performed
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Game Theory
+\series default
+ is a branch of mathematics focused on determining optimal strategies and
+ decisions in competitive situations
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Solved Games
+\series default
+ are games where the outcome (Win/Loss/Draw) can be predicted at any stage
+ assuming optimal play
+\end_layout
+
+\begin_layout Itemize
+The 
+\series bold
+Optimal Move
+\series default
+ or 
+\series bold
+Optimal Strategy
+\series default
+ is the move or strategy that will lead to the most favourable outcome for
+ an Agent 
+\end_layout
+
+\begin_layout Itemize
+A 
+\series bold
+Zero-Sum Game
+\series default
+ is a game in which a player's gains are losses are balanced by another
+ player's gains or losses.
+ Open Face Chinese Poker is an example of a Zero-Sum Game as a player's
+ gains are directly taken from their opponent.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Hidden Information
+\series default
+ is relevant information available to one or more agents but not others.
+ For example in a Poker game, the cards that players individually possess
+ or have discarded are known to them but are hidden from other players.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Perfect Information Games
+\series default
+ are games where at any stage all relevant information is available to an
+ agent in order to inform its decision.
+ The inverse of this is an 
+\series bold
+Imperfect Information Game
+\series default
+ where certain information or prior actions remain unknown.
+\end_layout
+
+\begin_layout Section
+References
+\end_layout
+
+\begin_layout Itemize
 Browne, C.
  Et al, 2012, A Survey of Monte Carlo Tree Search Methods, IEEE TRANSACTIONS
  ON COMPUTATIONAL INTELLIGENCE AND AI IN GAMES, VOL.
@@ -1408,13 +1903,7 @@ Browne, C.
  1.
 \end_layout
 
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "key-2"
-
-\end_inset
-
+\begin_layout Itemize
 Cowling, P.
  Et al, 2012, Information Set Monte Carlo Tree Search, IEEE TRANSACTIONS
  ON COMPUTATIONAL INTELLIGENCE AND AI IN GAMES, VOL.
@@ -1422,25 +1911,14 @@ Cowling, P.
  2.
 \end_layout
 
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "key-3"
-
-\end_inset
-
+\begin_layout Itemize
 Whitehouse, D.
  Et al, 2013, Integrating Monte Carlo Tree Search with Knowledge-Based Methods
- to Create Engaging Play in a Commercial Mobile Game, University of York
+ to Create Engaging Play in a Commercial Mobile Game, University of York,
+ p5
 \end_layout
 
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "key-4"
-
-\end_inset
-
+\begin_layout Itemize
 Özcan, E.
  and Hulagu, B., 2004, A Simple Intelligent Agent for Playing Abalone Game:
  ABLA, Proc.
@@ -1449,13 +1927,7 @@ key "key-4"
  281-290
 \end_layout
 
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "key-5"
-
-\end_inset
-
+\begin_layout Itemize
 
 \color blue
 http://scrambledeggsontoast.github.io/2014/06/26/artificial-intelligence-ofcp/
@@ -1464,28 +1936,17 @@ http://scrambledeggsontoast.github.io/2014/06/26/artificial-intelligence-ofcp/
  Carlo methods, implemented in Haskell, accessed 2015
 \end_layout
 
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "key-6"
-
-\end_inset
-
+\begin_layout Itemize
 
 \color blue
 https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applica
 tions-using-a-cherrypy-web-server-behind-nginx 
 \end_layout
 
-\begin_layout Bibliography
-\begin_inset CommandInset bibitem
-LatexCommand bibitem
-key "key-7"
-
-\end_inset
-
+\begin_layout Itemize
 Gerber, A.
- Et al, 2007, Implications of Rapid Development Methodologies, CSITEd 2007
+ Et al, 2007, Implications of Rapid Development Methodologies, CSITEd 2007,
+ p242-243
 \end_layout
 
 \end_body
