@@ -1172,7 +1172,7 @@ Unit Tests
 
 \begin_layout Standard
 Modular testing of code e.g.
- individual functions 
+ individual functions using unittest python framework
 \end_layout
 
 \begin_layout Standard

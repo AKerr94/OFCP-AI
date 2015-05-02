@@ -237,8 +237,8 @@ def scoring_helper(game_state):
     scores_final.append([winnerid, p1_royalty, p2_royalty])
     
     scores_final.append([p1invalid,p2invalid]) 
-        
-    #print scores_final, '\n', hands_list, '\n', classifications
+
+    #print "Scores Final Array:", scores_final, '\n', "hands list:", hands_list, '\n', "Classifications:", classifications
     
     return scores_final
 
