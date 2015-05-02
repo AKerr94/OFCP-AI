@@ -337,7 +337,7 @@ Open Face Chinese Poker (commonly abbreviated to
 OFCP
 \shape default
 ) is a perfect or imperfect information (depending on variant) card game
- with elements of randomness.
+ with elements of randomness due to cards dealt.
  OFCP is a variant of 
 \shape italic
 Chinese Poker 
@@ -388,8 +388,8 @@ scoop
 \align center
 \begin_inset Graphics
 	filename scoring example 2.png
-	lyxscale 40
-	scale 40
+	lyxscale 45
+	scale 45
 
 \end_inset
 
@@ -454,8 +454,8 @@ fouling
 \align center
 \begin_inset Graphics
 	filename scoring example 3.png
-	lyxscale 40
-	scale 40
+	lyxscale 45
+	scale 45
 
 \end_inset
 
@@ -499,8 +499,8 @@ Three of A Kind
 \align center
 \begin_inset Graphics
 	filename scoring example 1.png
-	lyxscale 40
-	scale 40
+	lyxscale 45
+	scale 45
 
 \end_inset
 

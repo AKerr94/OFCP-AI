@@ -24,6 +24,21 @@ function allowDrop(ev) {
 
 function drag(ev) {
     ev.dataTransfer.setData("text", ev.target.id);
+    // highlight droppable locations
+    for (i=0; i<13; i++) {
+        var temp = document.getElementById(player_positions[i]);
+        temp.style.borderColor = '#12FF01';
+        temp.style.backgroundColor = "rgba(186,255,191,0.5)"; // semi-opaque for better browsers
+    }
+}
+
+function dragstop(ev) {
+    // remove highlighting of droppable locations
+    for (i=0; i<13; i++) {
+        var temp = document.getElementById(player_positions[i]);
+        temp.style.borderColor = '#aaaaaa';
+        temp.style.backgroundColor = "transparent";
+    }
 }
 
 function drop(ev) {

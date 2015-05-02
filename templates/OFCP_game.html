@@ -9,7 +9,7 @@
 
 <body>
 <nav id="navigator"></nav>
-<div id="main" style="min-width:1400px;background-color:#E5FFD4;background-image:url('../static/chinese_dragon_transparent_red-min.png');background-repeat:no-repeat;background-position:center center;">
+<div id="main" style="min-width:1400px;background-color:#E5FFD4;background-image:url('../static/chinese_dragon_transparent_red_60o-min.png');background-repeat:no-repeat;background-position:center center;">
 <h1>Open Face Chinese Poker (Round {{roundNumber}})</h1>
 
 <p>Create the best poker hands possible in each row by dragging and dropping the cards. Each row must have a stronger hand than the row above it!</p>
@@ -122,17 +122,17 @@
             {% set cardsrc = "" %}
             {% set cardname = "" %}
         {% endif %}
-		<img id="place1card" draggable="true" ondragstart="drag(event)" width="109" height="150" {{cardsrc}} {{cardname}}>
+		<img id="place1card" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150" {{cardsrc}} {{cardname}}>
 
 		<!-- these are the cards for the following rounds -->
-		<img id="place6card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
-		<img id="place7card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
-		<img id="place8card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
-		<img id="place9card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
-		<img id="place10card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
-		<img id="place11card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
-		<img id="place12card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
-		<img id="place13card" style="display:none;" draggable="true" ondragstart="drag(event)" width="109" height="150">
+		<img id="place6card" style="display:none;" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150">
+		<img id="place7card" style="display:none;" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150">
+		<img id="place8card" style="display:none;" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150">
+		<img id="place9card" style="display:none;" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150">
+		<img id="place10card" style="display:none;" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150">
+		<img id="place11card" style="display:none;" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150">
+		<img id="place12card" style="display:none;" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150">
+		<img id="place13card" style="display:none;" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150">
 	</div>
 
     <!-- cards 2-5 for initial 5 placements -->
@@ -145,7 +145,7 @@
                 {% set cardsrc = "" %}
                 {% set cardname = "" %}
             {% endif %}
-            <img id="place{{ i }}card" draggable="true" ondragstart="drag(event)" width="109" height="150" {{cardsrc}} {{cardname}}>
+            <img id="place{{ i }}card" draggable="true" ondragstart="drag(event)" ondragend="dragstop(event)" width="109" height="150" {{cardsrc}} {{cardname}}>
         </div>
     {% endfor %}
 </div>
