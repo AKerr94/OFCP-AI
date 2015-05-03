@@ -96,7 +96,10 @@ def scoring_helper(game_state):
             t2 += str( game_state['properties2']['cards']['items']['position'+str(i)] ) # take card info for p2's row
         hands_list.append([reformat_hand_xyy_yx(t1,numCards)])
         hands_list.append([reformat_hand_xyy_yx(t2,numCards)])
-        
+
+        if None in hands_list:
+            return None
+
         return hands_list
       
     def calculate_royalties(hand_tuple,row):
@@ -163,7 +166,12 @@ def scoring_helper(game_state):
     hands_list = decode_state_hand(1,6,hands_list,5)    # append bottom
     hands_list = decode_state_hand(6,11,hands_list,5)   # append middle
     hands_list = decode_state_hand(11,14,hands_list,3)  # append top
-    
+
+    # validation
+    for innerlist in hands_list:
+        if None in innerlist:
+            return None
+
     scores = []                     # format: p1 bot, p2 bot, p1 mid, p2 mid, p1 top, p2 top. Type: score tuples
     classifications = []            # format: p1 bot, p2 bot, p1 mid, p2 mid, p1 top, p2 top. Type: Strings
     
@@ -250,6 +258,17 @@ def scores_arr_to_int(scores):
     '''
 
     #print "\nScoring a board! Scores array:", scores
+
+    # validation of scores array
+    if type(scores) != type([]) or len(scores) != 4:
+        return None
+    for i in range(0,3):
+        for j in range(0,3):
+            if type(scores[i][j]) != type(1):
+                return None
+    for x in scores[3]:
+        if type(x) != type(True):
+            return None
     
     p1score = 0
     p2score = 0
@@ -307,6 +326,12 @@ def classify_3(eval_result):
         e.g. 'Three of a Kind Ks', 'Pair of As, 7 kicker' '''
     
     c3_dic = {4:'Three of a Kind ', 2:'Pair of ', 1:'High Card: '}
+
+    if type(eval_result) != type(()):
+        return None
+    if type(eval_result[0]) != type(1):
+        return None
+
     hand_name = c3_dic[eval_result[0]]
     if eval_result[0] == 4:
         hand_name += str(eval_result[1]) + 's '
@@ -316,6 +341,7 @@ def classify_3(eval_result):
         hand_name += str(eval_result[1]) + ', kickers: ' + str(eval_result[2]) + ', ' + str(eval_result[3])
     else:
         print "Error! Invalid tuple?..."
+        return None
     
     return hand_name
     

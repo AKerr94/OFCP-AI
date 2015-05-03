@@ -58,6 +58,8 @@ def find_valid_moves(game_state):
                 number_middle += 1
             elif i <= 13:
                 number_top += 1
+
+    return [number_bottom, number_middle, number_top]
     #print "Valid placements: Bottom", 5 - number_bottom, ", Middle", 5 - number_middle, ", Top", 3 - number_top, "\n"
 
 def produce_deck_of_cards():

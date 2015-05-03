@@ -12,6 +12,7 @@ import helpers
 import OFCP_AI
 import db_backend
 
+
 def handle_game_logic(game_state, game_id):
     '''
     Take in game state from frontend and game id as inputs - use game id to get record from database

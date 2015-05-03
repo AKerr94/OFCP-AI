@@ -21,7 +21,7 @@ import os
 class Test_game_logic(TestCase):
 
     def test_handle_game_logic1(self):
-        print "Running Tests for game_logic.py now...\n"
+        print "\n###################\nRunning Tests for game_logic.py now...\n"
         print "\nTest #1 game logic @ empty gs (player to place 5)"
 
         # test player first empty gs receives 5 cards
