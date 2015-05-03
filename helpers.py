@@ -76,7 +76,7 @@ def reformat_hand_xyy_yx(hand, numCards):
             return formatted_hand
             
         except: 
-            print "An error occured! Ensure a valid hand was passed."
+            print "An error occurred! Ensure a valid hand was passed."
             return None
     
     print "Invalid parameters. Parameter 1: Hand string, Parameter 2: Num cards (3 or 5)"
