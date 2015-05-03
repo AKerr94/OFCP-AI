@@ -94,7 +94,7 @@ def prune_deck_of_cards(game_state):
     
     #print 'Pruned deck\n' + str(game_state)+'\n\n'
     
-def simulateGame(game_state, row, card, bAppend):
+def simulateGame(game_state, row, card, bAppend, op_deck=None):
     ''' takes in game state and chosen row to place given card in if bAppend == True
     else if bAppend is false skip appending any specific card.
     randomly simulates rest of game and returns score '''
@@ -105,10 +105,14 @@ def simulateGame(game_state, row, card, bAppend):
     prune_deck_of_cards(gs_copy)        
     
     #print gs_copy
-    
-    global deck     # get available cards for placement 
-    tdeck = deck[:]
-    random.shuffle(tdeck)
+
+    if op_deck is None:
+        global deck     # get available cards for placement
+        tdeck = deck[:]
+        random.shuffle(tdeck)
+    else:
+        # use a specific passed deck (e.g. for consistent unit testing)
+        tdeck = op_deck[:]
     
     # populate empty slots in game board with random cards
     for i in range(1,14):
@@ -134,24 +138,7 @@ def simulateGame(game_state, row, card, bAppend):
     counthands += 1
     
     if scores[3][1] == False or scores[3][0] == False: # only printing valid results (fouled simulated hands from both players omitted)
-        '''
-        scores_string = map(str, ["\nAi calculates potential score of ", p2score - p1score, " for placing " , card , " in " , row, "\n    ", scores, "\n"])
-        scores_string = ''.join(scores_string)
-        AIstring = "AI board~~\n "
-        for i in range(1,14):
-            t = map(str, ["Pos", i, ": ", game_state['properties2']['cards']['items']['position'+str(i)], "->", gs_copy['properties2']['cards']['items']['position'+str(i)], ". "])
-            AIstring += ''.join(t)
-            if i == 5 or i == 10:
-                    AIstring += "\n "
-        p1string = "P1 board~~\n "
-        for i in range(1,14):
-            t = map(str, ["Pos", i, ": ", game_state['properties1']['cards']['items']['position'+str(i)], "->", gs_copy['properties1']['cards']['items']['position'+str(i)], ". "])
-            p1string += ''.join(t)
-            if i == 5 or i == 10:
-                    p1string += "\n "
-                  
-        print "\n******************************\n*Hand simulation", counthands, "\n", scores_string, "\n++++++  game state info  ++++++\n", AIstring, "\n", p1string, "\n======================================================"
-        '''
+
         if p2score > 0:
             global scoringhands
             scoringhands += 1

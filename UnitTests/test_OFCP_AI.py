@@ -118,6 +118,14 @@ class Test_OFCP_AI(TestCase):
         self.assertEqual(set(test_deck), set(result))
         print "Passed!"
 
+    def test_simulateGame(self):
+        # testing simulateGame function
+        print "\nTest #8 testing OFCP_AI simulateGame basic functionality"
+        test_game_state = make_state()
+        test_deck = generate_deck()
+        result = OFCP_AI.simulateGame(test_game_state, None, None, False, test_deck[:40])
+        print result
+
 
 # helper functions for testing
 def generate_deck():
