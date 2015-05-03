@@ -9,6 +9,7 @@ __author__ = 'Ali'
 
 import game_logic
 import db_backend
+import deck
 
 from bson.objectid import ObjectId
 import json
@@ -20,7 +21,7 @@ import os
 class TestHandle_game_logic(TestCase):
 
     def test_handle_game_logic1(self):
-        print "\nTesting game logic with playerFirst @ empty gs"
+        print "\nTest #1 game logic @ empty gs (player to place 5)"
 
         # test player first empty gs receives 5 cards
         xs = create_test_gs_vars()
@@ -45,7 +46,7 @@ class TestHandle_game_logic(TestCase):
         print "Passed!"
 
     def test_handle_game_logic2(self):
-        print "\nTesting game logic with playerFirst @ AIs first turn"
+        print "\nTest #2 game logic @ AIs first turn"
 
         # test player first AI's round 1 - should see updated db state
         xs = create_test_gs_vars()
@@ -107,7 +108,7 @@ class TestHandle_game_logic(TestCase):
         print "Passed!"
 
     def test_handle_game_logic3(self):
-        print "\nTesting game logic with playerFirst @ general case"
+        print "\nTest #3 game logic @ general case"
 
         xs = create_test_gs_vars()
         test_game_state = xs[0]
@@ -170,7 +171,7 @@ class TestHandle_game_logic(TestCase):
         print "Passed!"
 
     def test_handle_game_logic4(self):
-        print "\nTesting game logic with playerFirst @ game end"
+        print "\nTest #4 game logic @ game end"
 
         xs = create_test_gs_vars()
         test_game_state = xs[0]
@@ -217,6 +218,58 @@ class TestHandle_game_logic(TestCase):
         for x in result[3]:
             self.assertEqual(type(True), type(x))
         self.assertEqual(type(1), type(result[4][0]))
+
+        print "Passed!"
+
+    def test_validate_and_update_state(self):
+        # test whether game_logic helper function reads in, validates and updates state correctly
+        print "\nTest #5 validate_and_update_state helper function"
+        xs = create_test_gs_vars()
+        test_game_state = xs[0]
+        test_game_id = xs[1]
+        test_db_state = xs[2]
+
+        # generating test game state for player
+        dcount = 0
+        for i in range(1,12):
+            test_game_state['properties1']['cards']['items']['position'+str(i)] = possible_cards[i -1]
+            dcount += 1
+
+        t_deck = deck.Deck(possible_cards, dcount)
+
+        result = game_logic.validate_and_update_state(t_deck, dcount, test_game_state, test_db_state)
+
+        if 'properties1' not in result or 'cards' not in result['properties1'] or 'items' not in result['properties1']['cards']:
+            raise KeyError()
+
+        for i in range(0,13):
+            val = result['properties1']['cards']['items']['position'+str(i+1)]
+            if val is not None:
+                self.assertEqual(True, isCard(str(val)))
+
+        print "Passed!"
+
+    def test_zip_placements_cards(self):
+        # test game_logic helper for zipping calculated placements and cards, and updating state
+        print "\nTest #6 game_logic helper function zip_placement_cards"
+
+        xs = create_test_gs_vars()
+        test_db_state = xs[2]
+
+        # some test data
+        placements = [1,1,3,2,1]
+        cards_list = ["d01", "h01","c12","c13","s01"]
+
+        result = game_logic.zip_placements_cards(placements, cards_list, test_db_state)
+
+        try:
+            x = result['properties2']['cards']['items']
+        except:
+            raise KeyError()
+
+        asserted_positions = ['position1', 'position2', 'position11', 'position6', 'position3']
+        for i in range(0,5):
+            self.assertEqual(cards_list[i], x[asserted_positions[i]])
 
         print "Passed!"
 
@@ -267,4 +320,5 @@ def isCard(test_me):
     return True
 
 possible_cards = generate_deck()
+print "Running Tests for game_logic.py now...\n"
 

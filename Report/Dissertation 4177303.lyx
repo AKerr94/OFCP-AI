@@ -988,6 +988,10 @@ More efficient poker hand evaluators are available, however generally written
 Design and Implementation
 \end_layout
 
+\begin_layout Standard
+use case diagrams, system architecture diagrams, wireframes
+\end_layout
+
 \begin_layout Subsection
 Approach
 \end_layout
@@ -1164,6 +1168,14 @@ http://www.alastairkerr.co.uk/ofc
 
 \begin_layout Section
 Evaluation
+\end_layout
+
+\begin_layout Standard
+usability tests - table of what tests, what happened
+\end_layout
+
+\begin_layout Standard
+questionnaire and results, general evaluation
 \end_layout
 
 \begin_layout Subsection
