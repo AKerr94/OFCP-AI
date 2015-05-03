@@ -1171,6 +1171,13 @@ Unit Tests
 \end_layout
 
 \begin_layout Standard
+continuous integration/ deploymentwith continuous integration when you make
+ a commit to github it automatically connects to server and runs the tests,
+ if they pass it deploys it http://code.tutsplus.com/tutorials/setting-up-continuo
+us-integration-continuous-deployment-with-jenkins--cms-21511
+\end_layout
+
+\begin_layout Standard
 Modular testing of code e.g.
  individual functions using unittest python framework
 \end_layout
