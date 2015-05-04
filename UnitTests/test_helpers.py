@@ -2,6 +2,11 @@ from unittest import TestCase
 
 __author__ = 'Ali'
 
+'''
+    Run these tests from server with following command:  pypy -m unittest discover --pattern=test*.py
+    Ensure this file is in root folder with rest of backend scripts
+'''
+
 import helpers
 
 import sys

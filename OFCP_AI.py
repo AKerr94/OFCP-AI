@@ -74,6 +74,7 @@ def produce_deck_of_cards():
                 temp += "0"
             temp += str(i)
             deck.append(temp)
+    random.shuffle(deck)
     return deck
 
 def prune_deck_of_cards(game_state):
@@ -159,7 +160,7 @@ def simulateGame(game_state, row, card, bAppend, op_deck=None):
 def simulate_append_card(game_state, row, card, force_place):
     ''' pass in game_state + a card and destination row
     returns a modified game_state with that card added to that row '''
-    
+
     global placed_cards_s
     global number_bottom
     global number_middle
@@ -197,6 +198,7 @@ def simulate_append_card(game_state, row, card, force_place):
     
     else:
         print "Invalid row passed to simulate_append_card:\n", row
+        return None
     
     #print "New AI board state:", str(game_state['properties2']['cards']['items']), '\n'
     return game_state
@@ -204,7 +206,10 @@ def simulate_append_card(game_state, row, card, force_place):
 def produce_histogram(cards):
     ''' takes in cards as input e.g. ['AS','AD','7H','5C','5H']
     and returns histogram of ranks '''
-    
+
+    if len(cards) != 5:
+        return None
+
     histogram = [
         [2, 0],     # Deuce
         [3, 0],     # 3
@@ -222,16 +227,24 @@ def produce_histogram(cards):
     ]
 
     for i in range(0,5):
-        temp = rankmappingdic[cards[i][0]]
-        histogram[temp -2][1] += 1
+        try:
+            temp = rankmappingdic[cards[i][0]]
+            histogram[temp -2][1] += 1
+        except:
+            return None
 
     return histogram 
 
-def place_5(game_state, cards, sim_timer):
+def place_5(game_state, cards, sim_timer, test_deck=None):
     ''' takes game_state, first 5 cards and allocated simulated time in ms as inputs.
     Aggregates scores for simulations of each permutation of the first possible placements 
     and returns an optimal placement as a list with index i = card i+1's allocated row
     e.g. return [1,1,2,2,3] = card 1 in row 1, card 2 in row 1, card 3 in row 2, card 4 in row 2, card 5 in row 3'''
+
+    # if a test deck is passed assign it to global
+    if test_deck != None:
+        global deck
+        deck = test_deck
 
     try:
         cdic = {cards[0]:1, cards[1]:2, cards[2]:3, cards[3]:4, cards[4]:5} # keep a permanent record of which card was which index
@@ -275,6 +288,8 @@ def place_5(game_state, cards, sim_timer):
     # e.g. if we have pair of Aces removes states where these aces are not placed together
     # as it is very unlikely this would be an optimal placement
     hist = produce_histogram(cformatted)
+    if hist == None:
+        raise ValueError("Invalid values passed to produce_histogram")
     print "Histogram:", hist, "\n"
 
     highestfreq = 1 # look for quads or trips or a pair
@@ -634,23 +649,26 @@ def chooseMove(game_state, card, iterations_timer):
                 return 3             #top
             elif valid_middle == True:
                 return 2             #middle
+
+        else:
+            return None
     
     else:
         print "Invalid cards.", card, ". Need type: String e.g. 's01' (ace of spades)"
         return None
 
-def place_one_test(game_state, card, iterations):
+def place_one_test(game_state, card, iterations, timer):
     ''' takes game_state, card and iterations as parameters
     determines optimal placement for card given game state 
     
     Test function - server calls chooseMove function directly'''
     
     row_counts = [0,0,0]
-    x = 1
+    x = iterations
     global number_top
     for i in range(0,x):  # run x simulations of iterations each 
         number_top = 0 # reset
-        chosen_row = chooseMove(game_state, card, iterations)
+        chosen_row = chooseMove(game_state, card, timer)
         row_counts[chosen_row -1] += 1
     print row_counts
     
@@ -672,7 +690,7 @@ def place_one_test(game_state, card, iterations):
    
     return chosenrow
 
-def place_five_initial_test(game_state, cards, iterations):
+def place_five_initial_test(game_state, cards, iterations, timer):
     ''' takes game_state, cards array and iterations as parameters
     determines optimal placement for cards given game state 
     
@@ -686,12 +704,12 @@ def place_five_initial_test(game_state, cards, iterations):
     global number_top
     
     #row_counts = [0,0,0]
-    x = 1
+    x = iterations
     for i in range(0,x):  # # run x simulations of iterations each 
         card_placements = [0,0,0,0,0]
         number_top = 0 # reset num top
         
-        chosen_rows = chooseMove(game_state, cards, iterations)
+        chosen_rows = chooseMove(game_state, cards, timer)
         
         j = 0
         for row in chosen_rows:
@@ -735,16 +753,31 @@ if __name__ == "__main__":
     ### exit ###
     if user_choice not in ['0','1']:
         print "Exiting now..."
+        raw_input("Press Enter to continue...")
         quit()
     
-    times_to_run = raw_input("How many test would you like to run? \n")
-    
-    valid = False
-    try:
-        times_to_run = int(times_to_run)
-        valid = True 
-    except:
-        print "Invalid input! Required type: integer.\n"
+    msValid = False
+    itValid = False
+    while (True):
+        try:
+            iteration_timer = raw_input("How many ms for simulations? \n")
+            iteration_timer = int(iteration_timer)
+            msValid = True
+            iterations = raw_input("How many tests would you like to run? \n")
+            iterations = int(iterations)
+            itValid = True
+            break
+        except:
+            if msValid == False:
+                print "Invalid input:", iteration_timer, "Required type: integer. [input] ms\n"
+            else:
+                print "Invalid input:", iterations, "Required type: integer. [input] tests\n"
+            input = raw_input("Try again Y/ Quit N: ")
+            if input == 'n' or input == 'N':
+                break
+
+    if msValid == False or itValid == False:
+        quit()
 
     # create empty game state
     game_state = {}
@@ -759,28 +792,29 @@ if __name__ == "__main__":
         for j in range(1,14):
             game_state['properties'+str(i)]['cards']['items']['position'+str(j)] = None
 
-    #### 1 card test ####
-    if user_choice == "0" and valid == True:
+    deck = produce_deck_of_cards()
 
-        card = 's01' # example test card (ace of spades)
-        iteration_timer = 500
-        for i in range(0, times_to_run):
+    #### 1 card test ####
+    if user_choice == "0":
+
+        card = random.sample(deck, 1)
+        for i in range(0, iterations):
             chosenrow = place_one_test(game_state, card, iteration_timer)
             print "Recommendation: Place card in", chosenrow, "row!"
     
-    
-    #### 5 card test ####
-    elif user_choice == "1" and valid == True:
 
-        cards = ['s01', 'd01', 'h01', 'c10', 'd05']  # example test cards 
-        num_iterations = 500
+    #### 5 card test ####
+    elif user_choice == "1":
+
         placements_array = []
-        for i in range(0, times_to_run):
-            placements_array.append( place_five_initial_test(game_state, cards, num_iterations) )
-        print "Simulations results: ", placements_array
+        for i in range(0, iterations):
+            cards = random.sample(deck, 5)
+            placements_array.append( place_five_initial_test(game_state, cards, 1, iteration_timer) )
+        print "\n##############################\nSimulations results: "
+        for i in range(0, len(placements_array)):
+            print str(i) + ":", placements_array[i]
     
-    
-    print "\nThis is a helper script implementing MCTS for OFCP.\n\
-    Intended use: import module externally.\n"
+    print "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    print "OFCP AI script. Intended use: import module externally. Ran from command line for testing options.\n"
     
     raw_input("Press Enter to continue...")
