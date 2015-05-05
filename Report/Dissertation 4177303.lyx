@@ -341,7 +341,7 @@ Introduction
 \end_layout
 
 \begin_layout Subsection
-Summary of Introduction
+Outline of Introduction 
 \end_layout
 
 \begin_layout Standard
@@ -369,7 +369,8 @@ Section 1.3 outlines the problem description, considering the limitations
 \end_inset
 
 Section 1.4 outlines specific aims and objectives for the project based on
- requirements for performance and meeting user demands.
+ functional, non-functional and usability requirements for function, performance
+ and meeting user demands.
 \begin_inset Newline newline
 \end_inset
 
@@ -405,12 +406,12 @@ Pineapple OFC
 
 \end_inset
 
- card game with elements of randomness due to the shuffled cards dealt.
- OFCP is a variant of 
+ card game, and is a variant of 
 \shape italic
-Chinese Poker 
+Chinese Poker.
+ 
 \shape default
-where players take turns placing cards face-up into three distinct 
+In OFCP, players take turns placing cards face-up into three distinct 
 \shape italic
 rows
 \shape default
@@ -431,12 +432,12 @@ top
 poker hands
 \shape default
  they can in order to score points from each other.
- Stronger hands score 
+ Stronger hands score bonus points called 
 \shape italic
 royalties
 \shape default
- for extra points and royalty-scoring hands in higher rows score more points
- than an equivalent hand in a lower row.
+ and royalty-scoring hands in higher rows score more points than equivalent
+ hands in lower rows.
  For example, a 
 \shape italic
 Royal House
@@ -450,9 +451,9 @@ scoop
  bonus which grants an additional point for each row, for a total of +6
  base points before royalties are calculated.
  OFCP is a zero-sum game, meaning any gains by one player are balanced with
- losses by another player; as players win points directly from their opponents,
- if a player's score is +16 points then in a 1v1 game it is therefore implied
- that their opponent's score would be -16.
+ losses by another player; players win points directly from their opponents,
+ so if a player's score is +16 points then in a 1v1 game it is therefore
+ implied that their opponent's score would be -16.
  
 \end_layout
 
@@ -472,8 +473,8 @@ scoop
 \align center
 
 \shape italic
-Fig 1.2.1 – example layout of the board after a single round of Open Face
- Chinese Poker (screenshot from an early prototype of the application)
+Fig 1.2.1 – layout of the board after a round of Open Face Chinese Poker (screensh
+ot from an early prototype of the application)
 \end_layout
 
 \begin_layout Standard
@@ -601,14 +602,14 @@ Full House
 \shape default
 , Aces full of Deuces versus the computer opponent’s Pair of 9s, scoring
  +1 point for winning the row and an additional +12 royalty.
- Player 1 and Player 2 both have 
+ Player 1 and the computer opponent both have 
 \shape italic
 High Card
 \shape default
  King in the top row, but the computer opponent wins the row because their
  kicker of 10 beats Player 1's 6 kicker.
- Player 2 wins +1 point for winning this row but the hand is not strong
- enough to score any additional royalties.
+ The computer opponent wins +1 point for winning this row but the hand is
+ not strong enough to score any additional royalties.
  The points each player wins are taken from their opponent, so the final
  score for Player 1 is 
 \begin_inset Formula $-1+13+11=23$
@@ -653,14 +654,14 @@ with a branching factor
 
  which is prohibitively complex for any reasonably exhaustive search of
  a game with a high branching factor.
- Consider for example the game of Chess which has an estimated branching
- factor of 35 (Mandziuk, 2010).
+ Consider for example Chess, which has an estimated branching factor of
+ 35 (Mandziuk, 2010, p4).
  In his influential paper 
 \shape italic
 Programming a Computer for Playing Chess
 \shape default
-, Shannon estimated a lower-bound for the game-tree complexity of Chess
- of 
+, Claude Shannon estimated a lower-bound for the game-tree complexity of
+ Chess of 
 \begin_inset Formula $10^{120}$
 \end_inset
 
@@ -1325,7 +1326,8 @@ Table 1.3.1 showing the intractability of a brute force search of a Chess
 
 Open Face Chinese Poker does not have such an astronomical space state or
  game-tree complexity as Chess, although unlike Chess it incorporates stochastic
- elements because of its nature as a card game.
+ elements because of its nature as a card game, and the subsequent challenge
+ this poses for an Intelligent Agent makes it an interesting area of research.
  Considering there are 
 \begin_inset Formula $52!\approx8\times10^{67}$
 \end_inset
@@ -1337,7 +1339,7 @@ permutations of a standard deck of cards, representation of each possible
 status open
 
 \begin_layout Plain Layout
-this estimate is generous as it includes duplicate states e.g.
+This estimate is generous as it includes duplicate states e.g.
  rows with the exact same cards but in different orders
 \end_layout
 
@@ -1437,7 +1439,7 @@ Approximate Time to Search (
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $15,498$
+\begin_inset Formula $1.55\times10^{4}$
 \end_inset
 
  
@@ -1563,7 +1565,7 @@ Approximate Time to Search (
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $990$
+\begin_inset Formula $9.9\times10^{2}$
 \end_inset
 
  years
@@ -1733,6 +1735,8 @@ Approximate Time to Search (
 
 \begin_layout Standard
 \align center
+
+\shape italic
 Table 1.3.2 showing the possible states to consider in an exhaustive search
  of an Open Face Chinese Poker game tree
 \end_layout
@@ -1744,8 +1748,15 @@ Table 1.3.2 showing the possible states to consider in an exhaustive search
 The rapid expansion of the search space makes it clear that more processing
  power is not in itself a solution to the problem, as combinatorial explosion
  quickly makes deep searches of these games impractical for any realistic
- purposes; it is unlikely a user playing a game versus an Intelligent Agent
- is willing to wait several years for the opponent to make its move! 
+ purposes; even a machine that could search 1 Trillion (
+\begin_inset Formula $10{}^{12}$
+\end_inset
+
+) nodes per second would take 
+\begin_inset Formula $7\times10^{11}$
+\end_inset
+
+ years to perform such an exhaustive search of an entire OFCP game tree.
 \begin_inset Newline newline
 \end_inset
 
@@ -1760,9 +1771,9 @@ However, despite the fact that modern computers are still not powerful enough
  or through pruning algorithms which reduce the complexity of the search
  by removing branches of the tree that do not provide beneficial information.
  A variety of algorithms and heuristics have been formalised over the decades,
- with the creation of a multitude of Intelligent Agents of varying competence
- playing a wide range of games, with wide coverage of more traditional games
- such as Chess and Checkers, and even for more complex games such as Go.
+ with the creation of a multitude of Intelligent Agents of varying competence,
+ with wide coverage of more traditional games such as Chess and Checkers,
+ and even for more complex games such as Go.
  In terms of artificial intelligence applications for Poker, more well-known
  variants such as Texas Hold'Em have seen lots of interest while more obscure
  variants such as OFCP have remained somewhat untouched.
@@ -1774,55 +1785,54 @@ However, despite the fact that modern computers are still not powerful enough
 \begin_inset Newline newline
 \end_inset
 
-Intelligent Agents do exist for OFCP, but largely play predictably or sub-optima
-lly, often favouring conservative play over taking risks, even in situations
- where fouling would not be heavily penalised (such as when the human opponent
- is in a fouling position themselves).
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Introduce problem and motivation for study, outline purpose OFCP poker bots
- generally underperform vs human players.
- Rely on simple algorithms and make sub-optimal plays.
- Little work done on OFCP AI, more focus on other games/ more well-known
- variants of poker (Texas Hold’em).
- Poker is an interesting area of research for game theory as has many aspects
- other games (e.g.
- chess) do not – chance from unknown cards.
-\end_layout
-
-\begin_layout Standard
-Imperfect information means that more sophisticated algorithms are generally
- necessary for optimal play.
- Or can traditional algorithms with suitable heuristics perform as well
- or better? 
-\end_layout
-
-\begin_layout Standard
-Hidden information poses many challenges from an AI point of view.
- In many games, the number of states within an information set can be large:
- for example, there are 52! ~= 8x10
-\begin_inset script superscript
+Intelligent Agents do exist for OFCP, but publicly available implementations
+ largely play predictably or sub-optimally, often favouring conservative
+ play over taking risks, even in situations where fouling would not be heavily
+ penalised (such as when the human opponent is in a fouling position themselves).
+ There has been little formal research into Intelligent Agents for OFCP,
+ and as such limited source material is available.
+ Most existing bots for the game are designed for Poker sites which do not
+ have any source code made available, or made by development teams which
+ license the software out to Poker players for money such as in the case
+ of Warren
+\begin_inset Foot
+status open
 
 \begin_layout Plain Layout
-67
+Warren is an OFCP bot which uses neural networks to train and improve, licensed
+ for $7-79/month 
+\color blue
+(https://www.playwarren.com/)
+\color inherit
+ 
 \end_layout
 
 \end_inset
 
- possible orderings of a standard deck of cards, each of which may have
- a corresponding state in the initial information set of a card game.
- If states are represented in a game tree, this leads to a combinatorial
- explosion in branching factor.
+.
+ Even with such advanced techniques the game has not been solved, as evidenced
+ with the modest claim 
+\begin_inset Quotes eld
+\end_inset
+
+(Warren) plays almost perfect Open Face Chinese Poker after the 6th card
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Other implementations by hobbyist programmers for personal projects often
+ make use of simple algorithms which leads to sub-optimal, exploitable play
+ because of predictable or naïve behaviour.
+ This project aims to create an Intelligent Agent that performs well versus
+ competent human players, and to do so will need to be able to do everything
+ a human can in terms of making judgement calls, exploiting the player's
+ game position in order to inform its decision as to whether it should take
+ a risk or play conservatively to avoid fouling itself.
  
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -1830,32 +1840,47 @@ Aims and Objectives
 \end_layout
 
 \begin_layout Standard
-Specific objectives
+The project aim is to create a functional, competent Intelligent Agent for
+ a bespoke Open Face Chinese Poker Web-Application, which can be broken
+ down simply into two main objectives.
+\end_layout
+
+\begin_layout Enumerate
+Create a game environment for Open Face Chinese Poker (Web-Application)
+\end_layout
+
+\begin_layout Enumerate
+Create an Intelligent Agent which interfaces with the Application and plays
+ the game
 \end_layout
 
 \begin_layout Standard
-1.
- Create a functional Open Face Chinese Poker Application – game environment
+Beyond these simple functional requirements the Intelligent Agent must meet
+ expectations for competent performance, making strong plays and avoiding
+ the pitfalls of more simplistic Agents.
+ To create a credible degree of perceived intelligence, the Agent must play
+ tactically, avoiding fouling on one hand but not playing in such a risk
+ averse and conservative manner as to limit potential for scoring and exploitati
+on of a weak player position.
+ In addition to this, the Agent must be able to make its decisions quickly
+ in order to minimise delay in line with user demands for responsiveness.
  
-\end_layout
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Standard
-2.
- Create Intelligent Agent for application
-\end_layout
 
-\begin_layout Standard
-3.
- AI must have a level of sophistication such that it performs well vs.
- humans and other AI
-\end_layout
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Standard
-4.
- AI algorithms must be suitably optimised with tradeoffs between efficiency,
- space and time complexity so that it is responsive.
- E.g.
- AI calculates move in less than 5 seconds 
+With regards to the Web-Application itself there are multiple demands to
+ be met in terms of reliability, usability and functionality.
+ The interface must be intuitive and aesthetically appealing, and must feel
+ responsive and efficient.
+ As it will be a Web-Application accessible via the internet efforts must
+ be made to optimise performance and decrease loads times through means
+ such as compression of assets and redirection minimisation, also enabling
+ larger support for multiple concurrent users and increasing scalability.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -2242,18 +2267,229 @@ More efficient poker hand evaluators are available, however generally written
 \end_layout
 
 \begin_layout Section
-Design and Implementation
-\end_layout
-
-\begin_layout Standard
-use case diagrams, system architecture diagrams, wireframes
+Design and Approach 
 \end_layout
 
 \begin_layout Subsection
-Approach
+Requirements Specification
 \end_layout
 
 \begin_layout Standard
+The requirements for this project were driven by the need to meet user demands
+ and expectations for the Application, as well as ensuring the quality of
+ the Intelligent Agent produced.
+ The functional requirements below describe what the system will do.
+\end_layout
+
+\begin_layout Enumerate
+Create a game environment for Open Face Chinese Poker (Web-Application)
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The Application must implement appropriate rules for the game - fouling,
+ scoring system
+\end_layout
+
+\begin_layout Enumerate
+Enable alternate round support - player acts first in Round 1, Intelligent
+ Agent acts first in Round 2 etc.
+\end_layout
+
+\begin_layout Enumerate
+Use appropriate networking technology to support concurrent connections
+ so multiple users can play at once 
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Create an Intelligent Agent to play Open Face Chinese Poker
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The Intelligent Agent must interface with the Web-Application in order to
+ make its moves 
+\end_layout
+
+\begin_layout Enumerate
+The Intelligent Agent must adhere to all rules of the game
+\end_layout
+
+\begin_layout Enumerate
+The Intelligent Agent must not use any information a human player in its
+ position would not have (i.e.
+ it will not cheat)
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+Building on these are non-functional requirements specifying how the system
+ will work, which fall into 4 categories: Reliability, Usability, Supportability
+ and Performance.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Reliability
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The System must be reliable with minimal errors and failures: Long Mean-Time-To-
+Failure 
+\end_layout
+
+\begin_layout Enumerate
+Uptime of the Application should be maximised, meaning minimal downtime
+ for upgrades and avoidance of fatal crashes 
+\end_layout
+
+\begin_layout Enumerate
+Implement support for performance monitoring through logs of errors, server
+ actions and statistics (e.g.
+ time taken for requests) 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series bold
+Usability
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The Application should be responsive and quick to load 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The website should load in an acceptable time (<1s is optimal) 
+\end_layout
+
+\begin_layout Enumerate
+The Application should feel responsive e.g.
+ when dragging cards 
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Interface elements should be intuitive and easy to understand (clearly labelled
+ buttons, instructions) 
+\end_layout
+
+\begin_layout Enumerate
+The aesthetics of the Application should be pleasing - good layout, colour
+ scheme, graphical elements
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series bold
+Supportability
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Maximise potential for scalability through maximised throughput and appropriate
+ optimisations to reduce Application's footprint
+\end_layout
+
+\begin_layout Enumerate
+Reconfiguring the Application should not require extensive or problematic
+ changes.
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Tweaking values should be easy e.g.
+ time limit for Intelligent Agent's decisions
+\end_layout
+
+\begin_layout Enumerate
+Adding features shouldn't break the system - achieved through good design
+ structure
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The Application should be compatible with as many devices as possible
+\end_layout
+
+\begin_layout Enumerate
+Installation of the Application should be easy, requiring minimal reconfiguratio
+n 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\series bold
+Performance
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Users should not have to wait more than 5 seconds after their input for
+ the Intelligent Agent to make its move
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Employ heuristics and efficient algorithms to optimise performance 
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Stress Requirements: The Application must be able to support at least 100
+ concurrent users 
+\end_layout
+
+\begin_layout Enumerate
+Throughput: At least 95% of the time, the Application should take no more
+ than 5 seconds for any request 
+\end_layout
+
+\begin_layout Enumerate
+The Intelligent Agent must play competently and provide a significant level
+ of challenge to human opponent
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Use Case and Data Flow Diagrams
+\end_layout
+
+\begin_layout Standard
+use case diagram
+\end_layout
+
+\begin_layout Standard
+data flow diagram of a game of chinese poker
+\end_layout
+
+\begin_layout Subsection
+Design Overview
+\end_layout
+
+\begin_layout Standard
+system flow diagram for application / system architecture diagram/ wireframes
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
 html css and javascript for website/ app.
  Javascript handles front end, sends POST ‘reqwest’s with game state to
  cherrypy server – backend – which validates the sent game state and then
@@ -2264,30 +2500,8 @@ html css and javascript for website/ app.
  cards to be placed, scores at end of game
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-data flow diagram of a game of chinese poker
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-system flow diagram for application / system architecture diagram 
-\begin_inset VSpace smallskip
-\end_inset
-
-
+\begin_layout Subsection
+Design Principles 
 \end_layout
 
 \begin_layout Standard
@@ -2310,45 +2524,8 @@ nts and to implement new features.
  
 \end_layout
 
-\begin_layout Standard
-
-\color white
-.
- 
-\end_layout
-
-\begin_layout Standard
-1.
- OFCP application must implement appropriate rules.
- E.g.
- correct scoring system 
-\end_layout
-
-\begin_layout Standard
-2.
- AI must have a level of sophistication such that it performs well vs humans
- and other AI 
-\end_layout
-
-\begin_layout Standard
-3.
- AI algorithms must be suitably optimised
-\end_layout
-
-\begin_layout Standard
-4.
- Website should have minimal downtime 
-\end_layout
-
-\begin_layout Standard
-5.
- Website should be responsive and quick to load
-\end_layout
-
-\begin_layout Standard
-6.
- Footprint of application must be low – if it were to be scaled up e.g.
- hundreds of concurrent users, server has to be able to handle this 
+\begin_layout Section
+Implementation
 \end_layout
 
 \begin_layout Subsection
@@ -2356,8 +2533,8 @@ Technologies
 \end_layout
 
 \begin_layout Standard
-Website and application created with HTML, CSS and Javascript with pages
- created dynamically with jinja2 templates.
+Website and application created with HTML, CSS and Javascript with OFCP
+ game page created dynamically with jinja2 templates.
 \end_layout
 
 \begin_layout Standard
@@ -2373,14 +2550,25 @@ Pure python networking with cherrypy, which is efficient and can handle
 \end_layout
 
 \begin_layout Standard
-Site hosted using DigitialOcean VPS running Ubuntu 14.04 with nginx reverse-proxy.
-\begin_inset CommandInset citation
-LatexCommand cite
-key "key-6"
+Site hosted using DigitialOcean VPS running Ubuntu 14.04 with CherryPy behind
+ nginx reverse-proxy
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+This tutorial was incredibly helpful for this purpose: 
+\color blue
+https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applica
+tions-using-a-cherrypy-web-server-behind-nginx 
+\end_layout
 
 \end_inset
 
-
+.
+ This allowed for a more robust system architecture with reduced stress
+ on the CherryPy server as nginx was configured to handle client requests,
+ meaning that scalability in the future is more feasible.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -2414,7 +2602,68 @@ tal branch without affecting or potentially breaking the master version.
 \end_layout
 
 \begin_layout Subsection
-Implementation 
+Intelligent Agent- algorithms, heuristics etc
+\end_layout
+
+\begin_layout Standard
+write it all here - monte carlo, descision rules for placements/ pruning,
+ EV.
+ Everything.
+ Wow.
+ Do it.
+ Soon.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+First 5 placements approach - find all permutations of possible placements
+ (13 choose 5 = ~1.2k) then remove duplicates (e.g.
+ ADAHAKASKD and KDASAHASAC - different order but effectively same state)
+ -> reduces max states to consider to ~240.
+ Next even more pruning/ optimisation by implementing heuristics to evaluate
+ hand and remove some obviously bad placements e.g.
+ if AI is dealt two cards of same rank, will always place these together
+ (removes states with these cards in separate rows).
+ Also applies to trips, four of a kind etc.
+ -> better the hand the less states considered.
+ Worst case scenario with 5 unique ranked cards no straight/ flush potential
+ = over 200 states, potentially suboptimal placements due to need to return
+ move decision in <= 5 seconds (very little time for each simulation - 5
+ seconds to simulate 200 states will not produce best results except with
+ exceptional hardware).
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Subsequent card placements a lot easier - carry out simulations for as many
+ seconds as possible (hardcoded limits can be tweaked in response to user
+ feedback [sweet spot 2-4s, 5s meets requirements but makes game feel somewhat
+ slow]).
+ Aggregates EV for placements in each row and choose highest result, update
+ state return placement info to frontend along with player's next card.
+ With only 3 choices to make (place card in top, middle or bottom) can potential
+ly get thousands of simulations for each placement which should give close
+ to optimal results - see limitations in reflection e.g.
+ potential for overvaluing moves.
+ Simulated random population of rest of board for scoring EV is naive but
+ works well most of the time.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+URI 
 \end_layout
 
 \begin_layout Standard
@@ -2721,7 +2970,7 @@ The Intelligent Agent generally favours optimal card placements, but because
  of the element of randomness in evaluating moves there is the potential
  for the AI to mistakenly over-value a sub-optimal move.
  As Whitehouse et al.
- (2013) state 
+ (2013, p5) state 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3253,44 +3502,62 @@ References
 \end_layout
 
 \begin_layout Itemize
-Mandziuk, J., 2010, Knowledge-Free and Learning-Based Methods in Intelligent
- Game Playing, p3
+Mandziuk, J., 2010, 
+\shape italic
+Knowledge-Free and Learning-Based Methods in Intelligent Game Playing
+\shape default
+, Springer Verlag
 \end_layout
 
 \begin_layout Itemize
-Shannon, C., 1950, Programming a Computer for Playing Chess, Philosophical
- Magazine, Ser .7, Vol.
+Shannon, C., 1950, 
+\shape italic
+Programming a Computer for Playing Chess
+\shape default
+, Philosophical Magazine, Ser .7, Vol.
  41, No.
- 314, p4
+ 314
 \end_layout
 
 \begin_layout Itemize
 Browne, C.
- Et al, 2012, A Survey of Monte Carlo Tree Search Methods, IEEE TRANSACTIONS
- ON COMPUTATIONAL INTELLIGENCE AND AI IN GAMES, VOL.
+ Et al, 2012, 
+\shape italic
+A Survey of Monte Carlo Tree Search Methods
+\shape default
+, IEEE TRANSACTIONS ON COMPUTATIONAL INTELLIGENCE AND AI IN GAMES, VOL.
  4, NO.
  1.
 \end_layout
 
 \begin_layout Itemize
 Cowling, P.
- Et al, 2012, Information Set Monte Carlo Tree Search, IEEE TRANSACTIONS
- ON COMPUTATIONAL INTELLIGENCE AND AI IN GAMES, VOL.
+ Et al, 2012, 
+\shape italic
+Information Set Monte Carlo Tree Search
+\shape default
+, IEEE TRANSACTIONS ON COMPUTATIONAL INTELLIGENCE AND AI IN GAMES, VOL.
  4, NO.
  2.
 \end_layout
 
 \begin_layout Itemize
 Whitehouse, D.
- Et al, 2013, Integrating Monte Carlo Tree Search with Knowledge-Based Methods
- to Create Engaging Play in a Commercial Mobile Game, University of York,
- p5
+ Et al, 2013, 
+\shape italic
+Integrating Monte Carlo Tree Search with Knowledge-Based Methods to Create
+ Engaging Play in a Commercial Mobile Game
+\shape default
+, University of York
 \end_layout
 
 \begin_layout Itemize
 Özcan, E.
- and Hulagu, B., 2004, A Simple Intelligent Agent for Playing Abalone Game:
- ABLA, Proc.
+ and Hulagu, B., 2004, 
+\shape italic
+A Simple Intelligent Agent for Playing Abalone Game: ABLA
+\shape default
+, Proc.
  of the 13th Turkish Symposium on Artificial Intelligence and Neural Networks,
  pp.
  281-290
@@ -3306,16 +3573,12 @@ http://scrambledeggsontoast.github.io/2014/06/26/artificial-intelligence-ofcp/
 \end_layout
 
 \begin_layout Itemize
-
-\color blue
-https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applica
-tions-using-a-cherrypy-web-server-behind-nginx 
-\end_layout
-
-\begin_layout Itemize
 Gerber, A.
- Et al, 2007, Implications of Rapid Development Methodologies, CSITEd 2007,
- p242-243
+ Et al, 2007, 
+\shape italic
+Implications of Rapid Development Methodologies
+\shape default
+, CSITEd 2007, p242-243
 \end_layout
 
 \end_body
