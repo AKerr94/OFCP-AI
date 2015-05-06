@@ -1800,18 +1800,19 @@ status open
 
 \begin_layout Plain Layout
 Warren is an OFCP bot which uses neural networks to train and improve, licensed
- for $7-79/month 
+ out for use at a cost of between $7-79/month depending on chosen package
+ (
 \color blue
-(https://www.playwarren.com/)
+https://www.playwarren.com/
 \color inherit
- 
+)
 \end_layout
 
 \end_inset
 
 .
  Even with such advanced techniques the game has not been solved, as evidenced
- with the modest claim 
+ by the modest claim that 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1820,9 +1821,9 @@ Warren is an OFCP bot which uses neural networks to train and improve, licensed
 \end_inset
 
 .
- Other implementations by hobbyist programmers for personal projects often
- make use of simple algorithms which leads to sub-optimal, exploitable play
- because of predictable or naïve behaviour.
+ Other implementations of Agents for OFCP by hobbyist programmers for personal
+ projects often make use of simple algorithms which leads to sub-optimal,
+ exploitable play because of predictable or naïve behaviour.
  This project aims to create an Intelligent Agent that performs well versus
  competent human players, and to do so will need to be able to do everything
  a human can in terms of making judgement calls, exploiting the player's
@@ -2202,18 +2203,19 @@ Artificial Intelligence in Poker
 \begin_layout Standard
 Pot limit poker solved.
  Not true for holdem.
- Where does OFC stand? Relatively low complexity for standard OFC, but other
- variants of OFC are much more complex e.g.
+ Where does OFC stand? Reasonable complexity for standard OFC, but other
+ variants of OFC are even more complex e.g.
  Pineapple OFC.
 \end_layout
 
 \begin_layout Standard
-That said, permutations for OFCP game state: deck of 52 cards, each player
+permutations for standard OFCP game state: deck of 52 cards, each player
  places 13 cards (26 total for a heads up game) 
 \end_layout
 
 \begin_layout Standard
-52 choose 26 = 495,918,532,948,104 ( 4.9591853e+14 ) 
+52 choose 26 = 495,918,532,948,104 ( 4.9591853e+14 ) [including duplicates]
+ 
 \end_layout
 
 \begin_layout Standard
@@ -2478,6 +2480,61 @@ data flow diagram of a game of chinese poker
 
 \begin_layout Subsection
 Design Overview
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Diagram-System-Architecture.png
+	lyxscale 60
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 3.3.1 - System Architecture Diagram
+\shape default
+
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Diagram-Software-Architecture.png
+	lyxscale 60
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 3.3.1 - Software Architecture Diagram
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
