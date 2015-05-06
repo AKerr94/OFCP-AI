@@ -2714,17 +2714,66 @@ Fig 3.3.2 - Software Architecture Diagram
 
 \end_layout
 
+\begin_layout Subsection
+Wireframe
+\end_layout
+
 \begin_layout Standard
-system flow diagram for application / system architecture diagram/ wireframes
+The Application's frontend will consist of one dynamic webpage, using Jinja2
+ templates to enable persistent information across multiple rounds, with
+ content dynamically updated and created using JavaScript.
+ Following Jakob Nielsen's general principles for interaction design (Nielsen,
+ 1994, p115), the interface for the site will be made as intuitive as possible
+ with a clear, well-structured layout.
+ The simpler the interface, the easier to understand and use, and following
+ this concept the wireframe mockup presented below was produced.
  
-\begin_inset Newline newline
+\begin_inset VSpace smallskip
 \end_inset
 
 
-\begin_inset Newline newline
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Diagram-Wireframe.png
+	lyxscale 80
+	scale 80
+
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 3.4.1 - Wireframe of the Interface demonstrating a clear, simple layout
+ in adherence to principles for interaction design
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The player and Intelligent Agent have distinct, separate play areas on either
+ side of the screen where they will place their respective cards.
+ Use of the interface is as simple as possible, with cards to be placed
+ appearing at the bottom of the screen to be dragged and dropped into free
+ positions on their board.
+ The process of starting a game, finalising card placements and moving onto
+ a new round will all be controlled through one button, making the game
+ process as simple and intuitive as possible for the user; there are no
+ surprises and behaviour remains consistent throughout the game.
+ This is in strict adherence to Nielsen's aforementioned usability principles,
+ specifically regarding consistency.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -2732,14 +2781,14 @@ Design Principles
 \end_layout
 
 \begin_layout Standard
-The design principle adhered to throughout the process of creating the applicati
-on will be Rapid Application Development using Evolutionary Prototyping,
- creating a functional prototype at each stage which can be refined and
+The design principle to adhere to throughout the process of creating the
+ application will be Rapid Application Development using Evolutionary Prototypin
+g, creating a functional prototype at each stage which can be refined and
  updated to implement new features and meet changing requirements per user
  feedback.
- This approach is ideal for the needs of the project as it allows for lots
- of flexibility and means that emphasis can be put on development, creating
- a functional or semi-functional application at each stage implementing
+ This approach is ideal for the needs of the project as it allows for a
+ flexible approach and means that emphasis can be put on development, creating
+ a functional or semi-functional application at each stage, implementing
  some of the planned features, meeting some of the requirements and being
  ready to build upon and develop further into a new version which improves
  upon itself.
@@ -3615,7 +3664,7 @@ B
 Combinatorial Explosion
 \series default
  is the phenomenon of exponential growth encountered in search problems.
- Deeper searches become increasingly complex increasing by the branching
+ Deeper searches become increasingly complex multiplying by the branching
  factor at each level
 \end_layout
 
@@ -3781,6 +3830,14 @@ Integrating Monte Carlo Tree Search with Knowledge-Based Methods to Create
  Engaging Play in a Commercial Mobile Game
 \shape default
 , University of York
+\end_layout
+
+\begin_layout Itemize
+Nielsen, J., 1994, 
+\shape italic
+Usability Engineering
+\shape default
+, San Diego: Academic Press
 \end_layout
 
 \begin_layout Itemize
