@@ -2471,16 +2471,26 @@ Use Case and Data Flow Diagrams
 \end_layout
 
 \begin_layout Standard
-use case diagram
+Most of the complexity of the Application will be hidden from the user,
+ with heavy processing of data and algorithms handled behind the scenes.
+ In terms of interaction with the application there will be a frontend interface
+ which will allow the user to interact with and play against the Intelligent
+ Agent.
+ At its highest level of abstraction from the user's perspective, a use
+ case can simply boil down to the diagram below.
+ 
+\begin_inset VSpace smallskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-data flow diagram of a game of chinese poker
-\end_layout
-
-\begin_layout Standard
+\align center
 \begin_inset Graphics
-	filename Use Case Diagram.png
+	filename Diagram-Use-Case .png
+	lyxscale 70
+	scale 70
 
 \end_inset
 
@@ -2488,6 +2498,107 @@ data flow diagram of a game of chinese poker
 \end_layout
 
 \begin_layout Standard
+\align center
+
+\shape italic
+Fig 3.2.1 - Highly abstract Use Case Diagram for the Application from an end
+ user's perspective
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A more useful analysis of how a user will interact with the Application
+ considers individual actions a user will need to be able to carry out,
+ which is presented below.
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Diagram-User-Actions.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 3.2.2 - Individual actions and events necessary for the user to interact
+ with the Application
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the Application to function there must be a sequential process of user
+ inputs followed by Application outputs, demanding further inputs and so
+ on.
+ For example, after a user places their cards for one round, the Application
+ must output a response with the Intelligent Agent's card placements as
+ well as the next card for the player to place.
+ In order for this to work there must be at least 2 tiers for the application:
+ a frontend and a backend.
+ The frontend will be responsible for displaying information to the user
+ and handling the interface, while the backend will be responsible for the
+ main processing tasks such as processing the game state, determining the
+ Intelligent Agent's moves and handling the game logic.
+ This will require a 2 way flow of information from the frontend of the
+ Application to the backend, with the frontend sending data describing the
+ user's inputs to the backend, which will process this and return a formatted
+ response which the frontend can interpret and display to the user.
+\end_layout
+
+\begin_layout Standard
+In practice, the Application will make use of a standard three tier architecture
+, with a frontend for client interacton; an Application layer for the processing
+ tasks and communication between the higher and lower tiers; and a database
+ for storage and management of game state information.
+ A data flow diagram has been constructed to visualise this process.
+ 
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Diagram-Data-Flow.png
+	lyxscale 60
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 3.2.3 - Data Flow Diagram modelling the 2 way flow of information in the
+ Application
+\begin_inset VSpace smallskip
+\end_inset
+
 
 \end_layout
 
@@ -2496,8 +2607,8 @@ Design Overview
 \end_layout
 
 \begin_layout Standard
-In the system design most client requests will be handled by a Web Server
- serving static content such as images, CSS and JavaScript files.
+Most client requests will be handled by a Web Server serving static content
+ such as images, CSS and JavaScript files.
  Dynamic requests, however, will be passed by the Web Server to an Application
  server, which will then process the request, undertaking any necessary
  interactions with other pieces of software before formatting and returning
@@ -2622,21 +2733,26 @@ Design Principles
 
 \begin_layout Standard
 The design principle adhered to throughout the process of creating the applicati
-on was Rapid Application Development using Evolutionary Prototyping, creating
- a functional prototype which was refined and updated to meet changing requireme
-nts and to implement new features.
- This approach was perfect for the needs of the project as it allowed for
- lots of flexibility and meant that emphasis could be put on development,
- creating a functional or semi-functional application at each stage which
- implemented some of the planned features, meeting some of the requirements
- and being ready to build upon and develop further into a new version which
- improves upon itself.
+on will be Rapid Application Development using Evolutionary Prototyping,
+ creating a functional prototype at each stage which can be refined and
+ updated to implement new features and meet changing requirements per user
+ feedback.
+ This approach is ideal for the needs of the project as it allows for lots
+ of flexibility and means that emphasis can be put on development, creating
+ a functional or semi-functional application at each stage implementing
+ some of the planned features, meeting some of the requirements and being
+ ready to build upon and develop further into a new version which improves
+ upon itself.
  This flexible style is naturally advantageous over a more traditional approach
  such as the Waterfall model which involves rigorously defining specifications
  from the start, which means making changes down the line becomes increasingly
  difficult and costly; such a style of development was appropriated from
  other industries before more suitable methodologies of software development
  were formalised.
+ Rapid Application Development allows for a versatile development-driven
+ approach which naturally incorporates user feedback, design and testing
+ as part of the cyclic process, which hopefully will result in a better,
+ well-rounded final product.
  
 \end_layout
 
