@@ -2480,6 +2480,22 @@ data flow diagram of a game of chinese poker
 
 \begin_layout Subsection
 Design Overview
+\end_layout
+
+\begin_layout Standard
+In the system design most client requests will be handled by a Web Server
+ serving static content such as images, CSS and JavaScript files.
+ Dynamic requests, however, will be passed by the Web Server to an Application
+ server, which will then process the request, undertaking any necessary
+ interactions with other pieces of software before formatting and returning
+ a response.
+ This response will then be passed up from the Application Server to the
+ Web Server and from there back to the client's browser.
+ The diagram below illustrates this process.
+ 
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace smallskip
 \end_inset
 
@@ -2503,8 +2519,45 @@ Design Overview
 
 \shape italic
 Fig 3.3.1 - System Architecture Diagram
-\shape default
+\end_layout
 
+\begin_layout Standard
+\align center
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A lower level of abstraction from this System Architecture considers specific
+ technologies which will enable the system to function as a whole.
+ The Application will be hosted using a Virtual Private Server running Ubuntu
+ 14.04, aided by various technologies.
+ Use of HTML, CSS and JavaScript will be largely responsible for the frontend
+ of the application and will be served using an Nginx reverse proxy server.
+ In order to produce dynamic web pages Jinja2 templates will be utilised,
+ which will be served through Nginx by an Application Server implemented
+ with CherryPy, a Pythonic Web Application Framework.
+ User actions which require a response will be handled using JavaScript
+ which will send HTTP POST requests containing the game state information
+ to the CherryPy server.
+ Here, the request will be parsed and sent on to the backend for processing,
+ which will be handled with Python scripts.
+ The backend will validate the sent game state and call helper functions
+ and scripts to handle processes such as hand evaluation and scoring, handling
+ the Intelligent Agent's turn and dealing cards.
+ If everything is in order and once all necessary processes have been completed,
+ the game state will be stored in a MongoDB document-oriented database,
+ and an appropriate response containing information for the frontend will
+ be formatted and sent back to the client.
+ The JavaScript will parse and handle this response, reflecting the updates
+ to the game state on the web page by dynamically creating and updating
+ HTML DOM Element Objects.
+ 
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace smallskip
 \end_inset
 
@@ -2527,7 +2580,7 @@ Fig 3.3.1 - System Architecture Diagram
 \align center
 
 \shape italic
-Fig 3.3.1 - Software Architecture Diagram
+Fig 3.3.2 - Software Architecture Diagram
 \end_layout
 
 \begin_layout Standard
@@ -2547,14 +2600,7 @@ system flow diagram for application / system architecture diagram/ wireframes
 \begin_inset Newline newline
 \end_inset
 
-html css and javascript for website/ app.
- Javascript handles front end, sends POST ‘reqwest’s with game state to
- cherrypy server – backend – which validates the sent game state and then
- calls helper functions (python scripts) for hand evaluation, handling AI
- simulations etc.
- , updates the game state in the database, and returns appropriate response
- e.g.
- cards to be placed, scores at end of game
+
 \end_layout
 
 \begin_layout Subsection
