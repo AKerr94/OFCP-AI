@@ -625,9 +625,9 @@ Problem Description
 
 \begin_layout Standard
 Creating sophisticated Intelligent Agents for games with large branching
- factors poses a significant issue, as for the Agent to perform well it
- must be able to search many moves ahead of the current state in order to
- find the optimal move.
+ factors poses a significant challenge, as for the Agent to perform well
+ it must be able to search many moves ahead of the current state in order
+ to find the optimal move.
  With every additional level of depth searched in a game tree the complexity
  of the search increases exponentially due to combinatorial explosion; at
  a depth of 
@@ -2476,6 +2476,19 @@ use case diagram
 
 \begin_layout Standard
 data flow diagram of a game of chinese poker
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Use Case Diagram.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Subsection
