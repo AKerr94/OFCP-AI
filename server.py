@@ -15,7 +15,7 @@ import game_logic
 #from config import application_config, cherrypy_config
 
 
-class subpage(object):
+class api(object):
 
     def ofc_backend(self, **params):
         ''' This page handles the OFC backend
@@ -41,8 +41,7 @@ class subpage(object):
     ofc_backend.exposed = True
 
 class Root(object):
-    #make a subpage
-    subpage = subpage()
+    api = api()
 
     def make_game(self, player_first=True, score =0, roundNum =0 ):
         games = db_backend.get_database_collection()

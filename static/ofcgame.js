@@ -391,7 +391,7 @@ function POST_reqwest(thenFunction) {
     tarray2 = t[1];
 
     reqwest({
-            'url': 'http://alastairkerr.co.uk/ofc/subpage/ofc-backend/',
+            'url': 'http://alastairkerr.co.uk/ofc/api/ofc-backend/',
             'method': 'post',
             'data': {
                 "game-id": gameId,

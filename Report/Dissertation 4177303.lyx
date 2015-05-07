@@ -1927,6 +1927,80 @@ Background
 Game Theory 
 \end_layout
 
+\begin_layout Subsubsection
+Minimax 
+\end_layout
+
+\begin_layout Standard
+While game theory has been discussed at least as far back as 1713, it wasn't
+ until John von Neumman's research into the field that game theory was establish
+ed as a mathematical discipline.
+ Neumann's early efforts focused on proving the minimax theorem, which was
+ put forward in his 1928 paper 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Zur Theorie der Gesellschaftsspiele
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+ (The Theory of Board Games).
+ Proving the minimax theorem was considered by Neumman to be of utmost importanc
+e, saying 
+\begin_inset Quotes eld
+\end_inset
+
+I thought there was nothing worth publishing until the Minimax Theorem was
+ proved
+\begin_inset Quotes erd
+\end_inset
+
+ (Casti, 1996, p19).
+ The minimax theorem states that in any finite zero-sum two player game
+ there exists strategies for each player that minimise their maximum losses
+ (hence minimax).
+ These strategies must consider their adversary's possible responses, and
+ the strategy which minimises a player's maximum losses is known as the
+ optimal strategy.
+ Expanding on his 1928 paper, Neumman co-authored 
+\shape italic
+
+\begin_inset Quotes eld
+\end_inset
+
+Theory of Games and Economic Behavior
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+ in 1944, which presented a different proof of the minimax theorem, extending
+ the theorem to include imperfect information games and games with more
+ than two players.
+ This 1944 publication was the first formal, coherent book in the field
+ of game theory and is the basis for modern game theory.
+ .
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Minimax tree search explores potential moves, looking for moves that maximise
+ a player's chance of winning.
+ It is not useful to explore moves tjat 
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
 Game theory – John von Neumann.
  Traditional Game Search: e.g.
@@ -2242,29 +2316,447 @@ Hand Evaluation Algorithms
 \end_layout
 
 \begin_layout Standard
-Naïve – non-optimal and non-trivial to implement.
- Simple histogram algorithm can be used to rank high card, pair, two pair,
- trips, full house, quads, but needs extra steps to check flushes, straights,
- kickers etc.
- -> use this approach for bespoke 3 card evaluator for top row in OFC.
- Very low complexity, efficiency not as much a concern as with 5 card hands.
+For any Poker game - and indeed for any Poker AI - hand evaluator functions
+ are necessary to rank, score and compare hands.
+ A naïve approach to the problem could involve step-by-step comparison of
+ a given hand against each entry in a comprehensive list of hands and matching
+ ranks.
+ Such a technique would generally prove efficient in terms of time-complexity
+ and could prove to be significantly faster than performing scoring calculations
+ on demand.
+ One problem with this approach however is that it would necessarily involve
+ pre-computation and scoring of every single possible hand combination,
+ which would undoubtedly be a lengthy process.
+ Another issue is potential memory and space constraints, dependent on the
+ system and application in question.
+ There are 
+\begin_inset Formula $\binom{52}{5}=2,598,960$
+\end_inset
+
+ possible Poker Hands, and representation of each would amount to a sizeable
+ lookup table
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+For example, this Poker hand lookup table is 100MB (
+\color blue
+https://github.com/chenosaurus/poker-evaluator/blob/master/data/HandRanks.dat
+\color inherit
+) 
+\end_layout
+
+\end_inset
+
+.
+ This could prove problematic for example in the case of a pre-packaged
+ application; it would be incredibly undesirable to include such a large
+ file.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+In situations where such a technique is infeasible or undesirable, for example
+ due to memory constraints, other approaches are possible.
+ On-demand hand evaluation can be achieved in a variety of ways, for example
+ through a simple histogram approach which reads in a hand and records the
+ frequency of each card rank.
+ Using this information the evaluator would be able to work out the hands
+ rank based on highest rank frequencies.
+ For example, a hand consisting of 
+\begin_inset Quotes eld
+\end_inset
+
+2 of diamonds, 2 of hearts, 5 of clubs, 7 of spades, King of diamonds
+\begin_inset Quotes erd
+\end_inset
+
+ would be represented in a histogram as seen below.
+\begin_inset VSpace smallskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-A faster, more efficient algorithm means more hands can be evaluated more
- quickly leading to higher responsiveness and more optimal play – e.g.
- able to evaluate more hands in deeper, broader searches.
- Using “kmanley”’s 5 card poker hand evaluator (handles all hands properly
- e.g with kickers etc, reasonable efficiency compared to other algorithms,
- understandable, performs better than other simple naive algorithms).
- Written in python so can be easily used in conjunction with my backend
- (cherrypy server)
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="14">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Card Rank
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+9
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+J
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Q
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+K
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Rank Frequency
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-More efficient poker hand evaluators are available, however generally written
- in much more efficient languages such as C - cannot be used in conjunction
- with pypy.
+\align center
+
+\shape italic
+Table 2.3.1 - Demonstrating how a histogram approach would store information
+ about a hand
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this example the evaluator would then analyse the histogram, recognising
+ that the highest frequency rank was 2 (indicating a pair), and that no
+ other frequency was higher than 1 (indicating there is no second pair),
+ and that the highest ranked card with a frequency above 0 was a King.
+ A potential format of this information could be along the lines of 
+\begin_inset Formula $[1,2,13]$
+\end_inset
+
+, where the first number indicates the overall hand rank (1 signifying a
+ Pair), the second number indicating the rank of the card with this frequency
+ (2), and the third number indicating the kicker (13 signifying a King).
+ This could then be used directly elsewhere for comparison, or interpreted
+ into a more readable format such as 
+\begin_inset Quotes eld
+\end_inset
+
+Pair of 2s, King kicker
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The advantage of this approach comes in its simplicity as it is trivial
+ to implement and easy to understand, and provides a strong compromise between
+ space and time complexity.
+ One limitation to note is that simply mapping frequencies of hands is not
+ enough to produce complete results; additional consideration must be made
+ to check for straights and flushes.
+ However, this does not pose a significant challenge, as simple checks can
+ be made if the highest frequency found is 1 to see whether all the suits
+ are the same, or if the 5 cards are sequential.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+These kind of approaches to hand evaluation have reasonable efficiency,
+ with the potential to evaluate hundreds of thousands of poker hands per
+ second, and considering the relative ease of implementation are perfect
+ for most purposes.
+ However, more efficient algorithms require less processing power enabling
+ higher throughput and faster execution times, and as such can be hugely
+ beneficial for large scale applications.
+ Other approaches to hand evaluators generally are not so simple, using
+ shrewd techniques and taking full advantage of the efficiency of low level
+ languages such as C.
+ One such evaluator is Cactus Kev's
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+For more information on how this algorithm works see here (
+\color blue
+http://www.suffecool.net/poker/evaluator.html
+\color inherit
+)
+\end_layout
+
+\end_inset
+
+, the principle component of which is the realisation that while there are
+ 2,598,960 possible combinations of Poker Hands, these can be sorted into
+ 7462 distinct categories.
+ Through the use of various methods including efficient card representations,
+ bitwise operations, lookup tables and binary searches, an incredibly fast
+ hand evaluator can be constructed.
+ The main disadvantage of using such an approach is the complexity to implement,
+ and the ease of deployment is entirely dependent on the specific environment
+ due to the nature of compiled C code.
+ In addition, the feasibility of using such an evaluator is dependent on
+ the compatibility of any other technologies and languages used.
  
 \end_layout
 
@@ -2471,6 +2963,10 @@ Use Case and Data Flow Diagrams
 \end_layout
 
 \begin_layout Standard
+Cheng is a gambling degenerate who wishes to improve his OFC gameplay 
+\end_layout
+
+\begin_layout Standard
 Most of the complexity of the Application will be hidden from the user,
  with heavy processing of data and algorithms handled behind the scenes.
  In terms of interaction with the application there will be a frontend interface
@@ -2674,7 +3170,7 @@ A lower level of abstraction from this System Architecture considers specific
  If everything is in order and once all necessary processes have been completed,
  the game state will be stored in a MongoDB document-oriented database,
  and an appropriate response containing information for the frontend will
- be formatted and sent back to the client.
+ be produced in JSON format and sent back to the client.
  The JavaScript will parse and handle this response, reflecting the updates
  to the game state on the web page by dynamically creating and updating
  HTML DOM Element Objects.
@@ -2766,11 +3262,11 @@ The player and Intelligent Agent have distinct, separate play areas on either
  side of the screen where they will place their respective cards.
  Use of the interface is as simple as possible, with cards to be placed
  appearing at the bottom of the screen to be dragged and dropped into free
- positions on their board.
+ positions on the board.
  The process of starting a game, finalising card placements and moving onto
- a new round will all be controlled through one button, making the game
- process as simple and intuitive as possible for the user; there are no
- surprises and behaviour remains consistent throughout the game.
+ a new round will all be controlled through one dynamic button, making the
+ game process as simple and intuitive as possible for the user; there are
+ no surprises and behaviour remains consistent throughout the game.
  This is in strict adherence to Nielsen's aforementioned usability principles,
  specifically regarding consistency.
  
@@ -2853,7 +3349,7 @@ tions-using-a-cherrypy-web-server-behind-nginx
 \end_layout
 
 \begin_layout Standard
-Game states stored in database using mongodb (which is a document-oriented
+Game states stored in database using MongoDB (which is a document-oriented
  database as opposed to a traditional relational database which decreases
  development time and reduces complexity as there is no need to constantly
  transform the data when reading from the database into the python backend.
@@ -2944,13 +3440,15 @@ ly get thousands of simulations for each placement which should give close
 \end_layout
 
 \begin_layout Subsection
-URI 
+Live Implementation
 \end_layout
 
 \begin_layout Standard
-
+The Application is available and playable at the following URI:
 \color blue
-http://www.alastairkerr.co.uk/ofc
+ http://www.alastairkerr.co.uk/ofc
+\color inherit
+ 
 \end_layout
 
 \begin_layout Section
@@ -3779,7 +4277,7 @@ Zero-Sum Game
 \end_layout
 
 \begin_layout Section
-References
+Bibliography
 \end_layout
 
 \begin_layout Itemize
@@ -3787,7 +4285,7 @@ Mandziuk, J., 2010,
 \shape italic
 Knowledge-Free and Learning-Based Methods in Intelligent Game Playing
 \shape default
-, Springer Verlag
+, Springer-Verlag
 \end_layout
 
 \begin_layout Itemize
@@ -3798,6 +4296,47 @@ Programming a Computer for Playing Chess
 , Philosophical Magazine, Ser .7, Vol.
  41, No.
  314
+\end_layout
+
+\begin_layout Itemize
+Von Neumann, J, 1928, 
+\shape italic
+Zur Theorie der
+\shape default
+ 
+\shape italic
+Gesellschaftsspiele,
+\shape default
+ Math.
+ Annalen.
+ 100, 295-320
+\end_layout
+
+\begin_layout Itemize
+Von Neumann, J.
+ and Morgenstern, O., 1944
+\shape italic
+, Theory of Games and Economic Behavior
+\shape default
+, Princeton University Press
+\end_layout
+
+\begin_layout Itemize
+Casti, J., 1996, 
+\shape italic
+Five golden rules: great theories of 20th-century mathematics – and why
+ they matter
+\shape default
+, New York: Wiley-Interscience
+\end_layout
+
+\begin_layout Itemize
+Kjeldsen, T., 2001, 
+\shape italic
+John von Neumann’s Conception of the Minimax Theorem: A Journey Through
+ Different Mathematical Contexts,
+\shape default
+ Springer-Verlag
 \end_layout
 
 \begin_layout Itemize
