@@ -241,7 +241,8 @@ algorithms
 \shape italic
 heuristics
 \shape default
- in this area can have on other fields of study such as 
+ in this area can have beyond the domain of game-playing in other fields
+ of study such as 
 \shape italic
 Automated Planning and Scheduling
 \shape default
@@ -1354,7 +1355,7 @@ Open Face Chinese Poker does not have such an astronomical space state or
 \begin_inset Formula $52!\approx8\times10^{67}$
 \end_inset
 
-permutations of a standard deck of cards, representation of each possible
+ permutations of a standard deck of cards, representation of each possible
  state in a game tree invokes a combinatorial explosion of branching factor.
  An upper-bound
 \begin_inset Foot
@@ -1949,6 +1950,16 @@ Background
 Game Theory 
 \end_layout
 
+\begin_layout Standard
+In game theory, a zero-sum perfect information game such as Chess or Checkers
+ can be formalised as a search problem, representing possible game states
+ in a game tree (Özcan, 2004, p282).
+ Such a tree can be explored and analysed in order to determine the best
+ move from a given position, and to do so it is necessary to implement some
+ form of search algorithm.
+ 
+\end_layout
+
 \begin_layout Subsubsection
 Minimax 
 \end_layout
@@ -1995,7 +2006,7 @@ Theory of Games and Economic Behavior
 Minimax searches a game tree, looking for moves that maximise a player's
  chance of winning.
  A minimax approach uses an evaluation function to score possible game states,
- choosing the moves that leads to the highest expected value for a given
+ choosing the moves that lead to the highest expected value for a given
  Agent.
  Implementation of a minimax search assumes that the opponent will play
  optimally and thus choose the next state with the lowest score from the
@@ -2004,7 +2015,7 @@ Minimax searches a game tree, looking for moves that maximise a player's
  evaluation function, but explores nodes unnecessarily and takes a very
  long time because it will exhaustively expand the game tree, and due to
  combinatorial explosion is prohibitively slow for all but the most simple
- of games, or when exploration of the tree is limited to a shallow depth.
+ of games, or when exploration of the tree is limited to a certain depth.
  Tic-Tac-Toe for example has 
 \begin_inset Formula $9!=362,880$
 \end_inset
@@ -2023,9 +2034,13 @@ Alpha-Beta Pruning
 \begin_layout Standard
 Alpha-Beta Pruning is an optimisation of the minimax algorithm, reducing
  the number of nodes that must be visited in a search.
- This is achieved through keeping track of and updating two scores; Alpha,
- which keeps a record of the best score possible by any means; and Beta,
- the worst-case scenario for the opponent.
+ It was discovered independently a number of times by various researchers
+ throughout the mid 20th century, and Arthur Samuel implemented an early
+ version for Checkers in 1959 (Samuel, 1959, p210-229).
+ This optimisation of the minimax algorithm is achieved through keeping
+ track of and updating two scores; Alpha, which keeps a record of the best
+ score possible by any means; and Beta, the worst-case scenario for the
+ opponent.
  Any move with a value lower than this Alpha score can safely be pruned
  since a better move has already been found, and with the Beta value it
  can be assumed that any discovered move with a value higher than this will
@@ -2036,33 +2051,43 @@ Alpha-Beta Pruning is an optimisation of the minimax algorithm, reducing
  as these branches could not possibly influence the final decision, and
  therefore Alpha-Beta Pruning returns the exact same move as a standard
  minimax approach would, but does so faster and more efficiently.
- Assuming that best moves are always searched first, the number of leaf
- nodes evaluated is 
+ In the worst case Alpha-Beta Pruning must examine 
+\begin_inset Formula $O(b^{d})$
+\end_inset
+
+ leaf nodes, although assuming that best moves are always searched first,
+ the number of leaf nodes evaluated will be as low as 
 \begin_inset Formula $O(\sqrt{b^{d}})$
 \end_inset
 
 , reducing the branching factor to its square root, effectively meaning
- a search can be made to twice the depth with same amount of computation
+ a search can be made to twice the depth with the same amount of computation
  (Russell, 2003).
  
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
+\begin_layout Subsection
+Solving Games
 \end_layout
 
 \begin_layout Standard
-Naïve minimax vs alpha-beta pruning: AB pruning eliminates branches of the
- search tree where a possibility has been found which is worse than a previously
- examined move, meaning this branch cannot possibly influence the final
- decision.
- These traditional methods work well for e.g.
- chess, checkers, but are generally insufficient for more complex games
- that cannot be ‘solved’ e.g.
- imperfect information games such as poker.
+Even with optimised approaches to game tree searches, due to high average
+ branching factors managing and mitigating the complexity of game trees
+ remains a challenge.
+ Simple games such as Tic-Tac-Toe can be trivially solved, and even more
+ complex games like Checkers can be weakly solved with traditional algorithms.
+ However, solving more complex games such as Chess and Go still remains
+ a challenge.
+ Chess can be partially solved with retrograde algorithms, solved for only
+ some positions or when using smaller non-standard boards.
+ Solving Chess is generally considered impossible with modern technology,
+ and it is debatable as to whether future improves in computer processing
+ speeds will one day allow for brute-force solving of the game.
+ Intelligent Agents for Go generally can only perform well in a limited
+ capacity, such as when playing on a much smaller than usual board.
+ It is not expected for full-size 19x19 board Go to be solved anywhere in
+ the immediate future, although modern approaches to the problem have produced
+ somewhat promising progress in terms of performance.
  
 \begin_inset VSpace smallskip
 \end_inset
@@ -2071,51 +2096,429 @@ Naïve minimax vs alpha-beta pruning: AB pruning eliminates branches of the
 \end_layout
 
 \begin_layout Standard
-Checkers state complexity: 10
-\begin_inset script superscript
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="4">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
 
 \begin_layout Plain Layout
-20
+
+\series bold
+Game
 \end_layout
 
 \end_inset
-
- (relatively low complexity, weakly solved with traditional algorithms)
-\end_layout
-
-\begin_layout Standard
-Chess state complexity: 10
-\begin_inset script superscript
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
 
 \begin_layout Plain Layout
-47
+
+\series bold
+State-Space Complexity
 \end_layout
 
 \end_inset
-
- (higher complexity, partially solved e.g.
- with retrograde algorithms.
- May be impossible to solve with current technology) 
-\end_layout
-
-\begin_layout Standard
-Go state complexity: 10
-\begin_inset script superscript
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
 
 \begin_layout Plain Layout
-171
+
+\series bold
+Solved
 \end_layout
 
 \end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
 
- (very high complexity, unlikely for strong AI to come out for many years)
+\begin_layout Plain Layout
+
+\series bold
+Method
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Tic-Tac-Toe
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10{}^{3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Strongly
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Traditional Algorithms
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Checkers
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10{}^{20}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Weakly
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Traditional Algorithms
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Chess
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10{}^{47}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Partially
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Retrograde Analysis
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Go 19x19
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10{}^{171}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-1940s: Monte Carlo methods formalised.
- 2006: Remi Coulom proposed Monte Carlo Tree Search – run random simulations
- and build search trees from the results.
+\align center
+
+\shape italic
+Table 2.2.1 - Showing the current state of some popular board games 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Games of Chance and Imperfect Information
+\end_layout
+
+\begin_layout Standard
+The aforementioned board games have all been zero-sum perfect information
+ deterministic games, which makes them well suited for the application of
+ traditional search methods such as minimax and its derivatives.
+ However, games such as Poker are stochastic in nature because of random
+ cards, and in addition to any elements of imperfect information, this presents
+ a challenge for implementation of an Intelligent Agent.
+ Imperfect Information game trees can be made, using chance and decision
+ nodes that are grouped into information sets, however since these nodes
+ are not independent it means that algorithms such as Alpha-Beta Pruning
+ cannot be used (Dizman, n.d, p3).
  
+\end_layout
+
+\begin_layout Subsection
+Monte Carlo 
+\end_layout
+
+\begin_layout Standard
+Monte Carlo methods are computational algorithms which use random sampling
+ over multiple trial runs in order to obtain usable, numerical results.
+ Modern Monte Carlo methods have origins in the 1940s during work on nuclear
+ weapons projects, and were used in the simulations required for the Manhattan
+ Project, although were limited by the lack of technology at the time (Eckhardt,
+ 1987, p131).
+ 
+\end_layout
+
+\begin_layout Standard
+Implementation of Monte Carlo methods generally involves defining possible
+ inputs and then randomly generating inputs within this range, computing
+ the value or result for each simulation and finally aggregating results.
+ An example of this process is illustrated below in the context of calculating
+ 
+\begin_inset Formula $\pi$
+\end_inset
+
+ by random distribution of points within a given area.
+ As the number of trials increases the fraction of points distributed within
+ the circle's area diverges on 
+\begin_inset Formula $\frac{\pi}{4}$
+\end_inset
+
+, which can then be multiplied by 4 to give a reasonably accurate estimation
+ of 
+\begin_inset Formula $\pi$
+\end_inset
+
+.
+ 
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename monte_carlo_pi_stage1.png
+	lyxscale 55
+	scale 55
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename monte_carlo_pi_stage2.png
+	lyxscale 55
+	scale 55
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Graphics
+	filename monte_carlo_pi_stage3.png
+	lyxscale 55
+	scale 55
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename monte_carlo_pi_stage4.png
+	lyxscale 55
+	scale 55
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 2.4.1 - Monte Carlo used in estimating the value of pi
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Images licensed under Creative Commons 3.0, Author: CaitlinJo
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Monte Carlo Methods have applications in a wide range of fields from physics
+ and mathematics to business and finance, and can be particularly useful
+ in applications where domain specific knowledge is limited or difficult
+ to implement.
+ 
+\end_layout
+
+\begin_layout Subsection
+Monte Carlo Tree Search
+\end_layout
+
+\begin_layout Standard
+Monte Carlo methods can be used with good results for applications in games,
+ and since 2006 have been developed into a technique called 
+\shape italic
+Monte Carlo Tree Search
+\shape default
+ 
+\shape italic
+(MCTS)
+\shape default
+, a term coined by Rémi Coulom during his application of the method to play
+ Go through expansion of the search tree based on random sampling (Coulom,
+ 2007, p72-83).
+ In MCTS, simulated games or 
+\shape italic
+playouts
+\shape default
+ are played out to the end through random move selection, and the final
+ result of each simulation is used to weight the nodes used, meaning that
+ better nodes are more likely to be chosen in future playouts.
+ MCTS in its most basic form follows a fairly simply process, generating
+ and scoring a search tree node by node according to the results of the
+ simulated playouts.
+ The diagram below illustrates this.
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename MCTS algorithm graphic.png
+	lyxscale 58
+	scale 58
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 2.5.1 - Methodology of a Monte Carlo Tree Search (Figure from Chaslot
+ et al., 2008)
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace smallskip
 \end_inset
 
@@ -2124,52 +2527,37 @@ Go state complexity: 10
 
 \begin_layout Standard
 MCTS has quickly gained traction as a strong general purpose algorithm for
- AI in games due to its effective results with (if properly implemented)
- low space and time complexity.
- MCTS concentrates on analysing the most promising moves, basing the expansion
- of the search tree on random sampling of the search space.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The game tree in MCTS grows asymmetrically, concentrating on searching more
- promising branches.
- Because of this it achieves better results than classical algorithms in
- games with a high branching factor.
+ AI in games due to its effective results with potentially low space and
+ time complexity.
+ The game tree in MCTS grows asymmetrically, with more promising branches
+ being favoured for exploration.
+ Because of this MCTS can be more efficient than traditional algorithms
+ and produce better results as it is better suited to dealing with the problems
+ posed by high branching factors.
  One of the most enticing benefits of MCTS is that it requires no strategic
  or tactical knowledge about a problem domain other than end conditions
  and legal moves, making MCTS implementations flexible and applicable to
- a variety of problem domains with little modification.
+ a variety of problem domains with little modification (Browne et al., 2012,
+ p9).
  
+\end_layout
+
+\begin_layout Subsubsection
+Upper Confidence Bounds Enhancement
+\end_layout
+
+\begin_layout Standard
+While the basic MCTS algorithm is not perfect, there have been many proposed
+ enhancements.
+ Perhaps the most well known of these uses an 
+\shape italic
+Upper Confidence Bounds 
+\shape default
+formula formalised by Kocsis and Szepesvári (2006, p1-12), as shown below.
 \end_layout
 
 \begin_layout Standard
 \begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-“The basic MCTS algorithm is simplicity itself: a search tree is built,
- node by node, according to the outcomes of simulated playouts.
- The process can be broken down into the following steps: 
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Graphics
-	filename MCTS algorithm graphic.png
-	lyxscale 85
-	scale 85
-
 \end_inset
 
 
@@ -2177,45 +2565,10 @@ The game tree in MCTS grows asymmetrically, concentrating on searching more
 
 \begin_layout Standard
 \align center
--
-\color blue
- http://www.cameronius.com/research/mcts/about/index.html
-\color inherit
- 
-\begin_inset Quotes erd
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Basic algorithm can be weak, but there are many enhancements e.g.
- Upper Confidence Bounds for Trees (UCT), used in 90% of MCTS applications.
- UCB formula: 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 \begin_inset Formula $v_{i}+C\times\sqrt{\frac{\ln N}{n_{i}}}$
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
 \begin_inset VSpace smallskip
 \end_inset
 
@@ -2223,86 +2576,106 @@ Basic algorithm can be weak, but there are many enhancements e.g.
 \end_layout
 
 \begin_layout Standard
-“where vi is the estimated value of the node, ni is the number of the times
- the node has been visited and N is the total number of times that its parent
- has been visited.
- C is a tunable bias parameter.
- Exploitation vs Exploration The UCB formula provides a good balance between
- the exploitation of known rewards and the exploration of relatively unvisited
- nodes to encourage their exercise.
- Reward estimates are based on random simulations, so nodes must be visited
- a number of times before these estimates become reliable; MCTS estimates
- will typically be unreliable at the start of a search but converge to reliable
- estimates given sufficient time and perfect estimates given infinite time.”
+\begin_inset Formula $v_{i}$
+\end_inset
+
+ is the estimated value of a node, 
+\begin_inset Formula $C$
+\end_inset
+
+ is a tunable exploration parameter, 
+\begin_inset Formula $n_{i}$
+\end_inset
+
+ is the number of times the nodes has been visited and 
+\begin_inset Formula $N$
+\end_inset
+
+ is the total number of times the node's parent has been visited.
+ This enhancement proves a strong balance between exploitation of high scoring
+ nodes and exploration of nodes that have not been explored thoroughly.
+ As with any method based on random sampling, initial estimates will not
+ be reliable but over time and with more iterations the results will diverge
+ on finding the optimal move.
+ Use of UCB with MCTS is known as the 
+\shape italic
+Upper Confidence Bounds for Trees
+\shape default
+ (UCT) method.
  
 \end_layout
 
 \begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
+Because of the asymmetric tree growth MCTS is suitable for deep and broad
+ explorations of larger search spaces that would be infeasible for a typical
+ search algorithm, and because of the adaptability in regards to exploitation
+ and exploration, optimal moves will be found and focused on.
+ MCTS therefore has revolutionised Artificial Intelligence approaches, most
+ notably in Go which has seen various successful applications of MCTS and
+ MCTS with UCT to create sophisticated Intelligent Agents which present
+ a credible challenge to even skilled human opponents
+\begin_inset Foot
+status open
 
+\begin_layout Plain Layout
 
-\end_layout
-
-\begin_layout Standard
-Improvements to MCTS? Light playouts – random moves.
- Heavy playouts utilise heuristics to influence choice of moves.
- “MCTS and UCT Kocsis and Szepervari (2006) first formalised a complete
- MCTS algorithm using UCB and dubbed it the Upper Confidence Bounds for
- Trees (UCT) method.
- This is the algorithm used in the vast majority of current MCTS implementations.
- UCT may be described as a special case of MCTS, that is: UCT = MCTS + UCB”
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-“Previous work has adapted MCTS to games which, like Spades, involve hidden
- information.
- This has led to the development of the Information Set Monte Carlo Tree
- Search (ISMCTS) family of algorithms (Cowling, Powley, and Whitehouse 2012).
- ISMCTS achieves a higher win rate than a knowledge-based AI developed by
- AI Factory for the Chinese card game Dou Di Zhu, and also performs well
- in other domains.
- ISMCTS uses determinizations, randomisations of the current game state
- which correspond to guessing hidden information.
- Each determinization is a game state that could conceivably be the actual
- current state, given the AI player’s observations so far.”
-\end_layout
-
-\begin_layout Standard
--
+\color black
+'Human-Computer Go Challenges'
 \color blue
- http://www.aaai.org/ocs/index.php/AIIDE/AIIDE13/paper/viewFile/7369/7595 
+ http://www.computer-go.info/h-c/index.html
+\color inherit
+ (Accessed 2015)
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace smallskip
 \end_inset
 
+.
+ 
+\end_layout
 
+\begin_layout Subsubsection
+Information Set Monte Carlo Tree Search
 \end_layout
 
 \begin_layout Standard
-ISMTCS useful for games like traditional Texas Hold’Em poker where each
- player is privy to information that others are not – i.e.
- their own cards.
- ISMTCS can model various possible game states/ permutations of what other
- players could have – guessing other players cards based on previous information.
- Not needed for OFCP because all players have the same information – cards
- are placed face up.
- However, could come into play for custom variants of OFC, such as pineapple
- – e.g.
- to model which cards are unlikely to have appeared based on how they play;
- if a player has a king on bottom row but does not pair it in the next hand
- then it is almost certain that the discarded card is not a King.
+Information Set Monte Carlo Tree Search (ISMCTS) follows on from application
+ of MCTS to games involving hidden information, aiming to overcome the shortcomi
+ng of previous approaches to dealing with hidden information such as determinisa
+tion techniques.
+ ISMCTS uses randomisations of the current game state to make guesses of
+ hidden information, with each determinisation conceivably representing
+ what could actually be the current game state based on the Agent's observations
+ so far (Whitehouse et al, 2013, p101).
+ 
+\end_layout
+
+\begin_layout Standard
+ISMTCS is useful for games like traditional Texas Hold’Em poker where elements
+ of hidden information mean an Agent lacks all necessary information to
+ make a well-informed decision.
+ ISMTCS models various possible game state variations of what other players
+ could have, attempting to guess other players cards based on previous informati
+on.
+ An advantage of ISMCTS over approaches such as determinised UCT is the
+ use of better strategies which more closely resemble the decision making
+ processes that a human player would make (Cowling et al, 2012, p121).
+ 
+\end_layout
+
+\begin_layout Standard
+This approach is not needed for standard OFCP because it is a perfect informatio
+n game.
+ However, ISMCTS could come into play in an implementation of a custom variant
+ of OFCP such as Pineapple OFC, which does have elements of hidden information
+ due to players secretly discarding one of their dealt cards each hand.
+ ISMCTS could be used to model which cards are unlikely to have appeared
+ based on how the opponent plays; for example, if a player has a King on
+ bottom row but does not pair it in the next hand then it is almost certain
+ that the discarded card is not a King.
  Information can be built in this way to influence determined probabilities
- of certain cards appearing and AI can act appropriately.
+ of certain cards appearing and the Intelligent Agent can act appropriately,
+ tweaking expected probabilities for outs and changing strategy to match
+ this information.
  
 \end_layout
 
@@ -4371,6 +4744,18 @@ Programming a Computer for Playing Chess
 \end_layout
 
 \begin_layout Itemize
+Özcan, E.
+ and Hulagu, B., 2004, 
+\shape italic
+A Simple Intelligent Agent for Playing Abalone Game: ABLA
+\shape default
+, Proc.
+ of the 13th Turkish Symposium on Artificial Intelligence and Neural Networks,
+ pp.
+ 281-290
+\end_layout
+
+\begin_layout Itemize
 Von Neumann, J, 1928, 
 \shape italic
 Zur Theorie der
@@ -4412,12 +4797,52 @@ John von Neumann’s Conception of the Minimax Theorem: A Journey Through
 \end_layout
 
 \begin_layout Itemize
+Samuel, A., 1959, 
+\shape italic
+Some Studies in Machine Learning Using the Game of Checkers
+\shape default
+, IBM Journal ,Vol 3
+\end_layout
+
+\begin_layout Itemize
+Dizman, D., n.d., 
+\shape italic
+A Survey on Artificial Intelligence in Stochastic Games of Imperfect Information
+: Poker
+\end_layout
+
+\begin_layout Itemize
 Russell, S.
  and Norvig, P., 2003, 
 \shape italic
 Artificial Intelligence: A Modern Approach
 \shape default
 , Upper Saddle River, New Jersey: Prentice Hall, 2nd Ed
+\end_layout
+
+\begin_layout Itemize
+Eckhardt, R., 1987, 
+\shape italic
+Stan Ulam, John Von Neumann, and the Monte Carlo
+\shape default
+ Method, Los Alamos Science Special Issue 1987, p131-143
+\end_layout
+
+\begin_layout Itemize
+Coulom, R., 2007, 
+\shape italic
+Efficient Selectivity and Backup Operators in Monte-Carlo Tree Search
+\shape default
+, Computers and Games, 5th International Conference, Springer 
+\end_layout
+
+\begin_layout Itemize
+Chaslot, G.
+ et al, 2008, 
+\shape italic
+Progressive Strategies for Monte-Carlo Tree Search
+\shape default
+, New Mathematics and Natural Computation, p343-357 
 \end_layout
 
 \begin_layout Itemize
@@ -4429,6 +4854,16 @@ A Survey of Monte Carlo Tree Search Methods
 , IEEE TRANSACTIONS ON COMPUTATIONAL INTELLIGENCE AND AI IN GAMES, VOL.
  4, NO.
  1.
+\end_layout
+
+\begin_layout Itemize
+Kocsis, L.
+ and Szepesvári, C., 2006, 
+\shape italic
+Bandit based Monte-Carlo Planning
+\shape default
+, Computer and Automation Research Institute of the Hungarian Academy of
+ Sciences
 \end_layout
 
 \begin_layout Itemize
@@ -4458,18 +4893,6 @@ Nielsen, J., 1994,
 Usability Engineering
 \shape default
 , San Diego: Academic Press
-\end_layout
-
-\begin_layout Itemize
-Özcan, E.
- and Hulagu, B., 2004, 
-\shape italic
-A Simple Intelligent Agent for Playing Abalone Game: ABLA
-\shape default
-, Proc.
- of the 13th Turkish Symposium on Artificial Intelligence and Neural Networks,
- pp.
- 281-290
 \end_layout
 
 \begin_layout Itemize
