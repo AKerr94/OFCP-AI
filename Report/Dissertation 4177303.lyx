@@ -397,7 +397,8 @@ OFCP
 status open
 
 \begin_layout Plain Layout
-Standard OFC is a perfect information game, but other variants such as 
+Standard OFCP is a perfect information game, but other variants such as
+ 
 \shape italic
 Pineapple OFC
 \shape default
@@ -455,6 +456,13 @@ scoop
  so if a player's score is +16 points then in a 1v1 game it is therefore
  implied that their opponent's score would be -16.
  
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -524,6 +532,13 @@ fouling
 \end_layout
 
 \begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \align center
 \begin_inset Graphics
 	filename scoring example 3.png
@@ -562,6 +577,13 @@ Three of A Kind
 \shape default
  in middle.
  
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -682,7 +704,7 @@ A machine operating at the rate of one variation per second would require
  While in theory exhaustively analysing a game of chess from start to finish
  is possible, it remains implausible with any conceivable modern computer
  despite huge advances in processing speed and power since 1950.
-\begin_inset Newline newline
+\begin_inset VSpace smallskip
 \end_inset
 
 
@@ -1935,21 +1957,13 @@ Minimax
 While game theory has been discussed at least as far back as 1713, it wasn't
  until John von Neumman's research into the field that game theory was establish
 ed as a mathematical discipline.
- Neumann's early efforts focused on proving the minimax theorem, which was
- put forward in his 1928 paper 
-\begin_inset Quotes eld
-\end_inset
-
-
+ Neumann's early efforts focused on proving the Minimax Theorem, which was
+ published in his 1928 paper 
 \shape italic
 Zur Theorie der Gesellschaftsspiele
 \shape default
-
-\begin_inset Quotes erd
-\end_inset
-
  (The Theory of Board Games).
- Proving the minimax theorem was considered by Neumman to be of utmost importanc
+ Proving the Minimax Theorem was considered by Neumman to be of utmost importanc
 e, saying 
 \begin_inset Quotes eld
 \end_inset
@@ -1960,58 +1974,80 @@ I thought there was nothing worth publishing until the Minimax Theorem was
 \end_inset
 
  (Casti, 1996, p19).
- The minimax theorem states that in any finite zero-sum two player game
- there exists strategies for each player that minimise their maximum losses
- (hence minimax).
+ The Minimax Theorem states that in any finite zero-sum two player game
+ there exists strategies for each player that minimise their maximum losses.
  These strategies must consider their adversary's possible responses, and
  the strategy which minimises a player's maximum losses is known as the
  optimal strategy.
  Expanding on his 1928 paper, Neumman co-authored 
 \shape italic
-
-\begin_inset Quotes eld
-\end_inset
-
 Theory of Games and Economic Behavior
 \shape default
-
-\begin_inset Quotes erd
-\end_inset
-
- in 1944, which presented a different proof of the minimax theorem, extending
+ in 1944, which presented a different proof of the Minimax Theorem, extending
  the theorem to include imperfect information games and games with more
  than two players.
  This 1944 publication was the first formal, coherent book in the field
  of game theory and is the basis for modern game theory.
- .
  
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-Minimax tree search explores potential moves, looking for moves that maximise
- a player's chance of winning.
- It is not useful to explore moves tjat 
-\begin_inset Newline newline
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
-Game theory – John von Neumann.
- Traditional Game Search: e.g.
- 1928 neumann proposes minimax tree search.
- Minimax decision rules dictate that in a 2-player zero-sum perfect information
- game there exists strategies for each player that minimise his maximum
- losses (hence minimax) which must be based on considerations of all the
- adversary’s possible responses.
- The strategy which minimises a player’s maximum losses is called the optimal
- strategy.
+Minimax searches a game tree, looking for moves that maximise a player's
+ chance of winning.
+ A minimax approach uses an evaluation function to score possible game states,
+ choosing the moves that leads to the highest expected value for a given
+ Agent.
+ Implementation of a minimax search assumes that the opponent will play
+ optimally and thus choose the next state with the lowest score from the
+ Agent's perspective.
+ A naïve minimax approach will produce optimal results assuming a perfect
+ evaluation function, but explores nodes unnecessarily and takes a very
+ long time because it will exhaustively expand the game tree, and due to
+ combinatorial explosion is prohibitively slow for all but the most simple
+ of games, or when exploration of the tree is limited to a shallow depth.
+ Tic-Tac-Toe for example has 
+\begin_inset Formula $9!=362,880$
+\end_inset
+
+ possible outcomes, which is feasible for a computer to compute, but this
+ huge amount of nodes to consider for such a simple game demonstrates the
+ impracticality of this naïve approach.
+ For these reasons its use is limited in games with high branching factors
+ unless optimisations are made.
+\end_layout
+
+\begin_layout Subsubsection
+Alpha-Beta Pruning
+\end_layout
+
+\begin_layout Standard
+Alpha-Beta Pruning is an optimisation of the minimax algorithm, reducing
+ the number of nodes that must be visited in a search.
+ This is achieved through keeping track of and updating two scores; Alpha,
+ which keeps a record of the best score possible by any means; and Beta,
+ the worst-case scenario for the opponent.
+ Any move with a value lower than this Alpha score can safely be pruned
+ since a better move has already been found, and with the Beta value it
+ can be assumed that any discovered move with a value higher than this will
+ not be used by the opponent.
+ With Alpha-Beta Pruning, a branch of the game tree is pruned when at least
+ one possibility is found that is worse than a previously examined move.
+ Pruning away branches in this way does not affect the quality of the result
+ as these branches could not possibly influence the final decision, and
+ therefore Alpha-Beta Pruning returns the exact same move as a standard
+ minimax approach would, but does so faster and more efficiently.
+ Assuming that best moves are always searched first, the number of leaf
+ nodes evaluated is 
+\begin_inset Formula $O(\sqrt{b^{d}})$
+\end_inset
+
+, reducing the branching factor to its square root, effectively meaning
+ a search can be made to twice the depth with same amount of computation
+ (Russell, 2003).
  
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace smallskip
 \end_inset
 
@@ -3203,21 +3239,15 @@ A lower level of abstraction from this System Architecture considers specific
 Fig 3.3.2 - Software Architecture Diagram
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 Wireframe
 \end_layout
 
 \begin_layout Standard
 The Application's frontend will consist of one dynamic webpage, using Jinja2
- templates to enable persistent information across multiple rounds, with
- content dynamically updated and created using JavaScript.
+ templates to enable persistent information across multiple rounds and page
+ refreshes, with content dynamically updated and created using JavaScript
+ as required.
  Following Jakob Nielsen's general principles for interaction design (Nielsen,
  1994, p115), the interface for the site will be made as intuitive as possible
  with a clear, well-structured layout.
@@ -3452,7 +3482,7 @@ The Application is available and playable at the following URI:
 \end_layout
 
 \begin_layout Section
-Evaluation
+Testing
 \end_layout
 
 \begin_layout Standard
@@ -3566,7 +3596,7 @@ Performance of AI versus human players
 \begin_layout Standard
 Alpha testing: playing individual games with participants vs AI Playing
  vs experienced players, new players – get an indication of AI’s comparative
- skill level 
+ skill level
 \end_layout
 
 \begin_layout Subsection
@@ -3586,8 +3616,14 @@ Pit this intelligent agent vs other AI and/or previous/ alternative versions
  
 \end_layout
 
+\begin_layout Standard
+^ 'probably' no time to do this.
+ Explain time constraints, say this is what i would do.
+ 
+\end_layout
+
 \begin_layout Section
-Conclusion
+Evaluation
 \end_layout
 
 \begin_layout Subsection
@@ -3792,6 +3828,42 @@ n in a more efficient language such as C, or by implementing more advanced
  make use of one or more of these changes in order to achieve increased
  scalability, for example for use in a commercial application with thousands
  of concurrent users.
+ 
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+In conclusion the Intelligent Agent produced performed adequately well and
+ largely ticked the boxes in terms of requirements specified, demonstrating
+ the versatility of Monte Carlo methods; with little domain specific knowledge,
+ usable results were obtainable.
+ The Web-Application itself worked perfectly for its intended purpose and
+ shows promising scalability, with a robust and sensible system architecture,
+ and the final interface produced was user-friendly and visually appealing.
+ The technologies and methodologies employed enabled very fast turnover
+ of prototypes and new software iterations, which turned out to be critically
+ useful in making improvements to the system in response to user feedback.
+ 
+\end_layout
+
+\begin_layout Standard
+Room for improvement can be had in many aspects however.
+ Using Python allowed for quick development but the application could have
+ benefited from the use of a more efficient language such as C, although
+ these performance concerns were partially mitigated through the use of
+ PyPy.
+ The Intelligent Agent's simplistic approach could be expanded upon and
+ improved, and fundamentally there are limitations with the approach used.
+ The simple Monte Carlo methods used produce good results but are CPU intensive
+ and necessarily require a tradeoff at some level between finding an optimal
+ solution and getting fast results.
+ It would be interesting to note the effect and improvements that implementation
+ of more sophisticated Monte Carlo methods such as MCTS with UCT could achieve,
+ and I look forward to further development of the Intelligent Agent in this
+ respect.
  
 \end_layout
 
@@ -4337,6 +4409,15 @@ John von Neumann’s Conception of the Minimax Theorem: A Journey Through
  Different Mathematical Contexts,
 \shape default
  Springer-Verlag
+\end_layout
+
+\begin_layout Itemize
+Russell, S.
+ and Norvig, P., 2003, 
+\shape italic
+Artificial Intelligence: A Modern Approach
+\shape default
+, Upper Saddle River, New Jersey: Prentice Hall, 2nd Ed
 \end_layout
 
 \begin_layout Itemize
