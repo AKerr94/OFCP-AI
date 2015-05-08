@@ -1824,11 +1824,11 @@ status open
 \begin_layout Plain Layout
 Warren is an OFCP bot which uses neural networks to train and improve, licensed
  out for use at a cost of between $7-79/month depending on chosen package
- (
+ 
 \color blue
 https://www.playwarren.com/
 \color inherit
-)
+ (Accessed 2015)
 \end_layout
 
 \end_inset
@@ -2592,8 +2592,8 @@ formula formalised by Kocsis and Szepesvári (2006, p1-12), as shown below.
 \end_inset
 
  is the total number of times the node's parent has been visited.
- This enhancement proves a strong balance between exploitation of high scoring
- nodes and exploration of nodes that have not been explored thoroughly.
+ This enhancement provides a strong balance between exploitation of high
+ scoring nodes and exploration of nodes that have not been explored thoroughly.
  As with any method based on random sampling, initial estimates will not
  be reliable but over time and with more iterations the results will diverge
  on finding the optimal move.
@@ -2620,7 +2620,7 @@ status open
 \begin_layout Plain Layout
 
 \color black
-'Human-Computer Go Challenges'
+Human-Computer Go Challenges Records
 \color blue
  http://www.computer-go.info/h-c/index.html
 \color inherit
@@ -2748,11 +2748,11 @@ For any Poker game - and indeed for any Poker AI - hand evaluator functions
 status open
 
 \begin_layout Plain Layout
-For example, this Poker hand lookup table is 100MB (
+For example, this Poker hand lookup table is 100MB 
 \color blue
 https://github.com/chenosaurus/poker-evaluator/blob/master/data/HandRanks.dat
 \color inherit
-) 
+ (Accessed 2015)
 \end_layout
 
 \end_inset
@@ -3132,8 +3132,8 @@ The advantage of this approach comes in its simplicity as it is trivial
 \end_inset
 
 These kind of approaches to hand evaluation have reasonable efficiency,
- with the potential to evaluate hundreds of thousands of poker hands per
- second, and considering the relative ease of implementation are perfect
+ with the potential to evaluate many hundreds of thousands of poker hands
+ per second, and considering the relative ease of implementation are perfect
  for most purposes.
  However, more efficient algorithms require less processing power enabling
  higher throughput and faster execution times, and as such can be hugely
@@ -3146,11 +3146,11 @@ These kind of approaches to hand evaluation have reasonable efficiency,
 status open
 
 \begin_layout Plain Layout
-For more information on how this algorithm works see here (
+For more information on how this algorithm works see here 
 \color blue
 http://www.suffecool.net/poker/evaluator.html
 \color inherit
-)
+ (Accessed 2015)
 \end_layout
 
 \end_inset
@@ -3709,29 +3709,106 @@ Implementation
 \end_layout
 
 \begin_layout Subsection
-Technologies 
+Technologies and Architecture 
+\end_layout
+
+\begin_layout Subsubsection
+Hosting with Virtual Private Server
 \end_layout
 
 \begin_layout Standard
-Website and application created with HTML, CSS and Javascript with OFCP
- game page created dynamically with jinja2 templates.
+The Web-Application was deployed on a Virtual Private Server hosted by DigitalOc
+ean
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+See 
+\color blue
+https://www.digitalocean.com/
+\color inherit
+ (Accessed 2015)
+\end_layout
+
+\end_inset
+
+.
+ It was set up with a custom stack along the lines of a LEMP stack, although
+ with some minor changes, using Ubuntu 14.04, Nginx, MongoDB and Python.
+ This allowed for a powerful, customisable and robust architecture that
+ met the needs of the project well.
+ Originally a simple LAMP stack was used, but this was reconfigured and
+ modified over time meeting changing requirements and implementing changes
+ to increase performance; the lightweight nature of nginx is naturally advantage
+ous over the bulkier Apache and better suited the needs of this project
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+For more information on the differences between Apache and Nginx see here
+ 
+\color blue
+https://www.digitalocean.com/community/tutorials/apache-vs-nginx-practical-conside
+rations
+\color inherit
+ (Accessed 2015)
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Main OFC Page
 \end_layout
 
 \begin_layout Standard
-Python backend handling dealing of cards, processing game state, AI's card
- placements and scoring of game board 
-\end_layout
-
-\begin_layout Standard
-Pure python networking with cherrypy, which is efficient and can handle
- up to 1000 concurrent requests which is more than enough for the requirements
- of this project.
+The page for the Web-Application was created with HTML, CSS and Javascript,
+ with Jinja2 templates used to create persistent, consistent content across
+ page refreshes and round changes.
+ This was important so that the scores were retained across multiple rounds,
+ and was useful for storing information pertaining to each specific page
+ such as the game id and and a boolean used in ascertaining whether the
+ player or Intelligent Agent acts first.
  
 \end_layout
 
 \begin_layout Standard
-Site hosted using DigitialOcean VPS running Ubuntu 14.04 with CherryPy behind
- nginx reverse-proxy
+Most of the aesthetics were controlled through external style sheets, allowing
+ for easy customisation of layouts.
+ That said, certain styling information was controlled inline or through
+ modification with JavaScript.
+ One example of this is the styling of the board positions for the player;
+ when a user drags a card their board positions are highlighted in green
+ for increased usability and visual appeal, which is controlled through
+ JavaScript in the drag event handlers.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Middle Tier 
+\end_layout
+
+\begin_layout Standard
+The application makes use of pure python networking with CherryPy, which
+ is an efficient and lightweight Web Framework.
+ Using CherryPy for the application server worked well as it can handle
+ up to 1000 concurrent requests, which is more than enough for the requirements
+ of this project.
+ This part of the application is responsible for handling requests for dynamic
+ content, acting as a middle man between the frontend and the guts of the
+ system.
+ The CherryPy server handles parameters received and processes these, returning
+ a dynamically created template as appropriate.
+ It is also responsible for listening for HTTP POST requests from the frontend,
+ which contain game state information that is decoded and sent to the backend
+ for processing, before returning the formatted response to the client.
+ 
+\end_layout
+
+\begin_layout Standard
+CherryPy was set up to operate behind an nginx reverse-proxy
 \begin_inset Foot
 status open
 
@@ -3740,15 +3817,64 @@ This tutorial was incredibly helpful for this purpose:
 \color blue
 https://www.digitalocean.com/community/tutorials/how-to-deploy-python-wsgi-applica
 tions-using-a-cherrypy-web-server-behind-nginx 
+\color black
+(Accessed 2015)
 \end_layout
 
 \end_inset
 
-.
- This allowed for a more robust system architecture with reduced stress
- on the CherryPy server as nginx was configured to handle client requests,
- meaning that scalability in the future is more feasible.
+, reducing stress on the Application server as nginx was configured to handle
+ client requests for static resources.
+ CherryPy could have handled these requests as well but configuring the
+ application in this manner means that scalability in the future is more
+ feasible, and played to the strengths of nginx which can handle large amounts
+ of concurrent users and excels at serving static content.
  
+\end_layout
+
+\begin_layout Subsubsection
+Backend
+\end_layout
+
+\begin_layout Standard
+The core functionality of the backend is handled entirely through Python
+ scripts, handling the various necessary processes such as validation of
+ game states, dealing of cards, handling the Intelligent Agent's card placements
+, hand evaluation and scoring and communication with the database.
+ These processes were subdivided into multiple scripts to form a more coherent
+ structure, with independent scripts called as needed from a main game_logic
+ handler.
+ The diagram below shows a breakdown of the structure of the backend.
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Diagram-System-Backend.png
+	lyxscale 65
+	scale 65
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 4.1.4.1 - Structure of the system's backend
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3847,7 +3973,7 @@ Live Implementation
 \end_layout
 
 \begin_layout Standard
-The Application is available and playable at the following URI:
+The application is available and playable at the following URI:
 \color blue
  http://www.alastairkerr.co.uk/ofc
 \color inherit
