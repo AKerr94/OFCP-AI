@@ -2354,7 +2354,7 @@ The aforementioned board games have all been zero-sum perfect information
 \end_layout
 
 \begin_layout Subsection
-Monte Carlo 
+Monte Carlo Methods
 \end_layout
 
 \begin_layout Standard
@@ -3565,9 +3565,9 @@ A lower level of abstraction from this System Architecture considers specific
  14.04, aided by various technologies.
  Use of HTML, CSS and JavaScript will be largely responsible for the frontend
  of the application and will be served using an Nginx reverse proxy server.
- In order to produce dynamic web pages Jinja2 templates will be utilised,
- which will be served through Nginx by an Application Server implemented
- with CherryPy, a Pythonic Web Application Framework.
+ The Jinja2 template engine will be utilised in order to produce dynamic
+ web pages, which will be served through Nginx by an Application Server
+ implemented with CherryPy, a Pythonic Web Application Framework.
  User actions which require a response will be handled using JavaScript
  which will send HTTP POST requests containing the game state information
  to the CherryPy server.
@@ -3637,8 +3637,8 @@ The Application's frontend will consist of one dynamic webpage, using Jinja2
 \align center
 \begin_inset Graphics
 	filename Diagram-Wireframe.png
-	lyxscale 80
-	scale 80
+	lyxscale 70
+	scale 70
 
 \end_inset
 
@@ -3727,7 +3727,7 @@ See
 \color blue
 https://www.digitalocean.com/
 \color inherit
- (Accessed 2015)
+ for more information on the services they provide (Accessed 2015)
 \end_layout
 
 \end_inset
@@ -3760,7 +3760,7 @@ rations
 \end_layout
 
 \begin_layout Subsubsection
-Main OFC Page
+Frontend (OFCP Game Webpage)
 \end_layout
 
 \begin_layout Standard
@@ -3771,7 +3771,43 @@ The page for the Web-Application was created with HTML, CSS and Javascript,
  and was useful for storing information pertaining to each specific page
  such as the game id and and a boolean used in ascertaining whether the
  player or Intelligent Agent acts first.
+ This also allowed for dynamic creation of page elements, namely, the cards
+ placed, which meant that these could be displayed across page refreshes
+ without being lost.
  
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Jinja2-Templating.png
+	lyxscale 63
+	scale 63
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 4.1.2.1 - Use of the Jinja2 Templating Engine in creating a dynamic webpage
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3786,8 +3822,97 @@ Most of the aesthetics were controlled through external style sheets, allowing
  
 \end_layout
 
+\begin_layout Standard
+Early prototypes of the application had a very simple, plain interface which
+ was clear to use, although not very visually appealing.
+ In response to user feedback the interface had a visual rework, using a
+ better colour scheme with updated graphics and more visually appealing
+ elements.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename scoring example 2.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 4.1.2.2 - Early prototypes of the interface were functional but basic
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Updated UI 2.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 4.1.2.3 - In response to user feedback a more visually appealing interface
+ was produced
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename UI_drag_highlight.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 4.1.2.4 - dragging a card highlights the positions on the board for aesthetic
+ appeal and usability
+\end_layout
+
 \begin_layout Subsubsection
-Middle Tier 
+Middle Tier (Web Server and Application Server)
 \end_layout
 
 \begin_layout Standard
@@ -3833,7 +3958,7 @@ tions-using-a-cherrypy-web-server-behind-nginx
 \end_layout
 
 \begin_layout Subsubsection
-Backend
+Backend (Processing and Database)
 \end_layout
 
 \begin_layout Standard
@@ -3855,8 +3980,8 @@ The core functionality of the backend is handled entirely through Python
 \align center
 \begin_inset Graphics
 	filename Diagram-System-Backend.png
-	lyxscale 65
-	scale 65
+	lyxscale 58
+	scale 58
 
 \end_inset
 
@@ -3878,32 +4003,104 @@ Fig 4.1.4.1 - Structure of the system's backend
 \end_layout
 
 \begin_layout Standard
-Game states stored in database using MongoDB (which is a document-oriented
- database as opposed to a traditional relational database which decreases
- development time and reduces complexity as there is no need to constantly
- transform the data when reading from the database into the python backend.
- Mongodb is scalable and high performance, and allows for flexible data
- structures for example with optional values being handled trivially, with
- the databases getting type information from the data itself meaning they
- can map easily into program objects, which is specifically advantageous
- in this application because of the use of dictionaries to store the game
- state.
- The flexibility and ease of deployment of such a style of database makes
- their use well suited for web-applications such as this one) run in docker
- virtual environment.
+Game_logic.py processes the game state, working out what stage the game is
+ in and handling the necessary logic and game flow.
+ This main script is responsible for validating the game state passed from
+ the frontend against the recorded game state in the MongoDB database.
+ Cards are retrieved from a deck object (initialised at the start of a round)
+ which are passed back to the player or through to the AI script as appropriate.
+ In OFCP_AI.py the Agent's moves are decided through running Monte Carlo
+ simulations of possible placements of the given card(s) in the current
+ game state.
+ Use of supplementary functions in helpers.py allows the AI to score simulated
+ game boards in order to calculate and aggregate the expected value for
+ various moves.
+ Once the Agent has determined its move this is passed back to the main
+ game_logic script, which formats this information in the game state to
+ be returned to the frontend along with the player's next card, and updates
+ the stored state in the database.
+ At the end of a round game_logic calls a scoring function in helpers.py
+ and then updates the database and returns this scoring information to the
+ frontend for display.
  
 \end_layout
 
 \begin_layout Standard
-Version control with github: OFCP-AI private repository.
- Use of version control is paramount as it allows for undesirable changes
- to be rolled back easily, and if something goes wrong there is always working
- versions available to roll back to.
+MongoDB is a document-oriented database (as opposed to a traditional relational
+ database e.g.
+ using SQL), which decreased development time and reduced complexity as
+ there was no need to constantly transform the data when reading from the
+ database into the python backend.
+ MongoDB offers a scalable and high performance solution to data storage,
+ and allows for flexible data structures, for example with optional values
+ being handled trivially.
+ The database gets type information from the data itself meaning it can
+ map easily into program objects, which is specifically advantageous in
+ this application because of the use of dictionaries to store the game state.
+ The flexibility and ease of deployment of such a style of database makes
+ its use well suited for web-applications such as this one.
+ For ease of deployability and redployability, MongoDB was set up to run
+ in a virtual docker environment.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Distributed Version Control System 
+\end_layout
+
+\begin_layout Standard
+Use of version control is paramount as it allows for undesirable changes
+ to be rolled back easily, and if something goes wrong there are always
+ working versions available to roll back to.
+ In this project I opted for the use of GitHub due to its high usability
+ and support.
  Using multiple branches (master and experimental) meant that a stable version
  could be maintained while new features were implemented safely on the experimen
 tal branch without affecting or potentially breaking the master version.
- Also allows for 'releases' for different versions of the software e.g.
- legacy client-side only, current with feature-full self-contained application
+ GitHub also allows for releases of different versions of the software,
+ which was useful for maintaining historical releases of stable, working
+ applications, for example a legacy client-side only prototype of the applicatio
+n.
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\begin_inset Graphics
+	filename GitHub.png
+	lyxscale 75
+	scale 75
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 4.1.5.1 - Throughout the development of the application, project files
+ were backed up in a private GitHub repository OFCP-AI
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The advantage of a Distributed Version Control System such as GitHub in
+ comparison to Local or Centralised Version Control is that there is not
+ one single point of failure; without proper alternative backups there is
+ a credible risk of losing everything in the case of a failure.
+ With a DVCS the entire repository is mirrored by clients meaning there
+ are multiple backups, any of which can be used to restore the repository.
  
 \end_layout
 
@@ -3993,19 +4190,21 @@ questionnaire and results, general evaluation
 \end_layout
 
 \begin_layout Subsection
-Unit Tests 
+Validation of Inputs
 \end_layout
 
 \begin_layout Standard
-continuous integration/ deploymentwith continuous integration when you make
- a commit to github it automatically connects to server and runs the tests,
- if they pass it deploys it http://code.tutsplus.com/tutorials/setting-up-continuo
-us-integration-continuous-deployment-with-jenkins--cms-21511
-\end_layout
+Tests were run throughout the development process to ensure proper validation
+ of inputs, as well as making sure that appropriate exception handling was
+ implemented.
+ This was achieved through various means including type checks, value checks,
+ try catch blocks and assertions.
+ Below is an example block of code in which some of these methods can be
+ seen.
+\begin_inset VSpace smallskip
+\end_inset
 
-\begin_layout Standard
-Modular testing of code e.g.
- individual functions using unittest python framework
+
 \end_layout
 
 \begin_layout Standard
@@ -4024,7 +4223,7 @@ Modular testing of code e.g.
 \align center
 
 \shape italic
-Fig 4.1.1 - Sample code from function ‘reformat_hand_xyy_yx’ in helpers.py
+Fig 5.1.1 - Sample code from function ‘reformat_hand_xyy_yx’ in helpers.py
  script: use of input validation and try except blocks to catch errors
 \end_layout
 
@@ -4036,11 +4235,22 @@ Fig 4.1.1 - Sample code from function ‘reformat_hand_xyy_yx’ in helpers.py
 \end_layout
 
 \begin_layout Standard
+Individual tests were run with test data comprising of a mixture of valid
+ and invalid inputs, testing that the validation could catch invalid data
+ and invalid types, and throw proper exceptions or print out appropriate
+ usage messages.
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \align center
 \begin_inset Graphics
 	filename Testing/helpers/reformat_hand_xyy_yx python test inputs.png
-	lyxscale 50
-	scale 50
+	lyxscale 60
+	scale 60
 
 \end_inset
 
@@ -4051,7 +4261,7 @@ Fig 4.1.1 - Sample code from function ‘reformat_hand_xyy_yx’ in helpers.py
 \align center
 
 \shape italic
-Fig 4.1.2 - Test inputs to ensure function works as intended
+Fig 5.1.2 - Test inputs to ensure function works as intended
 \end_layout
 
 \begin_layout Standard
@@ -4077,7 +4287,7 @@ Fig 4.1.2 - Test inputs to ensure function works as intended
 \align center
 
 \shape italic
-Fig 4.1.3 - Output – invalid hands are handled properly, throw exceptions/
+Fig 5.1.3 - Output – invalid hands are handled properly, throw exceptions/
  print usage messages rather than throwing errors 
 \end_layout
 
@@ -4086,6 +4296,63 @@ Fig 4.1.3 - Output – invalid hands are handled properly, throw exceptions/
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+Unit and Integration Testing
+\end_layout
+
+\begin_layout Standard
+Modular testing of individual functions was carried out using the Python
+ unittest framework, in addition to integration testing by testing the interacti
+on between different parts of the system.
+ The aim of these tests was to ensure that outputs were as expected, and
+ to test validation measures in functions by passing in erroneous data and
+ ensuring exceptions were properly handled.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Unittests-Results.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\shape italic
+Fig 5.2.1 - Unit Testing Output (All tests passed)
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The tests ran are included in the Unittest subdirectory of the code, along
+ with evidence of output.
+ All tests ran passed, or in the case of failure, appropriate fixes were
+ implemented, and then the tests were run again to ensure these changes
+ had the desired effect.
+ This only occurred in a few cases where proper input validation was lacking.
+ 
 \end_layout
 
 \begin_layout Subsection

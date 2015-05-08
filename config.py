@@ -22,7 +22,7 @@ cherrypy_config = {
             {
                 'environment': 'embedded',
                 'tools.trailing_slash.on': True,
-                'request.show_tracebacks': True,
+                'request.show_tracebacks': False,
                 'tools.encode.on': True,
                 'tools.encode.encoding': 'utf-8',
                 'tools.encode.text_only': False,
