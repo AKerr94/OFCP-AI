@@ -2081,13 +2081,13 @@ Even with optimised approaches to game tree searches, due to high average
  Chess can be partially solved with retrograde algorithms, solved for only
  some positions or when using smaller non-standard boards.
  Solving Chess is generally considered impossible with modern technology,
- and it is debatable as to whether future improves in computer processing
+ and it is debatable as to whether future improvements in computer processing
  speeds will one day allow for brute-force solving of the game.
  Intelligent Agents for Go generally can only perform well in a limited
  capacity, such as when playing on a much smaller than usual board.
  It is not expected for full-size 19x19 board Go to be solved anywhere in
  the immediate future, although modern approaches to the problem have produced
- somewhat promising progress in terms of performance.
+ promising results.
  
 \begin_inset VSpace smallskip
 \end_inset
