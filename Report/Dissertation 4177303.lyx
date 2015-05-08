@@ -3372,10 +3372,6 @@ Use Case and Data Flow Diagrams
 \end_layout
 
 \begin_layout Standard
-Cheng is a gambling degenerate who wishes to improve his OFC gameplay 
-\end_layout
-
-\begin_layout Standard
 Most of the complexity of the Application will be hidden from the user,
  with heavy processing of data and algorithms handled behind the scenes.
  In terms of interaction with the application there will be a frontend interface
@@ -4105,64 +4101,175 @@ The advantage of a Distributed Version Control System such as GitHub in
 \end_layout
 
 \begin_layout Subsection
-Intelligent Agent- algorithms, heuristics etc
+Intelligent Agent
+\end_layout
+
+\begin_layout Subsubsection
+General Approach
 \end_layout
 
 \begin_layout Standard
-write it all here - monte carlo, descision rules for placements/ pruning,
- EV.
- Everything.
- Wow.
- Do it.
- Soon.
+The general method used to implement the Intelligent Agent was a simple
+ Monte Carlo approach.
+ Although there are 13 separate positions to decide between for the placement
+ of a card, because the order of cards in each row does not matter the effective
+ choice is between either top, middle or bottom row.
+ The Agent carries out Monte Carlo simulations of its given card in each
+ of the rows many times, populating the rest of the board with random cards
+ and scoring the game state, recording this result.
+ After all simulations have been carried out, results are aggregated and
+ the row which produced the best results is chosen for the card placement.
+ The random nature of this methodology means initial results are naturally
+ unreliable, but as the iterations increase the results produced become
+ more and more reliable.
  
-\begin_inset Newline newline
+\end_layout
+
+\begin_layout Subsubsection
+First 5 Card Placements
+\end_layout
+
+\begin_layout Standard
+For the Intelligent Agent to determine the optimal placements for the first
+ 5 cards, analysis is first performed to find all permutations of possible
+ card placements.
+ This results in an initial total of 
+\begin_inset Formula $\binom{13}{5}=1287$
 \end_inset
 
+ states, but this can be pruned down further by removing duplicate states
+ with the same cards in each row but ordered differently, reducing the maximum
+ possible states to consider to around 240 which is a more manageable amount
+ although still isn't ideal.
+\end_layout
 
-\begin_inset Newline newline
-\end_inset
+\begin_layout Standard
+Here, heuristics and domain specific knowledge are implemented to further
+ prune the number of states considered.
+ The hand is evaluated, mapping the frequencies of each occurring rank in
+ a histogram.
+ In the case that the hand contains a Pair, Three of a Kind, or Four of
+ a Kind then any states which do not place these cards in the same row can
+ be pruned as they would almost inevitably be sub-optimal.
+ The better the initial starting hand, the fewer possible states the Agent
+ must consider.
+\end_layout
 
-First 5 placements approach - find all permutations of possible placements
- (13 choose 5 = ~1.2k) then remove duplicates (e.g.
- ADAHAKASKD and KDASAHASAC - different order but effectively same state)
- -> reduces max states to consider to ~240.
- Next even more pruning/ optimisation by implementing heuristics to evaluate
- hand and remove some obviously bad placements e.g.
- if AI is dealt two cards of same rank, will always place these together
- (removes states with these cards in separate rows).
- Also applies to trips, four of a kind etc.
- -> better the hand the less states considered.
- Worst case scenario with 5 unique ranked cards no straight/ flush potential
- = over 200 states, potentially suboptimal placements due to need to return
- move decision in <= 5 seconds (very little time for each simulation - 5
- seconds to simulate 200 states will not produce best results except with
- exceptional hardware).
+\begin_layout Standard
+In the worst case scenario with 5 unique ranks and no flush or straight
+ potential, some last resort pruning is implemented, removing certain state
+ combinations that can be considered unlikely to produce optimal results,
+ such as placing all cards in middle, or having three cards dumped in the
+ top row.
+ This reduces the number of states to consider, although will still likely
+ mean the Agent must consider ~200 different states.
+ Considering the requirement for the Agent to return its move in 5 seconds,
+ this will likely result in suboptimal placements as there will only be
  
-\begin_inset Newline newline
+\begin_inset Formula $\sim\frac{5}{200}$
 \end_inset
 
+ seconds worth of computation time spent simulating each state.
+ Such a limitation is unfortunate, and is discussed later in this report
+ in the Evaluation section.
+\end_layout
 
-\begin_inset Newline newline
-\end_inset
-
-Subsequent card placements a lot easier - carry out simulations for as many
- seconds as possible (hardcoded limits can be tweaked in response to user
- feedback [sweet spot 2-4s, 5s meets requirements but makes game feel somewhat
- slow]).
- Aggregates EV for placements in each row and choose highest result, update
- state return placement info to frontend along with player's next card.
- With only 3 choices to make (place card in top, middle or bottom) can potential
-ly get thousands of simulations for each placement which should give close
- to optimal results - see limitations in reflection e.g.
- potential for overvaluing moves.
- Simulated random population of rest of board for scoring EV is naive but
- works well most of the time.
+\begin_layout Standard
+The results of each game playout are stored and after all simulations have
+ been completed the results are aggregated and the most promising scoring
+ state's card placements are chosen.
  
-\begin_inset Newline newline
+\end_layout
+
+\begin_layout Subsubsection
+1 Card Placements
+\end_layout
+
+\begin_layout Standard
+Subsequent card placements are a lot easier and do not require such bespoke
+ analysis, simply carrying out simulations of the given card's placement
+ in each row for as many seconds as possible.
+ The allowed simulation time is hardcoded in the AI script, and was tweaked
+ in response to user feedback and demands for the Agent's performance.
+ A 5 second response meets the requirements specified, although users generally
+ found that 5 seconds seemed too slow, and a sweet spot for trade-off between
+ responsiveness and usable results was between 2 and 4 seconds.
+ With 1 card placement and only 3 choices to make (place card in top, middle
+ or bottom), thousands of simulations for each placement can be achieved
+ even on low-spec hardware, which generally produced close to optimal results.
+\end_layout
+
+\begin_layout Subsection
+Optimisations
+\end_layout
+
+\begin_layout Standard
+The Web-Application functions well, and the System Architecture is robust.
+ Performance issues arise in the backend however due to heavy processing
+ demands from the Intelligent Agent.
+ As aforementioned, use of heuristics to prune the potential game states
+ for the initial 5 placements were implemented in order to reduce the complexity
+ of the search space, and this had a dramatic improvement on the Agent's
+ performance.
+ 
+\end_layout
+
+\begin_layout Standard
+Further optimisation could be had through implementation of a more sophisticated
+ algorithm, as well as by using a more efficient language.
+ The hand evaluator used produces complete results and has reasonable efficiency
+, although again in this regard a more efficient evaluator would have increased
+ overall performance.
+ Time constraints on the project were the main reason why fundamental improvemen
+ts to these areas of the system could not be made, although attempts were
+ made to mitigate performance issues through further heuristics and techniques.
+ 
+\end_layout
+
+\begin_layout Standard
+For example, using Cython
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Cython is an optimising compiler for Python 
+\color blue
+http://www.cython.org 
+\color inherit
+(Accessed 2015)
+\end_layout
+
 \end_inset
 
+ noticeably increased the performance of the system, although involved compiling
+ the modules after every change, which in many ways subverted the usefulness
+ of developing in Python in the first place, and produced very bulky compiled
+ scripts.
+ Fortunately however, a more suitable solution was found through the use
+ of PyPy
+\begin_inset Foot
+status open
 
+\begin_layout Plain Layout
+
+\color blue
+http://www.pypy.org 
+\color inherit
+(Accessed 2015)
+\end_layout
+
+\end_inset
+
+, a 
+\shape italic
+Just In Time
+\shape default
+ compiler capable of converting Python to machine code at run time.
+ The speed increase with PyPy was comparable to that of Cython and preferable
+ in the sense that it simply worked - there was no need to compile modules
+ every time a change was made - which allowed for faster deployment of updates
+ and produced just as good results.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -4170,7 +4277,12 @@ Live Implementation
 \end_layout
 
 \begin_layout Standard
-The application is available and playable at the following URI:
+As of the time of writing (May, 2015), the application is available to play
+ at the following URI:
+\begin_inset Newline newline
+\end_inset
+
+
 \color blue
  http://www.alastairkerr.co.uk/ofc
 \color inherit
@@ -4179,14 +4291,6 @@ The application is available and playable at the following URI:
 
 \begin_layout Section
 Testing
-\end_layout
-
-\begin_layout Standard
-usability tests - table of what tests, what happened
-\end_layout
-
-\begin_layout Standard
-questionnaire and results, general evaluation
 \end_layout
 
 \begin_layout Subsection
@@ -4291,21 +4395,14 @@ Fig 5.1.3 - Output – invalid hands are handled properly, throw exceptions/
  print usage messages rather than throwing errors 
 \end_layout
 
-\begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 Unit and Integration Testing
 \end_layout
 
 \begin_layout Standard
 Modular testing of individual functions was carried out using the Python
- unittest framework, in addition to integration testing by testing the interacti
-on between different parts of the system.
+ unittest framework, in addition to integration testing of the interaction
+ between different parts of the system.
  The aim of these tests was to ensure that outputs were as expected, and
  to test validation measures in functions by passing in erroneous data and
  ensuring exceptions were properly handled.
@@ -4346,45 +4443,28 @@ Fig 5.2.1 - Unit Testing Output (All tests passed)
 \end_layout
 
 \begin_layout Standard
-The tests ran are included in the Unittest subdirectory of the code, along
- with evidence of output.
+The tests ran are included in the Unittest subdirectory of the code submitted,
+ along with evidence of output.
  All tests ran passed, or in the case of failure, appropriate fixes were
  implemented, and then the tests were run again to ensure these changes
  had the desired effect.
- This only occurred in a few cases where proper input validation was lacking.
+ This only occurred in a few cases where proper input validation was lacking,
+ and in one case, a minor bug where the wrong variable was being returned
+ by the OFCP_AI chooseMove function.
  
 \end_layout
 
 \begin_layout Subsection
-Performance of AI versus human players 
+User tests usability tests 
 \end_layout
 
 \begin_layout Standard
-Alpha testing: playing individual games with participants vs AI Playing
- vs experienced players, new players – get an indication of AI’s comparative
- skill level
-\end_layout
-
-\begin_layout Subsection
-Performance of AI versus other AI
-\end_layout
-
-\begin_layout Standard
-Pit this intelligent agent vs other AI and/or previous/ alternative versions
- of itself.
- E.g.
- performance of AI with MCTS vs AI using AB pruning/ minimax, MCTS vs totally
- random placement: if AI is working well should vastly outperform a naive
- AI.
- Visualisations of performance e.g.
- graphs, tables of win rates Database storing moves -> this would allow
- for analysis of individual rounds, games etc.
- 
-\end_layout
-
-\begin_layout Standard
-^ 'probably' no time to do this.
- Explain time constraints, say this is what i would do.
+User testing was an ongoing process throughout the development life cycle
+ of the project, in line with the demands of a Rapid Application Development
+ approach.
+ User feedback was crucial at every stage impacting decisions regarding
+ tweaking the Intelligent Agent's behaviour, making UI changes and updates
+ and general feedback about potential improvements.
  
 \end_layout
 
@@ -4406,35 +4486,920 @@ Performance of website: http://tools.pingdom.com/fpt/#!/cXxmxY/http://alastairke
 co.uk/ofc/play/5540d2e7b878ce06943c74f2/next 
 \end_layout
 
-\begin_layout Subsection
-Reflection 
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="28" columns="3">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Requirement
 \end_layout
 
-\begin_layout Standard
-Reflection on project, decisions, performance etc.
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Met?
 \end_layout
 
-\begin_layout Standard
-Design - frontend is functional but could have been designed better from
- the start.
- e.g.
- originally hard-coding player's card image objects rather than dynamically
- creating them with javascript
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Notes
 \end_layout
 
-\begin_layout Standard
-Backend works well but if different technologies and languages were used
- could be more efficient - e.g.
- hand evaluators written in C using bitwise operators could evaluate millions
- of hands per second rather than hundreds of thousands - could shave off
- seconds of processing time which could either lead to increased responsiveness
- or allow for more games to be simulated by the AI making it more likely
- to find optimal solutions for hand placements.
- 
-\begin_inset VSpace smallskip
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Create a game environment for OFCP
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Frontend Web-Application
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Implement appropriate rules for the game
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Proper Royalties are calculated
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Enable alternate round support
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Using persistent variable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Support concurrent connections
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Robust Networking setup
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Create an Intelligent Agent to play OFCP
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Using Monte Carlo Methods
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Agent must interface with the application
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2 way communication between front and backend
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Agent must adhere to all rules of game
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The Agent must not cheat
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AI does not use any information it shouldn't
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Long Lean-Time-To-Failure
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Servers are resistant to fatal crashes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximise application uptime
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Application uptime at least 99% of the time
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Support performance monitoring
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Error logs, database records, server output logs
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Application must be responsive and quick to load
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Good hosting provider, responsive interface
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Website should load in <1s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Assuming client has a good internet connection
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Application should feel responsive
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Dragging cards works well 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+UI should be intuitive and easy to understand
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Clear layout, buttons etc
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Pleasing aesthetic
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Updated colour scheme and graphics
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximise scalability
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Partially
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Reasonable scalability, room for improvement
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Reconfigurability
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+No need for extensive work to make changes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Able to tweak values e.g.
+ AI time limit
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Simply edit values in source code
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Adding features should not break the system
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Overall good design structure enables this
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Application should maximise compatibility
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Partially
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimal, basic support.
+ Room for improvement
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Installation of the application should be easy
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Snapshots for droplet - 60 second redeployment
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<5s wait for AI's move
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Hardcoded 5s time limit
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Optimise Performance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Partially
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Optimised with PyPy, heuristics.
+ Room for improvement
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Application must be able to support 100 concurrent users
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CherryPy can handle 1000 concurrent users
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+95% of time should take no longer than 5s for any request
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Yes
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Application is responsive.
+ 3-5s limits of AIs turns
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Agent must play competently, pose a significant challenge
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Partially
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+AI plays adequately, outplayed by skilled humans
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+Table 6.1.1 - Measuring how well the final application met the specified requireme
+nts 
+\end_layout
+
+\begin_layout Subsection
+Critical Appraisal 
+\end_layout
+
+\begin_layout Subsubsection
+Frontend
+\end_layout
+
+\begin_layout Standard
+The frontend for the application is functional and aesthetically pleasing,
+ but would have benefited from being designed better from the start.
+ For example, originally hard-coding player's card image objects rather
+ than dynamically creating them with JavaScript lead to problems down the
+ line which required hack-like workarounds until later refactoring improved
+ the design.
+ One important issue to note with the frontend is cross-platform compatibility.
+ Browsers such as older versions of Internet Explorer are not supported,
+ and the application does not display well on smaller screens.
+ Some basic efforts were made to support as many platforms as possible,
+ with measures taken to ensure that the board's structure would not break
+ when viewed on a low resolution device or when zoomed in at the browser
+ level.
+ In addition to this, basic support for mobile devices was implemented with
+ an iOS HTML drag and drop shim, necessitated because of my choice to implement
+ the application with pure JavaScript.
+ In hindsight, use of JQuery may have been more appropriate as drag and
+ drop event handlers would automatically have cross-platform support, but
+ development in this manner required me to really get to grips with understandin
+g and becoming competent with JavaScript and so in my mind was a fundamentally
+ important and useful process.
+\end_layout
+
+\begin_layout Subsubsection
+Backend
+\end_layout
+
+\begin_layout Standard
+The backend works well overall and I am very pleased with the system structure
+ and design.
+ Performance wise if different technologies and languages were used there
+ is a huge potential for increased efficiency.
+ For example writing the heavy-lifting backend scripts in C would have been
+ hugely beneficial, and using a more efficient hand evaluator algorithm
+ that could evaluate millions of hands per second rather than hundreds of
+ thousands could shave off seconds of processing time.
+ This hypothetical performance increase could either lead to increased responsiv
+eness or allow for more games to be simulated by the Intelligent Agent making
+ it more likely to find optimal solutions for hand placements.
+ In addition the overall footprint of the application would be reduced,
+ allowing for increased scalability.
+ 
+\end_layout
+
+\begin_layout Standard
+Throughout the course of the development of the application, many games
+ were played versus the various iterations of the Intelligent Agent, from
+ its origins with entirely naïve placements through to its current iteration,
+ using a Monte Carlo approach aided by domain specific knowledge.
+ The improvements over time were therefore incredibly noticeable, with early
+ prototypes struggling to even produce a legitimate, non-fouling board,
+ and later iterations able to make optimal plays which implicitly took into
+ account the opposing player's moves.
+ Despite the increasing ability of the Agent over time, however, the simple
+ approach limited its potential and it is unfortunate that time constraints
+ prevented me from producing a more sophisticated implementation, and it
+ is something I intend to work on improving in the future.
+\end_layout
+
+\begin_layout Subsubsection
+Software Methodology
 \end_layout
 
 \begin_layout Standard
@@ -4494,74 +5459,50 @@ Improvements
 \end_layout
 
 \begin_layout Standard
-add a new game button! 
-\end_layout
-
-\begin_layout Standard
-What can be done to improve the application/ AI in the future? 
-\end_layout
-
-\begin_layout Standard
-Limitations: “With any method based on random simulation, it is inevitable
- that poor quality moves will be chosen with nonzero probability, due to
- a particularly lucky run of simulations making the move appear better than
- it is.
- “ - 
-\color blue
-http://www.aaai.org/ocs/index.php/AIIDE/AIIDE13/paper/viewFile/7369/7595
-\color inherit
- page 5 
-\end_layout
-
-\begin_layout Standard
-Due to the need for a compromise between finding the optimal solution and
- finishing the request in a reasonable amount of time the number of simulated
- games is limited and therefore it is possible that sub-optimal plays will
- be over-valued due to the element of randomness.
+In line with user feedback, there is a demand for multiplayer support for
+ players vs players as well as players vs AI(s).
+ Implementing this would allow for a more well-rounded, feature-full application
+ and is certainly a consideration for the future.
  
 \end_layout
 
 \begin_layout Standard
-Improve frontend – make the app more visually appealing 
-\end_layout
-
-\begin_layout Standard
-Multiplayer support for players vs players as well as players vs AI(s) or
- players vs players vs AI(s)
-\end_layout
-
-\begin_layout Standard
-Add support for other variants of OFC such as pineapple - includes elements
- of hidden information as players choose to discard one card, the identity
- of which is known only to them.
- Will increase complexity of game requiring further modifications/ improvements
- to Agent, and would make any performance issues even more of an obstacle.
+Other feedback from users indicated a desire for support of other variants
+ such as Pineapple OFC.
+ This is indeed something I am interested in doing, as Pineapple includes
+ elements of hidden information due to players placing 2 of 3 cards at once
+ and choosing 1 to discard, the identity of which is known only to them.
+ This adds another layer of depth to the game, and increases the complexity
+ of game which would require further modifications and improvements to the
+ Intelligent Agent.
+ Performance issues faced in the Agent for standard OFC would become even
+ more of an obstacle which would almost certainly mean that use of more
+ sophisticated algorithms would be necessary.
  
 \end_layout
 
 \begin_layout Standard
-\begin_inset VSpace smallskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The Intelligent Agent generally favours optimal card placements, but because
- of the element of randomness in evaluating moves there is the potential
- for the AI to mistakenly over-value a sub-optimal move.
- As Whitehouse et al.
- (2013, p5) state 
+The most important area of improvement in my mind is the performance of
+ the Intelligent Agent.
+ While the general ability of the Intelligent Agent is adequate, it is clear
+ that there is room for improvement.
+ Despite generally choosing optimal placements it is important that the
+ limitations of the method used are acknowledged, as Whitehouse et al assert
+ 
 \begin_inset Quotes eld
 \end_inset
 
-With any method based on random simulation, it is inevitable that poor quality
+with any method based on random simulation, it is inevitable that poor quality
  moves will be chosen with nonzero probability, due to a particularly lucky
  run of simulations making the move appear better than it is
 \begin_inset Quotes erd
 \end_inset
 
-.
+ (Whitehouse et al, 2013, p104).
+ Due to the need for a compromise between finding the optimal solution and
+ finishing the request in a reasonable amount of time the number of simulated
+ games is limited and therefore it is possible that sub-optimal plays will
+ be over-valued due to the element of randomness.
  This potential for inaccurate evaluation of a move's strength has an inverse
  relationship with the number of iterations of simulated games - as the
  number of iterations increase the result diverges to the optimal solution,
@@ -4572,6 +5513,7 @@ With any method based on random simulation, it is inevitable that poor quality
  although it is important to note that there are diminishing returns with
  this strategy; doubling the iterations does not mean that the results will
  be twice as good.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -4589,11 +5531,38 @@ n in a more efficient language such as C, or by implementing more advanced
  like Monte Carlo Tree Search with UCT, as discussed in Section 2 of this
  dissertation.
  Overall the implementation of the Intelligent Agent satisfies the specified
- requirements and works well for its intended purpose in the scope of this
- application, but for larger scale implementations would likely need to
- make use of one or more of these changes in order to achieve increased
+ requirements and performs adequately for its intended purpose in the scope
+ of this application, but for larger scale implementations would likely
+ need to make use of one or more of these changes in order to achieve increased
  scalability, for example for use in a commercial application with thousands
  of concurrent users.
+ 
+\end_layout
+
+\begin_layout Subsection
+Reflection
+\end_layout
+
+\begin_layout Standard
+This project was a daunting task, but the experience was in all a thoroughly
+ enjoyable one.
+ It enabled me to build on a wider skill-set, and required me to immerse
+ myself in several different aspects of Computer Science and Software Engineerin
+g.
+ Artificial Intelligence was an area I had only very little prior experience
+ with, and while conceptually at times difficult to follow, I feel that
+ I have learnt a lot and it is has definitely sparked an interest in this
+ field of study.
+ Creation of the final product required a culmination of various technologies
+ and disciplines, giving me broad exposure to many new concepts along the
+ way.
+ Sharpening up my programming abilities in Python and JavaScript was certainly
+ a beneficial process, and I also learned a lot about web design and web
+ technologies in the process.
+ Furthermore, hosting the application on a dedicated website using a Virtual
+ Private Server required me to take on a role of System Administration,
+ brushing up on UNIX commands, learning more about security measures and
+ gaining a wider understanding of networking and system architecture.
  
 \end_layout
 
@@ -4606,8 +5575,8 @@ In conclusion the Intelligent Agent produced performed adequately well and
  largely ticked the boxes in terms of requirements specified, demonstrating
  the versatility of Monte Carlo methods; with little domain specific knowledge,
  usable results were obtainable.
- The Web-Application itself worked perfectly for its intended purpose and
- shows promising scalability, with a robust and sensible system architecture,
+ The Web-Application itself worked well for its intended purpose and shows
+ promising scalability, with a robust and sensible system architecture,
  and the final interface produced was user-friendly and visually appealing.
  The technologies and methodologies employed enabled very fast turnover
  of prototypes and new software iterations, which turned out to be critically
