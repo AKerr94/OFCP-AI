@@ -218,7 +218,6 @@ function validateCardsPlaced() {
     // first call, check first 5 cards have been placed
     if (vCardsId == 5) {
         for(i=0; i<5; i++) {
-            console.log("iteration:", i);
             var cardPlaceTemp = document.getElementById("place" + (i +1) + "card");
             if (cardPlaceTemp.parentNode.id == "place" + (i +1)) {
                 return false;
