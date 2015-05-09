@@ -111,7 +111,7 @@
 <!-- cards to be placed by player -->
 
 <div style="margin-bottom:160px;">
-	<div class="cardl" id="place1" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<div class="cardl" id="place1">
 
         {% if 'first5cards' in game_state.keys() %}
             {% set cardsrc = "src='../static/cards/" ~ game_state['first5cards'][0] ~ ".png'" %}
@@ -138,7 +138,7 @@
 
     <!-- cards 2-5 for initial 5 placements -->
     {% for i in range(2,6) %}
-        <div class="cardl" id="place{{ i }}" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div class="cardl" id="place{{ i }}">
             {% if 'first5cards' in game_state.keys() %}
                 {% set cardsrc = "src='../static/cards/" ~ game_state['first5cards'][i - 1] ~ ".png'" %}
                 {% set cardname = "name='" ~ game_state['first5cards'][i - 1] ~ "'" %}

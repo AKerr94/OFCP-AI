@@ -12,6 +12,7 @@ var p1score = t_score,
     p2score = -t_score;
 var player1 = "Player 1",
     player2 = "Computer Opponent";
+var vCardsId = 5;
 
 
 setupGame(); // Initial set up of game
@@ -28,7 +29,7 @@ function drag(ev) {
     for (i=0; i<13; i++) {
         var temp = document.getElementById(player_positions[i]);
         temp.style.borderColor = '#12FF01';
-        temp.style.backgroundColor = "rgba(186,255,191,0.5)"; // semi-opaque for better browsers
+        temp.style.backgroundColor = "rgba(186,255,191,0.5)";
     }
 }
 
@@ -103,33 +104,38 @@ function initial_5(resp) {
     // change button's functionality for future hands
     var button = document.getElementById("playButton");
     button.onclick = function() {
-        button.innerHTML = "Next";
-        button.style.display = "none"; // hide button while AI calculates moves
+        if (validateCardsPlaced()) {
+            vCardsId += 1;
+            button.innerHTML = "Next";
+            button.style.display = "none"; // hide button while AI calculates moves
 
-        // lock cards placed and count them
-        var count = 0;
-        for (i = 0; i < 13; i++) {
-            var temp = document.getElementById(player_positions[i]);
-            if (temp.hasChildNodes() && temp.firstChild.nodeType != 3) {
-                temp.firstChild.ondragstart = function() {
-                    return false;
-                };
-                count += 1;
+            // lock cards placed and count them
+            var count = 0;
+            for (i = 0; i < 13; i++) {
+                var temp = document.getElementById(player_positions[i]);
+                if (temp.hasChildNodes() && temp.firstChild.nodeType != 3) {
+                    temp.firstChild.ondragstart = function() {
+                        return false;
+                    };
+                    count += 1;
+                }
             }
+
+            // special case - if player acts second and the 13th card has just been placed handle round end
+            // otherwise carry on and handle AI placements
+            if (count == 13 && playerFirst == 'False') {
+                POST_reqwest(handleRoundEnd);
+                return;
+            }
+
+            var b_text = document.getElementById("buttonTextReplacer");
+            //b_text.innerHTML = "AI is calculating move..."
+            b_text.style.display = "block";
+
+            POST_reqwest(handlePlacements);
+        } else {
+            alert("Please place all your cards first!");
         }
-
-        // special case - if player acts second and the 13th card has just been placed handle round end
-        // otherwise carry on and handle AI placements
-        if (count == 13 && playerFirst == 'False') {
-            POST_reqwest(handleRoundEnd);
-            return;
-        }
-
-        var b_text = document.getElementById("buttonTextReplacer");
-        //b_text.innerHTML = "AI is calculating move..."
-        b_text.style.display = "block";
-
-        POST_reqwest(handlePlacements);
     };
 }
 
@@ -201,10 +207,34 @@ function handlePlacements(resp) {
         playerCardToPlace.src = "../static/cards/" + gs['cardtoplace'] + ".png"
         playerCardToPlace.name = gs['cardtoplace'];
         playerCardToPlace.style.display = "block";
-        console.log("Player card pos: " + cardsPlacedCount + ", with card " + gs['cardtoplace']);
     } else if (cardsPlacedCount == 13) { // handle end of game
         POST_reqwest(handleRoundEnd);
     }
+}
+
+function validateCardsPlaced() {
+    // returns true if appropriate cards have been placed by player
+
+    // first call, check first 5 cards have been placed
+    if (vCardsId == 5) {
+        for(i=0; i<5; i++) {
+            console.log("iteration:", i);
+            var cardPlaceTemp = document.getElementById("place" + (i +1) + "card");
+            if (cardPlaceTemp.parentNode.id == "place" + (i +1)) {
+                return false;
+            }
+        }
+    }
+
+    // subsequent calls, check card for appropriate round
+    else {
+        var cardPlaceTemp = document.getElementById("place" + vCardsId + "card");
+        if (cardPlaceTemp.parentNode.id == "place1") {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function handleRoundEnd(resp) {
