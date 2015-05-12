@@ -73,8 +73,9 @@
 
 \begin_body
 
-\begin_layout Title
+\begin_layout Standard
 \paragraph_spacing onehalf
+\align center
 \begin_inset Graphics
 	filename notts logo.png
 	lyxscale 25
@@ -91,6 +92,20 @@
 
 \size largest
 Intelligent Agent for Open Face Chinese Poker Web-Application
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace smallskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\size large
+8th May 2015
 \end_layout
 
 \begin_layout Standard
@@ -4121,7 +4136,11 @@ In the worst case scenario with 5 unique ranks and no flush or straight
  such as placing all cards in middle, or having three cards dumped in the
  top row.
  This reduces the number of states to consider, although will still likely
- mean the Agent must consider ~200 different states.
+ mean the Agent must consider
+\begin_inset Formula $\sim200$
+\end_inset
+
+ different states.
  Considering the requirement for the Agent to return its move in 5 seconds,
  this will likely result in suboptimal placements as there will only be
  
@@ -4273,7 +4292,7 @@ Tests were run throughout the development process to ensure proper validation
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Testing/helpers/reformat_hand_xyy_yx python sample error catching.png
+	filename reformat_hand_xyy_yx python sample error catching.png
 	lyxscale 70
 	scale 70
 
@@ -4311,7 +4330,7 @@ Individual tests were run with test data comprising of a mixture of valid
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Testing/helpers/reformat_hand_xyy_yx python test inputs.png
+	filename reformat_hand_xyy_yx python test inputs.png
 	lyxscale 60
 	scale 60
 
@@ -4337,7 +4356,7 @@ Fig 5.1.2 - Test inputs to ensure function works as intended
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Testing/helpers/reformat_hand_xyy_yx python output.png
+	filename reformat_hand_xyy_yx python output.png
 	lyxscale 70
 	scale 70
 
@@ -5039,7 +5058,7 @@ Users confirms action
 \begin_inset Text
 
 \begin_layout Plain Layout
-User waited after before pressing button
+User pressed button
 \end_layout
 
 \end_inset
@@ -5658,7 +5677,7 @@ Yes
 \begin_inset Text
 
 \begin_layout Plain Layout
-Robust Networking setup
+Robust networking setup
 \end_layout
 
 \end_inset
@@ -5785,7 +5804,7 @@ AI does not use any information it shouldn't
 \begin_inset Text
 
 \begin_layout Plain Layout
-Long Lean-Time-To-Failure
+Long Mean-Time-To-Failure
 \end_layout
 
 \end_inset
@@ -6403,7 +6422,7 @@ The frontend for the application is functional and aesthetically pleasing,
  when viewed on a low resolution device or when zoomed in at the browser
  level.
  In addition to this, basic support for mobile devices was implemented with
- an iOS HTML drag and drop shim, necessitated because of my choice to implement
+ an iOS HTML5 drag and drop shim, necessitated because of my choice to implement
  the application with pure JavaScript.
  In hindsight, use of JQuery may have been more appropriate as drag and
  drop event handlers would automatically have cross-platform support, but
