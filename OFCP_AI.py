@@ -4,6 +4,7 @@ __author__ = 'Alastair Kerr'
 from random import randint
 import random
 import helpers
+import hands
 import copy 
 import time
 import itertools 
@@ -307,23 +308,13 @@ def place_5(game_state, cards, sim_timer, test_deck=None):
                 nexthighestfreq = item[1]
                 secondrank = item[0]
     
-    # look for straights
-    highestrank = 0
-    lowestrank = 0
-    if highestfreq == 1:
-        for item in hist: #find lowest rank
-            if item[1] > 0:
-                lowestrank = item[0]
-                break
-        for item in reversed(hist): #find highest rank
-            if item[1] > 0:
-                highestrank = item[0]
-                break
-        if highestrank - lowestrank == 4:
-            straight = True
-            
-        #TODO straight state handling
-    
+    # look for straights and higher, return immediately if found
+    cards1 = helpers.reformat_hand_xyy_yx("".join(cards), 5)
+    hand_score = hands.score_5(cards1)
+    if hand_score[0] >= 5:
+        print "Found", hands.classify_5(cards1), ", choosing this in bottom row!"
+        return [1,1,1,1,1]
+
     print "Highest Freq:",highestfreq,"Rank:",thatrank,"... Next Highest Freq:",nexthighestfreq,"Rank:",secondrank
     
     final = []
