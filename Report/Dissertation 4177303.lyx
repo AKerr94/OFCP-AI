@@ -1848,7 +1848,8 @@ https://www.playwarren.com/
 
 \end_inset
 
-.
+, which uses neural networks to learn and improve over time as it plays
+ against human opponents.
  Even with such advanced techniques the game has not been solved, as evidenced
  by the modest claim that 
 \begin_inset Quotes eld
@@ -2086,9 +2087,9 @@ Solving Games
 \end_layout
 
 \begin_layout Standard
-Even with optimised approaches to game tree searches, due to high average
- branching factors managing and mitigating the complexity of game trees
- remains a challenge.
+Even with optimised approaches to game tree searches, managing and mitigating
+ the complexity of game trees remains difficult due to high average branching
+ factors.
  Simple games such as Tic-Tac-Toe can be trivially solved, and even more
  complex games like Checkers can be weakly solved with traditional algorithms.
  However, solving more complex games such as Chess and Go still remains
@@ -2098,11 +2099,12 @@ Even with optimised approaches to game tree searches, due to high average
  Solving Chess is generally considered impossible with modern technology,
  and it is debatable as to whether future improvements in computer processing
  speeds will one day allow for brute-force solving of the game.
- Intelligent Agents for Go generally can only perform well in a limited
- capacity, such as when playing on a much smaller than usual board.
+ Intelligent Agents for Go using traditional approaches generally can only
+ perform well in a limited capacity, such as when playing on a much smaller
+ than usual board.
  It is not expected for full-size 19x19 board Go to be solved anywhere in
- the immediate future, although modern approaches to the problem have produced
- promising results.
+ the near future, although modern approaches to creating Intelligent Agents
+ for Go produce Agents that can play to a good standard.
  
 \begin_inset VSpace smallskip
 \end_inset
@@ -3892,8 +3894,8 @@ The application makes use of pure python networking with CherryPy, which
  up to 1000 concurrent requests, which is more than enough for the requirements
  of this project.
  This part of the application is responsible for handling requests for dynamic
- content, acting as a middle man between the frontend and the guts of the
- system.
+ content, acting as a middle man between the frontend and the backend of
+ the system.
  The CherryPy server handles parameters received and processes these, returning
  a dynamically created template as appropriate.
  It is also responsible for listening for HTTP POST requests from the frontend,
@@ -3986,10 +3988,10 @@ Game_logic.py processes the game state, working out what stage the game is
  game boards in order to calculate and aggregate the expected value for
  various moves.
  Once the Agent has determined its move this is passed back to the main
- game_logic script, which formats this information in the game state to
+ game_logic.py script, which formats this information in the game state to
  be returned to the frontend along with the player's next card, and updates
  the stored state in the database.
- At the end of a round game_logic calls a scoring function in helpers.py
+ At the end of a round game_logic.py calls a scoring function in helpers.py
  and then updates the database and returns this scoring information to the
  frontend for display.
  
@@ -4136,7 +4138,7 @@ In the worst case scenario with 5 unique ranks and no flush or straight
  such as placing all cards in middle, or having three cards dumped in the
  top row.
  This reduces the number of states to consider, although will still likely
- mean the Agent must consider
+ mean the Agent must consider 
 \begin_inset Formula $\sim200$
 \end_inset
 
