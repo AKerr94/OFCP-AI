@@ -417,7 +417,7 @@ def place_5(game_state, cards, sim_timer, test_deck=None):
     s_count = 0
     for state in final:
         s_count += 1
-        print str(s_count) + ":", state
+        #print str(s_count) + ":", state
         
     print "Total states:", s_count
     
@@ -426,6 +426,7 @@ def place_5(game_state, cards, sim_timer, test_deck=None):
     # produce every possible initial game state dictionary for AI placements 
     state_id = 1
     states_scores = []
+    random.shuffle(final)
     for state in final:
         gs_copy = copy.deepcopy(game_state)
         for item in state[0]: # bottom
@@ -450,15 +451,18 @@ def place_5(game_state, cards, sim_timer, test_deck=None):
         
         state_id += 1
 
-    print "\nSTATE SCORES:", states_scores      
+    print "\nSTATE SCORES:", states_scores, "\n\n"   
         
     # find the state selection with the highest EV
     highest_ev = 0
     best_state_score = [0,0,0]
+    count = 0
     for result in states_scores:
-        if result[1] > highest_ev:
+        print "State:", final[count], "-> Total score", result[1], "from", result[2], "iterations = EV:", float(result[1])/float(result[2])
+        if float(result[1])/float(result[2]) > highest_ev: # total ev / iterations -> equal weighting between all states , find best score
             best_state_score = result
             highest_ev = result[1]
+        count += 1
     
     print "\nBest state score:", best_state_score
     
