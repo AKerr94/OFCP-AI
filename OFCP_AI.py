@@ -458,7 +458,7 @@ def place_5(game_state, cards, sim_timer, test_deck=None):
     best_state_score = [0,0,0]
     count = 0
     for result in states_scores:
-        print "State:", final[count], "-> Total score", result[1], "from", result[2], "iterations = EV:", float(result[1])/float(result[2])
+        print "State:", final[count], "-> Total score", result[1], "from", result[2], "iterations = EV:", "{0:.2f}".format(float(result[1])/float(result[2]))
         if float(result[1])/float(result[2]) > highest_ev: # total ev / iterations -> equal weighting between all states , find best score
             best_state_score = result
             highest_ev = result[1]
