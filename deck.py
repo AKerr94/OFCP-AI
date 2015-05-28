@@ -29,8 +29,8 @@ class Deck(object):
         return self.cards[self.current_position - 1]
 
     def __iter__(self):
-        while self.current_position < len(possible_cards):
-            yield deal_one()
+        while self.current_position < len(self.cards):
+            yield self.deal_one()
 
     def peep(self):
         return self.cards[self.current_position]

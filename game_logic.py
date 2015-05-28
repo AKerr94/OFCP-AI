@@ -372,15 +372,52 @@ def validate_and_update_state(cdeck, dealt_count, game_state, state):
     '''
     validate game state. Return updated state with player's placements if valid, else return 0
     '''
+
     dealt_cards = cdeck.cards[:dealt_count]
+
+    # prune AI's cards from list
     for i in range(1,14):
-        t = game_state['properties1']['cards']['items']['position'+str(i)]
+        t = state['properties2']['cards']['items']['position' + str(i)]
         if t is not None:
             if t in dealt_cards:
                 dealt_cards.remove(t)
-                state['properties1']['cards']['items']['position'+str(i)] = t
             else:
-                return 0 # will raise cherry py 500 error in server.py
+                print "One of the Agent's cards wasn't found in dealt_cards!"
+                return 0 # will raise cherrypy 500 error in server.py
+
+    if dealt_count == 5 or dealt_count == 10:
+        # special case validating first round placements (5 cards rather than 1)
+        existing_cards = []
+        pending_cards = dealt_cards[:]
+    else:
+        # general case. Existing cards: all but last (last card placed this round)
+        existing_cards = dealt_cards[:-1]
+        pending_cards = dealt_cards[-1:]
+
+    print "Existing cards:", existing_cards, "... Pending cards:", pending_cards
+
+    # iterate through each position. If card in existing state ensure same placement. If new make sure dealt card was placed
+    for i in range(1,14):
+        t = game_state['properties1']['cards']['items']['position' + str(i)]
+        if t is not None:
+            # check consistency of existing placements from previous round(s)
+            if t in existing_cards:
+                existing_cards.remove(t)
+                # ensure placement is consistent with database records
+                if t != state['properties1']['cards']['items']['position' + str(i)]:
+                    return 0 # will raise cherrypy 500 error in server.py
+            else:
+                if t not in pending_cards:
+                    return 0 # will raise cherrypy 500 error in server.py
+                pending_cards.remove(t)
+
+                # update state with this new placement
+                state['properties1']['cards']['items']['position' + str(i)] = t
+
+    # ensure all dealt cards for player have been placed
+    if len(pending_cards) > 0:
+        return 0 # will raise cherrypy 500 error in server.py
+
     return state
 
 def zip_placements_cards(placements, card_list, state):
