@@ -2667,10 +2667,10 @@ tion techniques.
 \end_layout
 
 \begin_layout Standard
-ISMTCS is useful for games like traditional Texas Hold’Em poker where elements
+ISMCTS is useful for games like traditional Texas Hold’Em poker where elements
  of hidden information mean an Agent lacks all necessary information to
  make a well-informed decision.
- ISMTCS models various possible game state variations of what other players
+ ISMCTS models various possible game state variations of what other players
  could have, attempting to guess other players cards based on previous informati
 on.
  An advantage of ISMCTS over approaches such as determinised UCT is the
