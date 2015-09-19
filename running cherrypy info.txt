@@ -1,7 +1,7 @@
 in unix 
 
 screen
-python server.py     (start cherrypy server normallu)
+python server.py     (start cherrypy server normally)
 
      OR ~faster~ with pypy (start cherrypy server using just in time compiler)
 

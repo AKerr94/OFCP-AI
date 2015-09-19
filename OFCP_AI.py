@@ -10,14 +10,14 @@ import time
 import itertools 
 from datetime import datetime
 
-num_top_first_count = 0 # ensure that initial 5 card placement doesn't put too many top (very unlikely but possible)
+num_top_first_count = 0  # ensure that initial 5 card placement doesn't put too many top (very unlikely but possible)
 
-number_top = 0      # keep track of cards placed top. When this reaches 3 prevent any more 
-number_middle = 0   # max 5
-number_bottom = 0   # max 5
+number_top = 0       # keep track of cards placed top. When this reaches 3 prevent any more
+number_middle = 0    # max 5
+number_bottom = 0    # max 5
 
-deck = []           # random deck for simulations 
-placed_cards_s = [] # stores records of simulated placed cards
+deck = []            # random deck for simulations
+placed_cards_s = []  # stores records of simulated placed cards
 
 nullscoringhands = 0
 scoringhands = 0

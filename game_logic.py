@@ -71,7 +71,7 @@ def handle_game_logic(game_state, game_id):
             # validate game state
             state = validate_and_update_state(cdeck, count, game_state, state)
             if state == 0:
-                return 0 # raise cherrypy 500 error
+                return 0  # raise cherrypy 500 error
 
             # calculate AI's first 5 card placements
             cards = cdeck.deal_n(5)
@@ -79,13 +79,14 @@ def handle_game_logic(game_state, game_id):
 
             stime = current_milli_time()
 
-            iterations_timer = 4000   # Sets time in ms to spend simulating games. As iterations increases diverges to optimal solution
-            AI_placements = OFCP_AI.chooseMove(game_state,cards,iterations_timer)
+            iterations_timer = 4000   # Sets time in ms to spend simulating games.
+            # As iterations increases diverges to optimal solution
+            cardPlacementsAI = OFCP_AI.chooseMove(game_state, cards, iterations_timer)
 
             print "\nTime taken calculating 5 placements:", current_milli_time() - stime, "ms"
             print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
 
-            state = zip_placements_cards(AI_placements, cards, state)
+            state = zip_placements_cards(cardPlacementsAI, cards, state)
             if state == 1:
                 # Error with AI placement
                 return 1
@@ -110,7 +111,7 @@ def handle_game_logic(game_state, game_id):
 
             del state['deck'] # don't return deck info to frontend
             del state['_id']
-            #state.pop('_id', None)
+            # state.pop('_id', None)
 
             return json.dumps(state)
 
@@ -122,7 +123,7 @@ def handle_game_logic(game_state, game_id):
             # validate game state
             state = validate_and_update_state(cdeck, count, game_state, state)
             if state == 0:
-                return 0 # raise cherrypy 500 error
+                return 0  # raise cherrypy 500 error
 
             # AI's next move
             card = str(cdeck.deal_one())
@@ -155,12 +156,12 @@ def handle_game_logic(game_state, game_id):
                 '$set': state
             })
 
-            #print "\nStored game state in database:", state
+            # print "\nStored game state in database:", state
 
             del state['deck'] # don't return deck info to frontend
             del state['_id']
 
-            #print "\nReturning state to player:", state
+            # print "\nReturning state to player:", state
 
             return json.dumps(state)
 
@@ -247,13 +248,14 @@ def handle_game_logic(game_state, game_id):
 
                 stime = current_milli_time()
 
-                iterations_timer = 4000   # Sets time in ms to spend simulating games. As iterations increases diverges to optimal solution
-                AI_placements = OFCP_AI.chooseMove(game_state,cards_5_AI,iterations_timer)
+                iterations_timer = 4000   # Sets time in ms to spend simulating games.
+                # As iterations increases diverges to optimal solution
+                cardPlacementsAI = OFCP_AI.chooseMove(game_state,cards_5_AI,iterations_timer)
 
                 print "\nTime taken calculating 5 placements:", current_milli_time() - stime, "ms"
                 print "Total time spent scoring hands: ", OFCP_AI.loop_elapsed, "ms"
 
-                state = zip_placements_cards(AI_placements, cards_5_AI, state)
+                state = zip_placements_cards(cardPlacementsAI, cards_5_AI, state)
                 if state == 1:
                     # Error with AI placement
                     return 1
@@ -271,7 +273,7 @@ def handle_game_logic(game_state, game_id):
 
                 del state['deck'] # don't return deck info to frontend
                 del state['_id']
-                #state.pop('_id', None)
+                # state.pop('_id', None)
 
                 return json.dumps(state)
 
@@ -316,12 +318,12 @@ def handle_game_logic(game_state, game_id):
                 '$set': state
             })
 
-            #print "\nStored game state in database:", state
+            # print "\nStored game state in database:", state
 
             del state['deck'] # don't return deck info to frontend
             del state['_id']
 
-            #print "\nReturning state to player:", state
+            # print "\nReturning state to player:", state
 
             return json.dumps(state)
 
@@ -356,7 +358,7 @@ def handle_game_logic(game_state, game_id):
                 '$set': state
             })
 
-            OFCP_AI.reset() # reset AI variables/ states
+            OFCP_AI.reset()  # reset AI variables/ states
 
             #    scores_array format [ [winnerid, winners_bottom_royalty, losers_bottom_royalty],
             #    [winnerid, winners_middle_royalty, losers_middle_royalty] ,
@@ -383,7 +385,7 @@ def validate_and_update_state(cdeck, dealt_count, game_state, state):
                 dealt_cards.remove(t)
             else:
                 print "One of the Agent's cards wasn't found in dealt_cards!"
-                return 0 # will raise cherrypy 500 error in server.py
+                return 0  # will raise cherrypy 500 error in server.py
 
     if dealt_count == 5 or dealt_count == 10:
         # special case validating first round placements (5 cards rather than 1)
