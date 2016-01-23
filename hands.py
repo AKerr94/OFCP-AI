@@ -58,6 +58,11 @@ def score_5(hand):
     
     #print "Scoring hand:", hand
     
+    # Run custom check for 5 high straight/ straight flush first
+    check_result = check_5_high_straight(hand)
+    if check_result:
+        return check_result
+
     ranks = hand[::2]
     suits = set(hand[1::2])
     counts = [None, [], [], [], []] 
@@ -184,6 +189,25 @@ def classify_5(hand_or_score):
         return "High Card - %s with %s kicker" % (high_card, cards[1])
     else:
         raise AssertionError, "invalid score: %s" % repr(score)    
+
+def check_5_high_straight(hand):
+    # Check if the given hand is an ace -> 5 straight 
+    # this function is implemented because of a bug in this hand evaluator not picking up 5 high straights 
+    # Return hand rank or False if not a 5 high straight / straight flush
+    assert isinstance(hand, str)
+    assert len(hand) == 10
+    desired_ranks = ['A', '2', '3', '4', '5']
+    for i in xrange(0, 10, 2):
+        if hand[i] in desired_ranks:
+            desired_ranks[:] = (value for value in desired_ranks if value != hand[i])
+    if len(desired_ranks) > 0:
+        return False
+    # Is a straight, check for straight flush
+    suit = hand[1]
+    for i in xrange(3, 10, 2):
+        if hand[i] != suit:
+            return (5, 5)
+    return (9, 5)
 
 if __name__ == "__main__":
     import doctest
